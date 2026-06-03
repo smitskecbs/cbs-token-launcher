@@ -1,0 +1,176 @@
+import type { Launch } from '../types/launch'
+import type { ReadTokenMintResult } from '../solana/verifyMint'
+import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
+import { formatSupply } from '../utils/formatSupply'
+import {
+  applyTokenLogo,
+  getLaunchDisplayName,
+  getLaunchLogoFallback,
+} from './applyLaunchCardMetadata'
+import { applyOfficialLinksFromMetadata } from './officialLinks'
+import { applyTokenCategory } from './tokenCategoryField'
+import { applyTokenTags } from './tokenTagsField'
+import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
+import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
+
+const LOADING = 'Loading…'
+const EMPTY = '—'
+
+export function applyTokenDetailFromResult(
+  launch: Launch,
+  result: ReadTokenMintResult,
+): void {
+  const page = document.querySelector<HTMLElement>(
+    `[data-token-detail="${launch.id}"]`,
+  )
+
+  if (!page) {
+    return
+  }
+
+  const displayName =
+    result.jsonName ??
+    result.metadataName ??
+    launch.name ??
+    getLaunchDisplayName(launch)
+
+  const displaySymbol =
+    result.jsonSymbol ??
+    result.metadataSymbol ??
+    launch.symbol ??
+    EMPTY
+
+  const displayDescription =
+    result.jsonDescription ??
+    launch.description ??
+    EMPTY
+
+  setText(page, '[data-token-name]', displayName)
+  setText(page, '[data-token-symbol]', displaySymbol)
+  setText(page, '[data-token-description]', displayDescription)
+
+  applyTokenLogo(
+    launch.id,
+    resolveMetadataImageUrl(result.jsonImage ?? undefined),
+    getLaunchLogoFallback(launch),
+    displayName,
+  )
+
+  setText(page, '[data-token-decimals]', formatDecimals(result))
+  setText(page, '[data-token-supply]', formatSupplyValue(result))
+  setText(page, '[data-token-metadata-uri]', formatMetadataUri(result))
+
+  if (result.error) {
+    showChainStatus(page, result.error, 'token-chain-status--error')
+  } else if (!result.exists) {
+    showChainStatus(page, 'Mint not found', 'token-chain-status--missing')
+  } else {
+    clearChainStatus(page)
+  }
+
+  applyOfficialLinksFromMetadata(page, launch, result)
+  applyTokenCategory(page, result)
+  applyTokenTags(page, result)
+  refreshLaunchAnalytics(launch)
+  refreshLaunchRisk(launch)
+}
+
+function showChainStatus(
+  root: HTMLElement,
+  message: string,
+  className: string,
+): void {
+  const element = root.querySelector<HTMLElement>('[data-token-chain-status]')
+
+  if (!element) {
+    return
+  }
+
+  element.hidden = false
+  element.textContent = message
+  element.className = `token-chain-status ${className}`
+}
+
+export function setTokenDetailLoading(launch: Launch): void {
+  const page = document.querySelector<HTMLElement>(
+    `[data-token-detail="${launch.id}"]`,
+  )
+
+  if (!page) {
+    return
+  }
+
+  setText(page, '[data-token-decimals]', LOADING)
+  setText(page, '[data-token-supply]', LOADING)
+  setText(page, '[data-token-metadata-uri]', LOADING)
+
+  const status = page.querySelector<HTMLElement>('[data-token-chain-status]')
+
+  if (status) {
+    status.hidden = false
+    status.textContent = 'Loading on-chain data…'
+    status.className = 'token-chain-status'
+  }
+}
+
+function formatDecimals(result: ReadTokenMintResult): string {
+  if (result.error || !result.exists) {
+    return EMPTY
+  }
+
+  return result.decimals !== null ? String(result.decimals) : EMPTY
+}
+
+function formatSupplyValue(result: ReadTokenMintResult): string {
+  if (result.error || !result.exists) {
+    return EMPTY
+  }
+
+  if (result.supply === null) {
+    return EMPTY
+  }
+
+  return formatSupply(result.supply, result.decimals ?? 0)
+}
+
+function formatMetadataUri(result: ReadTokenMintResult): string {
+  if (result.error || !result.exists) {
+    return EMPTY
+  }
+
+  if (!result.metadataFound) {
+    return 'Metadata not found'
+  }
+
+  return result.metadataUri ?? EMPTY
+}
+
+function setText(
+  root: HTMLElement,
+  selector: string,
+  value: string,
+  statusClass?: string,
+): void {
+  const element = root.querySelector<HTMLElement>(selector)
+
+  if (!element) {
+    return
+  }
+
+  element.textContent = value
+
+  if (statusClass) {
+    element.classList.add(statusClass)
+  }
+}
+
+function clearChainStatus(root: HTMLElement): void {
+  const element = root.querySelector<HTMLElement>('[data-token-chain-status]')
+
+  if (!element) {
+    return
+  }
+
+  element.textContent = ''
+  element.hidden = true
+}

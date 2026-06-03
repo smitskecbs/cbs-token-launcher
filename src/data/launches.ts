@@ -1,0 +1,37 @@
+import type { Launch } from '../types/launch'
+
+export type {
+  Launch,
+  LaunchInfo,
+  LaunchSection,
+  LaunchStatus,
+  OfficialLinks,
+} from '../types/launch'
+
+/**
+ * Authoritative launch catalog for the CBS Token Launcher.
+ *
+ * Mint address, status, section, and launchInfo are required.
+ * Token name, symbol, description, and logo load from metadata after Verify Mint
+ * (or automatically when autoLoadMetadata is enabled).
+ */
+export const launches: Launch[] = [
+  {
+    id: 'cbs-coin',
+    mintAddress: 'B9z8cEWFmc7LvQtjKsaLoKqW5MJmGRCWqs1DPKupCfkk',
+    status: 'live',
+    section: 'ecosystem',
+    verificationLevel: 'cbs-verified',
+    autoLoadMetadata: true,
+    logoFallback: 'C',
+    launchInfo: {
+      launchStatus: 'Live',
+      tradingStatus: 'Live',
+      poolStatus: 'Liquidity pool active',
+      launchDate: 'Live on Solana',
+      officialLinks: {
+        website: 'https://cbs-coin.com',
+      },
+    },
+  },
+]
