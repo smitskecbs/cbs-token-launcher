@@ -175,20 +175,24 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <span class="launch-risk-check is-clear">
         ✓ ${$(e.label.replace(` active`,``))} revoked
       </span>
-    `}function PT(e,t){let n=document.querySelector(`[data-token-card="${e}"] [data-launch-overview-risk]`);n&&(n.textContent=t.loaded?t.riskLevel??DT:DT,n.className=`launch-risk-level launch-risk-level--${(t.riskLevel??`unknown`).toLowerCase()}`)}function FT(e){let t=TC(e.mintAddress),n=NC(e.mintAddress);AT(e.id,ET(t,n))}function IT(e){return e.autoLoadMetadata?jw:Aw}function LT(e){return e.name??IT(e).name}function RT(e){return e.symbol??IT(e).symbol}function zT(e){return e.description??IT(e).description}function BT(e){if(e.logoFallback)return e.logoFallback;let t=e.name?.trim();return t?t.charAt(0).toUpperCase():`🪙`}function VT(e,t){if(!t.exists){yT(e),FT(e);return}let n=document.getElementById(`launch-${e.id}`);if(!n)return;let r=t.jsonName??t.metadataName??e.name,i=t.jsonSymbol??t.metadataSymbol??e.symbol,a=t.jsonDescription??e.description;if(r){let e=n.querySelector(`[data-token-name]`);e&&(e.textContent=r)}if(i){let e=n.querySelector(`[data-token-symbol]`);e&&(e.textContent=i)}if(a){let e=n.querySelector(`[data-token-description]`);e&&(e.textContent=a)}HT(e.id,Sy(t.jsonImage??void 0),BT(e),r??LT(e)),Hw(n,e,t),Kw(n,t),Xw(n,t),yT(e),FT(e)}function HT(e,t,n,r=`Token logo`){let i=document.querySelector(`[data-token-logo-wrap="${e}"]`);if(!i)return;i.querySelector(`.token-logo`)?.remove(),i.classList.remove(`has-metadata-logo`);let a=i.querySelector(`[data-token-logo-fallback]`);if(a||(a=document.createElement(`div`),a.className=`token-icon token-icon--fallback`,a.setAttribute(`data-token-logo-fallback`,``),a.setAttribute(`aria-hidden`,`true`),i.appendChild(a)),a.textContent=n,a.hidden=!1,a.style.removeProperty(`display`),!t)return;let o=document.createElement(`img`);o.className=`token-logo`,o.src=t,o.alt=`${r} logo`,o.width=64,o.height=64;let s=()=>{o.remove(),i.classList.remove(`has-metadata-logo`),a.hidden=!1,a.style.removeProperty(`display`)},c=()=>{i.classList.add(`has-metadata-logo`),a.hidden=!0,a.style.display=`none`};o.addEventListener(`error`,s,{once:!0}),o.addEventListener(`load`,()=>{c()},{once:!0}),i.appendChild(o),o.complete&&(o.naturalWidth>0?c():s())}function UT(e){return new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,maximumFractionDigits:0}).format(e)}function WT(e){return e>=1?new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:2,maximumFractionDigits:4}).format(e):e>=1e-4?new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:4,maximumFractionDigits:6}).format(e):new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:6,maximumFractionDigits:10}).format(e)}var GT=`—`;function KT(e,t){JT(document.querySelector(`[data-token-card="${e.id}"]`),t),JT(document.querySelector(`[data-token-detail="${e.id}"] [data-market-status-root]`),t),yT(e),FT(e)}function qT(e){let t=IC.CHECKING,n={tradingStatus:t,poolStatus:t,price:t,pairHtml:`<span class="market-pair-empty">${$(t)}</span>`,liquidity:t};QT(document.querySelector(`[data-token-card="${e.id}"]`),n),QT(document.querySelector(`[data-token-detail="${e.id}"] [data-market-status-root]`),n)}function JT(e,t){e&&QT(e,{tradingStatus:t.tradingStatus,poolStatus:t.poolStatus,price:YT(t),pairHtml:ZT(t),liquidity:XT(t)})}function YT(e){return e.error&&e.priceUsd===null?IC.UNAVAILABLE:e.priceUsd===null?GT:WT(e.priceUsd)}function XT(e){return e.error&&e.liquidityUsd===null?IC.UNAVAILABLE:e.liquidityUsd===null?GT:UT(e.liquidityUsd)}function ZT(e){if(e.error&&!e.tradable)return`<span class="market-pair-empty">${$(IC.UNAVAILABLE)}</span>`;if(e.pairName&&e.tradable){let t=$(e.pairName);return e.pairUrl?`
-        <span class="market-pair-name">${t}</span>
-        <a class="market-pair-link" href="${$(e.pairUrl)}" target="_blank" rel="noopener noreferrer">Dexscreener</a>
-      `:`<span class="market-pair-name">${t}</span>`}return e.poolDataNote?`<span class="market-pair-empty">${$(e.poolDataNote)}</span>`:e.tradable?`<span class="market-pair-empty">${$(GT)}</span>`:`<span class="market-pair-empty">${$(IC.NO_PAIR)}</span>`}function QT(e,t){e&&($T(e,`[data-market-trading-status]`,t.tradingStatus),$T(e,`[data-market-pool-status]`,t.poolStatus),$T(e,`[data-market-price]`,t.price),$T(e,`[data-market-liquidity]`,t.liquidity),eE(e,t.pairHtml))}function $T(e,t,n){for(let r of e.querySelectorAll(t))r.textContent=n}function eE(e,t){let n=e.querySelector(`[data-market-pair]`);n&&(n.innerHTML=t)}function tE(e,t){try{let n=BigInt(e);if(t===0)return n.toLocaleString(`en-US`);let r=10n**BigInt(t),i=n/r,a=(n%r).toString().padStart(t,`0`).replace(/0+$/,``),o=i.toLocaleString(`en-US`);return a?`${o}.${a}`:o}catch{return e}}function nE(e){return`verify-panel-${e}`}function rE(e){return`
+    `}function PT(e,t){let n=document.querySelector(`[data-token-card="${e}"] [data-launch-overview-risk]`);n&&(n.textContent=t.loaded?t.riskLevel??DT:DT,n.className=`launch-risk-level launch-risk-level--${(t.riskLevel??`unknown`).toLowerCase()}`)}function FT(e){let t=TC(e.mintAddress),n=NC(e.mintAddress);AT(e.id,ET(t,n))}function IT(e){return e.autoLoadMetadata?jw:Aw}function LT(e){return e.name??IT(e).name}function RT(e){return e.symbol??IT(e).symbol}function zT(e){return e.description??IT(e).description}function BT(e){if(e.logoFallback)return e.logoFallback;let t=e.name?.trim();return t?t.charAt(0).toUpperCase():`🪙`}function VT(e,t){if(!t.exists){yT(e),FT(e);return}let n=document.getElementById(`launch-${e.id}`);if(!n)return;let r=t.jsonName??t.metadataName??e.name,i=t.jsonSymbol??t.metadataSymbol??e.symbol,a=t.jsonDescription??e.description;if(r){let e=n.querySelector(`[data-token-name]`);e&&(e.textContent=r)}if(i){let e=n.querySelector(`[data-token-symbol]`);e&&(e.textContent=i)}if(a){let e=n.querySelector(`[data-token-description]`);e&&(e.textContent=a)}HT(e.id,Sy(t.jsonImage??void 0),BT(e),r??LT(e)),Hw(n,e,t),Kw(n,t),Xw(n,t),yT(e),FT(e)}function HT(e,t,n,r=`Token logo`){let i=document.querySelector(`[data-token-logo-wrap="${e}"]`);if(!i)return;i.querySelector(`.token-logo`)?.remove(),i.classList.remove(`has-metadata-logo`);let a=i.querySelector(`[data-token-logo-fallback]`);if(a||(a=document.createElement(`div`),a.className=`token-icon token-icon--fallback`,a.setAttribute(`data-token-logo-fallback`,``),a.setAttribute(`aria-hidden`,`true`),i.appendChild(a)),a.textContent=n,a.hidden=!1,a.style.removeProperty(`display`),!t)return;let o=document.createElement(`img`);o.className=`token-logo`,o.src=t,o.alt=`${r} logo`,o.width=64,o.height=64;let s=()=>{o.remove(),i.classList.remove(`has-metadata-logo`),a.hidden=!1,a.style.removeProperty(`display`)},c=()=>{i.classList.add(`has-metadata-logo`),a.hidden=!0,a.style.display=`none`};o.addEventListener(`error`,s,{once:!0}),o.addEventListener(`load`,()=>{c()},{once:!0}),i.appendChild(o),o.complete&&(o.naturalWidth>0?c():s())}var UT=`Unavailable`,WT=`Coming Soon`;function GT(e){return typeof e==`number`&&Number.isFinite(e)&&e>=0}function KT(e,t={}){if(t.compact??!1){if(e>=1e6)return`$${(e/1e6).toFixed(1)}M`;if(e>=1e3)return`$${(e/1e3).toFixed(1)}K`}return new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:0,maximumFractionDigits:e>=1?0:2}).format(e)}function qT(e){return typeof e==`number`&&Number.isFinite(e)&&e>0}function JT(e,t={}){let n=t.compact??!1;if(e>=1)return new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:2,maximumFractionDigits:n||e>=100?2:4}).format(e);if(e>=.01)return new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:2,maximumFractionDigits:4}).format(e);let r=Math.max(0,-Math.floor(Math.log10(e))-1),i=Math.min(12,r+(n?4:6)),a=new Intl.NumberFormat(`en-US`,{style:`currency`,currency:`USD`,minimumFractionDigits:2,maximumFractionDigits:i}).format(e);return a===`$0`||a===`$0.00`?`$${YT(e.toPrecision(n?4:6))}`:a}function YT(e){return e.includes(`.`)?e.replace(/\.?0+$/,``):e}var XT=`—`;function ZT(e,t){$T(document.querySelector(`[data-token-card="${e.id}"] .launch-card-overview`),t),eE(document.querySelector(`[data-token-card="${e.id}"] [data-market-data-root]`),t),eE(document.querySelector(`[data-token-detail="${e.id}"] [data-market-data-root]`),t),yT(e),FT(e)}function QT(e){let t=IC.CHECKING,n={price:t,liquidity:t},r={tradingStatus:t,poolStatus:t,price:t,pairText:t,liquidity:t,dexscreenerHtml:`<span class="market-data-empty">${$(t)}</span>`};sE(document.querySelector(`[data-token-card="${e.id}"] .launch-card-overview`),n),cE(document.querySelector(`[data-token-card="${e.id}"] [data-market-data-root]`),r),cE(document.querySelector(`[data-token-detail="${e.id}"] [data-market-data-root]`),r)}function $T(e,t){e&&sE(e,{price:tE(t),liquidity:nE(t)})}function eE(e,t){e&&cE(e,{tradingStatus:t.tradingStatus,poolStatus:t.poolStatus,price:rE(t),pairText:aE(t),liquidity:iE(t),dexscreenerHtml:oE(t)})}function tE(e){return e.error&&!qT(e.priceUsd)?UT:qT(e.priceUsd)?JT(e.priceUsd,{compact:!0}):XT}function nE(e){return e.error&&!GT(e.liquidityUsd)?UT:GT(e.liquidityUsd)?KT(e.liquidityUsd,{compact:!0}):XT}function rE(e){return qT(e.priceUsd)?JT(e.priceUsd):UT}function iE(e){return GT(e.liquidityUsd)?KT(e.liquidityUsd):UT}function aE(e){return e.error&&!e.tradable?UT:e.pairName&&e.tradable?e.pairName:e.poolDataNote?e.poolDataNote:e.tradable?UT:IC.NO_PAIR}function oE(e){return e.pairUrl?`
+      <a
+        class="market-dexscreener-link"
+        href="${$(e.pairUrl)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >View on Dexscreener</a>
+    `:`<span class="market-data-empty">${$(UT)}</span>`}function sE(e,t){e&&(lE(e,`[data-market-overview-price]`,t.price),lE(e,`[data-market-overview-liquidity]`,t.liquidity))}function cE(e,t){e&&(lE(e,`[data-market-trading-status]`,t.tradingStatus),lE(e,`[data-market-pool-status]`,t.poolStatus),lE(e,`[data-market-detail-price]`,t.price),lE(e,`[data-market-detail-liquidity]`,t.liquidity),lE(e,`[data-market-detail-pair]`,t.pairText),uE(e,t.dexscreenerHtml))}function lE(e,t,n){for(let r of e.querySelectorAll(t))r.textContent=n}function uE(e,t){let n=e.querySelector(`[data-market-dexscreener-link]`);n&&(n.innerHTML=t)}function dE(e,t){try{let n=BigInt(e);if(t===0)return n.toLocaleString(`en-US`);let r=10n**BigInt(t),i=n/r,a=(n%r).toString().padStart(t,`0`).replace(/0+$/,``),o=i.toLocaleString(`en-US`);return a?`${o}.${a}`:o}catch{return e}}function fE(e){return`verify-panel-${e}`}function pE(e){return`
     <div
       class="verify-panel"
-      id="${nE($(e))}"
+      id="${fE($(e))}"
       aria-live="polite"
       hidden
     ></div>
-  `}function iE(e){e.hidden=!1,e.className=`verify-panel verify-panel--checking`,e.innerHTML=`
+  `}function mE(e){e.hidden=!1,e.className=`verify-panel verify-panel--checking`,e.innerHTML=`
     <span class="verify-label">Mint Verification</span>
     <p class="verify-status">Checking...</p>
-  `}function aE(e,t,n={}){e.hidden=!1;let r=n.fromCache?lE(n.launchId):``;if(t.error){e.className=`verify-panel verify-panel--error`,e.innerHTML=`
+  `}function hE(e,t,n={}){e.hidden=!1;let r=n.fromCache?bE(n.launchId):``;if(t.error){e.className=`verify-panel verify-panel--error`,e.innerHTML=`
       <span class="verify-label">Mint Verification</span>
       <p class="verify-status verify-status--error">${$(t.error)}</p>
       ${r}
@@ -196,7 +200,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <span class="verify-label">Mint Verification</span>
       <p class="verify-status verify-status--missing">Mint not found</p>
       ${r}
-    `;return}let i=oE(t.decimals===null?`—`:String(t.decimals),t.supply===null?`—`:tE(t.supply,t.decimals??0),t.jsonName??t.metadataName??`—`,t.jsonSymbol??t.metadataSymbol??`—`),a=sE(t),o=a?`
+    `;return}let i=gE(t.decimals===null?`—`:String(t.decimals),t.supply===null?`—`:dE(t.supply,t.decimals??0),t.jsonName??t.metadataName??`—`,t.jsonSymbol??t.metadataSymbol??`—`),a=_E(t),o=a?`
     <button
       type="button"
       class="verify-expand-btn secondary-btn"
@@ -220,7 +224,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </div>
   `:``}
     ${r}
-  `}function oE(e,t,n,r){return`
+  `}function gE(e,t,n,r){return`
     <div class="verify-detail">
       <dt>Name</dt>
       <dd>${$(n)}</dd>
@@ -237,7 +241,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <dt>Decimals</dt>
       <dd>${$(e)}</dd>
     </div>
-  `}function sE(e){if(!e.metadataFound)return`
+  `}function _E(e){if(!e.metadataFound)return`
       <div class="verify-detail verify-detail--full">
         <dt>Metadata</dt>
         <dd class="verify-status--missing">Metadata not found</dd>
@@ -252,7 +256,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <dt>Metadata JSON</dt>
       <dd class="verify-status--missing">Could not load JSON from URI</dd>
     </div>
-  `:``,a=cE(e);return`
+  `:``,a=vE(e);return`
     <div class="verify-detail verify-detail--full">
       <dt>Description</dt>
       <dd class="verify-metadata-text">${$(t)}</dd>
@@ -264,13 +268,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     ${r}
     ${i}
     ${a}
-  `}function cE(e){let t=[`On-chain name: ${e.metadataName??`—`}`,`On-chain symbol: ${e.metadataSymbol??`—`}`,`Metadata URI: ${e.metadataUri??`—`}`];if(e.metadataJsonLoaded){t.push(`JSON name: ${e.jsonName??`—`}`,`JSON symbol: ${e.jsonSymbol??`—`}`,`JSON image: ${e.jsonImage??`—`}`,`JSON external URL: ${e.jsonExternalUrl??`—`}`,`JSON category: ${e.jsonCategory??`—`}`,`JSON tags: ${e.jsonTags.length>0?e.jsonTags.join(`, `):`—`}`);let n=Object.entries(e.jsonSocialLinks).filter(([,e])=>!!e?.trim());if(n.length>0)for(let[e,r]of n)t.push(`JSON ${e}: ${r}`)}else e.metadataUri&&t.push(`JSON metadata: unavailable`);return`
+  `}function vE(e){return`
     <div class="verify-detail verify-detail--full">
       <dt>Raw Metadata</dt>
-      <dd class="verify-metadata-raw">${$(t.join(`
-`))}</dd>
+      <dd class="verify-metadata-raw">${$(yE(e))}</dd>
     </div>
-  `}function lE(e){return`
+  `}function yE(e){let t=[`On-chain name: ${e.metadataName??`—`}`,`On-chain symbol: ${e.metadataSymbol??`—`}`,`Metadata URI: ${e.metadataUri??`—`}`];if(e.metadataJsonLoaded){t.push(`JSON name: ${e.jsonName??`—`}`,`JSON symbol: ${e.jsonSymbol??`—`}`,`JSON image: ${e.jsonImage??`—`}`,`JSON external URL: ${e.jsonExternalUrl??`—`}`,`JSON category: ${e.jsonCategory??`—`}`,`JSON tags: ${e.jsonTags.length>0?e.jsonTags.join(`, `):`—`}`);let n=Object.entries(e.jsonSocialLinks).filter(([,e])=>!!e?.trim());if(n.length>0)for(let[e,r]of n)t.push(`JSON ${e}: ${r}`)}else e.metadataUri&&t.push(`JSON metadata: unavailable`);return t.join(`
+`)}function bE(e){return`
     <div class="verify-cache-footer">
       <p class="verify-cache-note">
         Cached for 10 minutes to reduce RPC usage.
@@ -285,14 +289,14 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     </button>
   `:``}
     </div>
-  `}function uE(e,t){let n=e.querySelector(`[data-verify-expanded]`);if(!n)return;let r=!n.hidden;n.hidden=r,t.setAttribute(`aria-expanded`,String(!r)),t.textContent=r?`Show Full Metadata`:`Hide Full Metadata`}function dE(e,t,n){return`
+  `}function xE(e,t){let n=e.querySelector(`[data-verify-expanded]`);if(!n)return;let r=!n.hidden;n.hidden=r,t.setAttribute(`aria-expanded`,String(!r)),t.textContent=r?`Show Full Metadata`:`Hide Full Metadata`}function SE(e,t,n){return`
     <details class="launch-accordion" id="${$(e)}" data-launch-accordion>
       <summary class="launch-accordion-summary">${$(t)}</summary>
       <div class="launch-accordion-body">
         ${n}
       </div>
     </details>
-  `}function fE(e){let t=document.getElementById(e);t&&(t.open=!0,t.scrollIntoView({behavior:`smooth`,block:`nearest`}))}function pE(e){return`accordion-launch-info-${e}`}function mE(e){return`accordion-market-data-${e}`}function hE(e){return`accordion-analytics-${e}`}function gE(e){return`accordion-risk-${e}`}function _E(e){return`accordion-metadata-${e}`}var vE=!1;function yE(e){for(let t of e){xE(t),gw(t)?CE(t):SE(t);let e=document.querySelector(`[data-verify-mint="${t.id}"]`);e&&e.addEventListener(`click`,()=>{DE(t,e)})}vE||=(document.querySelector(`#app`)?.addEventListener(`click`,bE),!0)}function bE(e){let t=e.target,n=t.closest(`[data-technical-risk-info]`);if(n){e.preventDefault(),e.stopPropagation();let t=n.closest(`[data-token-card]`)?.querySelector(`[data-technical-risk-notice]`);t&&(t.scrollIntoView({behavior:`smooth`,block:`nearest`}),t.classList.add(`technical-risk-notice--highlight`),window.setTimeout(()=>{t.classList.remove(`technical-risk-notice--highlight`)},1600));return}let r=t.closest(`[data-open-accordion]`);if(r){e.preventDefault(),e.stopPropagation();let t=r.getAttribute(`data-open-accordion`);t&&fE(t);return}let i=t.closest(`[data-verify-expand]`);if(i){let e=i.closest(`.verify-panel`);e&&uE(e,i);return}let a=t.closest(`[data-refresh-verify]`);if(!a)return;let o=a.getAttribute(`data-refresh-verify`);if(!o)return;let s=pw(o);if(!s)return;let c=document.querySelector(`[data-verify-mint="${o}"]`);c&&DE(s,c,{forceRefresh:!0})}function xE(e){let t=document.querySelector(`[data-token-card="${e.id}"]`);if(!t)return;let n=()=>{b(g(e.id))};t.addEventListener(`click`,e=>{e.target.closest(`a, button, summary, .launch-card-accordions, .launch-manage-menu`)||n()}),t.addEventListener(`keydown`,e=>{e.key!==`Enter`&&e.key!==` `||(e.preventDefault(),n())})}function SE(e){let t=TC(e.mintAddress);if(t?.exists){VT(e,t);let n=document.getElementById(nE(e.id));n&&aE(n,t,{fromCache:!0,launchId:e.id})}let n=NC(e.mintAddress);n&&KT(e,n)}async function CE(e,t={}){await Promise.all([TE(e,t),EE(e,t)])}function wE(e,t,n,r){aE(t,n,{fromCache:r,launchId:e.id}),VT(e,n),fE(_E(e.id))}async function TE(e,t={}){let n=document.getElementById(nE(e.id));if(n){if(t.forceRefresh)DC(e.mintAddress);else{let t=TC(e.mintAddress);if(t){wE(e,n,t,!0);return}}iE(n),wE(e,n,await hw(e.mintAddress,t),!1)}}async function EE(e,t={}){if(!t.forceRefresh&&NC(e.mintAddress)){KT(e,NC(e.mintAddress));return}qT(e),KT(e,await kw(e.mintAddress,t))}async function DE(e,t,n={}){t.disabled=!0;try{await CE(e,n)}finally{t.disabled=!1}}var OE=`cbs-launches.json`;function kE(){return new Set(E.map(e=>e.mintAddress.trim()))}function AE(){return{version:1,exportedAt:Date.now(),launches:lC().map(jE)}}function jE(e){return{mintAddress:e.mintAddress.trim(),launchStatus:e.status,launchSection:e.section,launchDate:e.launchDate.trim(),createdAt:e.submittedAt,updatedAt:e.updatedAt??e.submittedAt,verificationLevel:e.verificationLevel??`normal`}}function ME(){if(lC().length===0)return!1;let e=`${JSON.stringify(AE(),null,2)}\n`,t=new Blob([e],{type:`application/json`}),n=URL.createObjectURL(t),r=document.createElement(`a`);return r.href=n,r.download=OE,r.click(),URL.revokeObjectURL(n),!0}function NE(e){if(!e||typeof e!=`object`)return null;let t=e,n=typeof t.mintAddress==`string`?t.mintAddress.trim():``,r=(t.launchStatus??t.status??``).toString(),i=(t.launchSection??t.section??``).toString(),a=typeof t.launchDate==`string`?t.launchDate.trim():``,o=typeof t.createdAt==`number`?t.createdAt:typeof t.submittedAt==`number`?t.submittedAt:NaN,s=typeof t.updatedAt==`number`?t.updatedAt:o,c=typeof t.verificationLevel==`string`?t.verificationLevel:`normal`;return!n||!VS(n)||Number.isNaN(o)||!nC({status:r,section:i,launchDate:a,verificationLevel:c}).valid||!ZS(r)||!QS(i)||!tC(a)||!$S(c)?null:{mintAddress:n,launchStatus:r,launchSection:i,launchDate:a,createdAt:o,updatedAt:s,verificationLevel:c}}function PE(e){if(!e||typeof e!=`object`)return null;let t=e,n=Array.isArray(t.launches)?t.launches:Array.isArray(e)?e:null;return n?n.map(NE).filter(e=>e!==null):null}function FE(e){let t=new Map;for(let n of e){let e=n.mintAddress.trim(),r=t.get(e);(!r||n.updatedAt>=r.updatedAt)&&t.set(e,n)}return[...t.values()]}function IE(e){return{id:gC(e.mintAddress),mintAddress:e.mintAddress.trim(),status:e.launchStatus,section:e.launchSection,launchDate:e.launchDate.trim(),submittedAt:e.createdAt,updatedAt:e.updatedAt,tokenName:null,tokenSymbol:null,verificationLevel:e.verificationLevel??`normal`}}function LE(e){return e.updatedAt??e.submittedAt}function RE(e){let t=PE(e);if(!t)return{success:!1,imported:0,skipped:0,errors:[`Invalid launch file format. Expected JSON with a launches array.`]};if(t.length===0)return{success:!1,imported:0,skipped:0,errors:[`No valid launches found in file.`]};let n=kE(),r=FE(t),i=[],a=new Map,o=0;for(let e of r){let t=e.mintAddress.trim();if(n.has(t)){o+=1,i.push(`Skipped ${t.slice(0,8)}… — mint already exists in built-in catalog.`);continue}a.set(t,IE(e))}if(a.size===0)return{success:!1,imported:0,skipped:o,errors:i.length>0?i:[`No launches could be imported.`]};let s=lC(),c=new Map;for(let e of s)c.set(e.mintAddress.trim(),e);let l=0;for(let[e,t]of a){let n=c.get(e);if(!n||LE(t)>=LE(n)){n?LE(t)>LE(n)&&(l+=1):l+=1,c.set(e,t);continue}o+=1,i.push(`Skipped ${e.slice(0,8)}… — existing local launch is newer.`)}return uC([...c.values()]),{success:!0,imported:l,skipped:o,errors:i}}async function zE(e){let t=await e.text();return JSON.parse(t)}var BE=!1;function VE(){return`
+  `}function CE(e){let t=document.getElementById(e);t&&(t.open=!0,t.scrollIntoView({behavior:`smooth`,block:`nearest`}))}function wE(e){return`accordion-launch-info-${e}`}function TE(e){return`accordion-market-data-${e}`}function EE(e){return`accordion-analytics-${e}`}function DE(e){return`accordion-risk-${e}`}function OE(e){return`accordion-metadata-${e}`}var kE=!1;function AE(e){for(let t of e){ME(t),gw(t)?PE(t):NE(t);let e=document.querySelector(`[data-verify-mint="${t.id}"]`);e&&e.addEventListener(`click`,()=>{RE(t,e)})}kE||=(document.querySelector(`#app`)?.addEventListener(`click`,jE),!0)}function jE(e){let t=e.target,n=t.closest(`[data-technical-risk-info]`);if(n){e.preventDefault(),e.stopPropagation();let t=n.closest(`[data-token-card]`)?.querySelector(`[data-technical-risk-notice]`);t&&(t.scrollIntoView({behavior:`smooth`,block:`nearest`}),t.classList.add(`technical-risk-notice--highlight`),window.setTimeout(()=>{t.classList.remove(`technical-risk-notice--highlight`)},1600));return}let r=t.closest(`[data-open-accordion]`);if(r){e.preventDefault(),e.stopPropagation();let t=r.getAttribute(`data-open-accordion`);t&&CE(t);return}let i=t.closest(`[data-verify-expand]`);if(i){let e=i.closest(`.verify-panel`);e&&xE(e,i);return}let a=t.closest(`[data-refresh-verify]`);if(!a)return;let o=a.getAttribute(`data-refresh-verify`);if(!o)return;let s=pw(o);if(!s)return;let c=document.querySelector(`[data-verify-mint="${o}"]`);c&&RE(s,c,{forceRefresh:!0})}function ME(e){let t=document.querySelector(`[data-token-card="${e.id}"]`);if(!t)return;let n=()=>{b(g(e.id))};t.addEventListener(`click`,e=>{e.target.closest(`a, button, summary, .launch-card-accordions, .launch-manage-menu`)||n()}),t.addEventListener(`keydown`,e=>{e.key!==`Enter`&&e.key!==` `||(e.preventDefault(),n())})}function NE(e){let t=TC(e.mintAddress);if(t?.exists){VT(e,t);let n=document.getElementById(fE(e.id));n&&hE(n,t,{fromCache:!0,launchId:e.id})}let n=NC(e.mintAddress);n&&ZT(e,n)}async function PE(e,t={}){await Promise.all([IE(e,t),LE(e,t)])}function FE(e,t,n,r){hE(t,n,{fromCache:r,launchId:e.id}),VT(e,n),CE(OE(e.id))}async function IE(e,t={}){let n=document.getElementById(fE(e.id));if(n){if(t.forceRefresh)DC(e.mintAddress);else{let t=TC(e.mintAddress);if(t){FE(e,n,t,!0);return}}mE(n),FE(e,n,await hw(e.mintAddress,t),!1)}}async function LE(e,t={}){if(!t.forceRefresh&&NC(e.mintAddress)){ZT(e,NC(e.mintAddress));return}QT(e),ZT(e,await kw(e.mintAddress,t))}async function RE(e,t,n={}){t.disabled=!0;try{await PE(e,n)}finally{t.disabled=!1}}var zE=`cbs-launches.json`;function BE(){return new Set(E.map(e=>e.mintAddress.trim()))}function VE(){return{version:1,exportedAt:Date.now(),launches:lC().map(HE)}}function HE(e){return{mintAddress:e.mintAddress.trim(),launchStatus:e.status,launchSection:e.section,launchDate:e.launchDate.trim(),createdAt:e.submittedAt,updatedAt:e.updatedAt??e.submittedAt,verificationLevel:e.verificationLevel??`normal`}}function UE(){if(lC().length===0)return!1;let e=`${JSON.stringify(VE(),null,2)}\n`,t=new Blob([e],{type:`application/json`}),n=URL.createObjectURL(t),r=document.createElement(`a`);return r.href=n,r.download=zE,r.click(),URL.revokeObjectURL(n),!0}function WE(e){if(!e||typeof e!=`object`)return null;let t=e,n=typeof t.mintAddress==`string`?t.mintAddress.trim():``,r=(t.launchStatus??t.status??``).toString(),i=(t.launchSection??t.section??``).toString(),a=typeof t.launchDate==`string`?t.launchDate.trim():``,o=typeof t.createdAt==`number`?t.createdAt:typeof t.submittedAt==`number`?t.submittedAt:NaN,s=typeof t.updatedAt==`number`?t.updatedAt:o,c=typeof t.verificationLevel==`string`?t.verificationLevel:`normal`;return!n||!VS(n)||Number.isNaN(o)||!nC({status:r,section:i,launchDate:a,verificationLevel:c}).valid||!ZS(r)||!QS(i)||!tC(a)||!$S(c)?null:{mintAddress:n,launchStatus:r,launchSection:i,launchDate:a,createdAt:o,updatedAt:s,verificationLevel:c}}function GE(e){if(!e||typeof e!=`object`)return null;let t=e,n=Array.isArray(t.launches)?t.launches:Array.isArray(e)?e:null;return n?n.map(WE).filter(e=>e!==null):null}function KE(e){let t=new Map;for(let n of e){let e=n.mintAddress.trim(),r=t.get(e);(!r||n.updatedAt>=r.updatedAt)&&t.set(e,n)}return[...t.values()]}function qE(e){return{id:gC(e.mintAddress),mintAddress:e.mintAddress.trim(),status:e.launchStatus,section:e.launchSection,launchDate:e.launchDate.trim(),submittedAt:e.createdAt,updatedAt:e.updatedAt,tokenName:null,tokenSymbol:null,verificationLevel:e.verificationLevel??`normal`}}function JE(e){return e.updatedAt??e.submittedAt}function YE(e){let t=GE(e);if(!t)return{success:!1,imported:0,skipped:0,errors:[`Invalid launch file format. Expected JSON with a launches array.`]};if(t.length===0)return{success:!1,imported:0,skipped:0,errors:[`No valid launches found in file.`]};let n=BE(),r=KE(t),i=[],a=new Map,o=0;for(let e of r){let t=e.mintAddress.trim();if(n.has(t)){o+=1,i.push(`Skipped ${t.slice(0,8)}… — mint already exists in built-in catalog.`);continue}a.set(t,qE(e))}if(a.size===0)return{success:!1,imported:0,skipped:o,errors:i.length>0?i:[`No launches could be imported.`]};let s=lC(),c=new Map;for(let e of s)c.set(e.mintAddress.trim(),e);let l=0;for(let[e,t]of a){let n=c.get(e);if(!n||JE(t)>=JE(n)){n?JE(t)>JE(n)&&(l+=1):l+=1,c.set(e,t);continue}o+=1,i.push(`Skipped ${e.slice(0,8)}… — existing local launch is newer.`)}return uC([...c.values()]),{success:!0,imported:l,skipped:o,errors:i}}async function XE(e){let t=await e.text();return JSON.parse(t)}var ZE=!1;function QE(){return`
     <div class="launch-data-actions">
       <button
         type="button"
@@ -321,7 +325,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         aria-live="polite"
       ></p>
     </div>
-  `}function HE(e){BE||=(document.addEventListener(`click`,e=>{let t=e.target,n=t.closest(`[data-export-launches]`);if(n){GE(n);return}let r=t.closest(`[data-import-launches]`);r&&KE(r)}),document.addEventListener(`change`,t=>{let n=t.target;!n.matches(`[data-import-launches-input]`)||!n.files?.[0]||qE(n.files[0],n,e)}),!0)}function UE(e){return e.closest(`.launch-data-actions`)?.querySelector(`[data-launch-data-status]`)??null}function WE(e,t,n=`success`){let r=UE(e);r&&(r.hidden=!1,r.textContent=t,r.className=`launch-data-status is-${n}`)}function GE(e){if(!ME()){WE(e,`No local launches to export.`,`error`);return}WE(e,`Downloaded cbs-launches.json.`)}function KE(e){let t=e.closest(`.launch-data-actions`)?.querySelector(`[data-import-launches-input]`);t&&(t.value=``,t.click())}async function qE(e,t,n){let r=t.closest(`.launch-data-actions`)?.querySelector(`[data-import-launches]`);if(r)try{let t=RE(await zE(e));if(!t.success){WE(r,t.errors[0]??`Import failed.`,`error`);return}n(),WE(r,`Launch data restored.${t.skipped>0?` Imported ${t.imported}, skipped ${t.skipped}.`:` Imported ${t.imported} launch${t.imported===1?``:`es`}.`}`,`success`)}catch{WE(r,`Could not read JSON file.`,`error`)}}function JE(){return`
+  `}function $E(e){ZE||=(document.addEventListener(`click`,e=>{let t=e.target,n=t.closest(`[data-export-launches]`);if(n){nD(n);return}let r=t.closest(`[data-import-launches]`);r&&rD(r)}),document.addEventListener(`change`,t=>{let n=t.target;!n.matches(`[data-import-launches-input]`)||!n.files?.[0]||iD(n.files[0],n,e)}),!0)}function eD(e){return e.closest(`.launch-data-actions`)?.querySelector(`[data-launch-data-status]`)??null}function tD(e,t,n=`success`){let r=eD(e);r&&(r.hidden=!1,r.textContent=t,r.className=`launch-data-status is-${n}`)}function nD(e){if(!UE()){tD(e,`No local launches to export.`,`error`);return}tD(e,`Downloaded cbs-launches.json.`)}function rD(e){let t=e.closest(`.launch-data-actions`)?.querySelector(`[data-import-launches-input]`);t&&(t.value=``,t.click())}async function iD(e,t,n){let r=t.closest(`.launch-data-actions`)?.querySelector(`[data-import-launches]`);if(r)try{let t=YE(await XE(e));if(!t.success){tD(r,t.errors[0]??`Import failed.`,`error`);return}n(),tD(r,`Launch data restored.${t.skipped>0?` Imported ${t.imported}, skipped ${t.skipped}.`:` Imported ${t.imported} launch${t.imported===1?``:`es`}.`}`,`success`)}catch{tD(r,`Could not read JSON file.`,`error`)}}function aD(){return`
     <div
       class="submit-launch-modal"
       data-manage-launch-modal
@@ -442,7 +446,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </form>
       </div>
     </div>
-  `}var YE=!1,XE=!1,ZE=null;function QE(e){ZE=e;let t=document.querySelector(`[data-manage-launch-modal]`);if(!t)return;let n=t.querySelector(`[data-manage-launch-form]`),r=t.querySelector(`[data-manage-launch-id]`),i=t.querySelector(`[data-manage-mint]`),a=t.querySelector(`[data-manage-token-label]`),o=t.querySelector(`[data-manage-status]`),s=t.querySelector(`[data-manage-section]`),c=t.querySelector(`[data-manage-launch-date]`),l=t.querySelector(`[data-manage-verification-level]`),u=t.querySelector(`[data-manage-error]`);!n||!r||!i||!a||!o||!s||!c||!l||!u||(tD({modal:t,form:n,launchIdInput:r,mintInput:i,tokenLabel:a,statusSelect:o,sectionSelect:s,launchDateInput:c,verificationLevelSelect:l,errorElement:u}),YE||=(document.addEventListener(`click`,$E),!0))}function $E(e){let t=e.target,n=t.closest(`[data-edit-launch]`);if(n){e.stopPropagation();let t=n.getAttribute(`data-edit-launch`);t&&rD(t);return}let r=t.closest(`[data-remove-launch]`);if(r){e.stopPropagation();let t=r.getAttribute(`data-remove-launch`);t&&cD(t)}}var eD=null;function tD(e){eD=e;for(let t of e.modal.querySelectorAll(`[data-manage-launch-close]`))t.addEventListener(`click`,()=>{iD()});e.form.addEventListener(`submit`,e=>{e.preventDefault(),sD()}),XE||=(document.addEventListener(`keydown`,nD),!0)}function nD(e){e.key!==`Escape`||!eD||eD.modal.hidden||iD()}function rD(e){let t=eD;if(!t)return;aD(t);let n=pw(e);if(!n||!fC(n))return;let r=dC(e);t.launchIdInput.value=e,t.mintInput.value=n.mintAddress;let i=n.name??r?.tokenName??`Token`,a=n.symbol??r?.tokenSymbol??``;t.tokenLabel.textContent=a?`Metadata: ${i} (${a}) — read-only from mint`:`Metadata: ${i} — read-only from mint`,t.statusSelect.value=n.status,t.sectionSelect.value=n.section,t.launchDateInput.value=r?.launchDate??n.launchInfo.launchDate,t.verificationLevelSelect.value=n.verificationLevel??r?.verificationLevel??`normal`,t.modal.hidden=!1,t.modal.setAttribute(`aria-hidden`,`false`),t.launchDateInput.focus()}function iD(){let e=eD;e&&(e.modal.hidden=!0,e.modal.setAttribute(`aria-hidden`,`true`),e.form.reset(),aD(e))}function aD(e){e.errorElement.hidden=!0,e.errorElement.textContent=``}function oD(e,t){e.errorElement.hidden=!1,e.errorElement.textContent=t}function sD(){let e=eD;if(!e)return;aD(e);let t=e.launchIdInput.value.trim(),n=e.launchDateInput.value.trim(),r=nC({status:e.statusSelect.value,section:e.sectionSelect.value,launchDate:n,verificationLevel:e.verificationLevelSelect.value});if(!t){oD(e,`Launch not found.`);return}if(!r.valid){oD(e,r.error??`Invalid launch details.`);return}if(!pC(t,{status:e.statusSelect.value,section:e.sectionSelect.value,launchDate:n,verificationLevel:e.verificationLevelSelect.value})){oD(e,`Could not update launch. It may have been removed.`);return}iD(),ZE?.()}function cD(e){let t=pw(e);if(!t||!fC(t))return;let n=t.name??t.symbol??t.mintAddress;if(!window.confirm(`Remove "${n}" from the launchpad?\n\nThis only removes the local listing. The token mint on Solana is unchanged.`))return;if(!mC(e)){window.alert(`Could not remove launch.`);return}iD();let r=v();if(r.name===`token`&&r.tokenId===e){b(`/`);return}ZE?.()}var lD=`—`;function uD(){return`
+  `}var oD=!1,sD=!1,cD=null;function lD(e){cD=e;let t=document.querySelector(`[data-manage-launch-modal]`);if(!t)return;let n=t.querySelector(`[data-manage-launch-form]`),r=t.querySelector(`[data-manage-launch-id]`),i=t.querySelector(`[data-manage-mint]`),a=t.querySelector(`[data-manage-token-label]`),o=t.querySelector(`[data-manage-status]`),s=t.querySelector(`[data-manage-section]`),c=t.querySelector(`[data-manage-launch-date]`),l=t.querySelector(`[data-manage-verification-level]`),u=t.querySelector(`[data-manage-error]`);!n||!r||!i||!a||!o||!s||!c||!l||!u||(fD({modal:t,form:n,launchIdInput:r,mintInput:i,tokenLabel:a,statusSelect:o,sectionSelect:s,launchDateInput:c,verificationLevelSelect:l,errorElement:u}),oD||=(document.addEventListener(`click`,uD),!0))}function uD(e){let t=e.target,n=t.closest(`[data-edit-launch]`);if(n){e.stopPropagation();let t=n.getAttribute(`data-edit-launch`);t&&mD(t);return}let r=t.closest(`[data-remove-launch]`);if(r){e.stopPropagation();let t=r.getAttribute(`data-remove-launch`);t&&yD(t)}}var dD=null;function fD(e){dD=e;for(let t of e.modal.querySelectorAll(`[data-manage-launch-close]`))t.addEventListener(`click`,()=>{hD()});e.form.addEventListener(`submit`,e=>{e.preventDefault(),vD()}),sD||=(document.addEventListener(`keydown`,pD),!0)}function pD(e){e.key!==`Escape`||!dD||dD.modal.hidden||hD()}function mD(e){let t=dD;if(!t)return;gD(t);let n=pw(e);if(!n||!fC(n))return;let r=dC(e);t.launchIdInput.value=e,t.mintInput.value=n.mintAddress;let i=n.name??r?.tokenName??`Token`,a=n.symbol??r?.tokenSymbol??``;t.tokenLabel.textContent=a?`Metadata: ${i} (${a}) — read-only from mint`:`Metadata: ${i} — read-only from mint`,t.statusSelect.value=n.status,t.sectionSelect.value=n.section,t.launchDateInput.value=r?.launchDate??n.launchInfo.launchDate,t.verificationLevelSelect.value=n.verificationLevel??r?.verificationLevel??`normal`,t.modal.hidden=!1,t.modal.setAttribute(`aria-hidden`,`false`),t.launchDateInput.focus()}function hD(){let e=dD;e&&(e.modal.hidden=!0,e.modal.setAttribute(`aria-hidden`,`true`),e.form.reset(),gD(e))}function gD(e){e.errorElement.hidden=!0,e.errorElement.textContent=``}function _D(e,t){e.errorElement.hidden=!1,e.errorElement.textContent=t}function vD(){let e=dD;if(!e)return;gD(e);let t=e.launchIdInput.value.trim(),n=e.launchDateInput.value.trim(),r=nC({status:e.statusSelect.value,section:e.sectionSelect.value,launchDate:n,verificationLevel:e.verificationLevelSelect.value});if(!t){_D(e,`Launch not found.`);return}if(!r.valid){_D(e,r.error??`Invalid launch details.`);return}if(!pC(t,{status:e.statusSelect.value,section:e.sectionSelect.value,launchDate:n,verificationLevel:e.verificationLevelSelect.value})){_D(e,`Could not update launch. It may have been removed.`);return}hD(),cD?.()}function yD(e){let t=pw(e);if(!t||!fC(t))return;let n=t.name??t.symbol??t.mintAddress;if(!window.confirm(`Remove "${n}" from the launchpad?\n\nThis only removes the local listing. The token mint on Solana is unchanged.`))return;if(!mC(e)){window.alert(`Could not remove launch.`);return}hD();let r=v();if(r.name===`token`&&r.tokenId===e){b(`/`);return}cD?.()}var bD=`—`;function xD(){return`
     <div
       class="submit-launch-preview"
       data-submit-preview
@@ -467,19 +471,19 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             </div>
           </div>
           <div>
-            <h3 data-submit-preview-name>${lD}</h3>
-            <p class="token-symbol" data-submit-preview-symbol>${lD}</p>
+            <h3 data-submit-preview-name>${bD}</h3>
+            <p class="token-symbol" data-submit-preview-symbol>${bD}</p>
           </div>
         </div>
 
         <div class="launch-details">
-          <p data-submit-preview-description>${lD}</p>
+          <p data-submit-preview-description>${bD}</p>
         </div>
 
         <dl class="launch-info-details submit-launch-preview-details">
           <div class="launch-info-row">
             <dt>Category</dt>
-            <dd data-submit-preview-category>${lD}</dd>
+            <dd data-submit-preview-category>${bD}</dd>
           </div>
           <div class="launch-info-row" data-submit-preview-tags-wrap hidden>
             <dt>Tags</dt>
@@ -489,20 +493,20 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           </div>
           <div class="launch-info-row">
             <dt>Website</dt>
-            <dd data-submit-preview-website>${lD}</dd>
+            <dd data-submit-preview-website>${bD}</dd>
           </div>
           <div class="launch-info-row">
             <dt>Telegram</dt>
-            <dd data-submit-preview-telegram>${lD}</dd>
+            <dd data-submit-preview-telegram>${bD}</dd>
           </div>
           <div class="launch-info-row">
             <dt>X</dt>
-            <dd data-submit-preview-twitter>${lD}</dd>
+            <dd data-submit-preview-twitter>${bD}</dd>
           </div>
         </dl>
       </article>
     </div>
-  `}function dD(e){return!!(e?.exists&&e.metadataFound&&!e.error)}function fD(e){if(e.metadataJsonLoaded)return e.jsonSocialLinks;let t=e.jsonExternalUrl?.trim();return t?{website:t}:{}}function pD(e,t){if(!t||!dD(t)){mD(e);return}e.hidden=!1;let n=t.jsonName??t.metadataName??`Unknown token`,r=t.jsonSymbol??t.metadataSymbol??lD,i=t.jsonDescription?.trim()||`No description in metadata.`;vD(e,`[data-submit-preview-name]`,n),vD(e,`[data-submit-preview-symbol]`,r),vD(e,`[data-submit-preview-description]`,i),vD(e,`[data-submit-preview-category]`,t.metadataJsonLoaded?Ey(t.jsonCategory):Ey(null)),hD(e,t,n,r),gD(e,t);let a=fD(t);_D(e,`[data-submit-preview-website]`,a.website),_D(e,`[data-submit-preview-telegram]`,a.telegram),_D(e,`[data-submit-preview-twitter]`,a.twitter)}function mD(e){e.hidden=!0,vD(e,`[data-submit-preview-name]`,lD),vD(e,`[data-submit-preview-symbol]`,lD),vD(e,`[data-submit-preview-description]`,lD),vD(e,`[data-submit-preview-category]`,Ty(null)),vD(e,`[data-submit-preview-website]`,lD),vD(e,`[data-submit-preview-telegram]`,lD),vD(e,`[data-submit-preview-twitter]`,lD);let t=e.querySelector(`[data-submit-preview-logo-wrap]`),n=e.querySelector(`[data-submit-preview-logo-fallback]`);t?.querySelector(`img`)?.remove(),n&&(n.textContent=`🪙`,n.hidden=!1);let r=e.querySelector(`[data-submit-preview-tags-wrap]`),i=e.querySelector(`[data-submit-preview-tags]`);r&&(r.hidden=!0),i&&(i.innerHTML=``)}function hD(e,t,n,r){let i=e.querySelector(`[data-submit-preview-logo-wrap]`),a=e.querySelector(`[data-submit-preview-logo-fallback]`);if(!i||!a)return;i.querySelector(`img`)?.remove(),i.classList.remove(`has-metadata-logo`),a.textContent=r===lD?n.charAt(0).toUpperCase()||`🪙`:r.charAt(0).toUpperCase(),a.hidden=!1;let o=Sy(t.jsonImage??void 0);if(!o)return;let s=document.createElement(`img`);s.className=`token-logo`,s.src=o,s.alt=`${n} logo`,s.width=64,s.height=64,s.addEventListener(`error`,()=>{s.remove(),i.classList.remove(`has-metadata-logo`),a.hidden=!1},{once:!0}),s.addEventListener(`load`,()=>{i.classList.add(`has-metadata-logo`),a.hidden=!0},{once:!0}),i.appendChild(s)}function gD(e,t){let n=e.querySelector(`[data-submit-preview-tags-wrap]`),r=e.querySelector(`[data-submit-preview-tags]`);if(!n||!r)return;let i=t.metadataJsonLoaded?t.jsonTags:[];if(i.length===0){n.hidden=!0,r.innerHTML=``;return}n.hidden=!1,r.innerHTML=Jw(i)}function _D(e,t,n){let r=e.querySelector(t);if(!r)return;let i=n?.trim();if(!i){r.textContent=lD;return}r.innerHTML=`
+  `}function SD(e){return!!(e?.exists&&e.metadataFound&&!e.error)}function CD(e){if(e.metadataJsonLoaded)return e.jsonSocialLinks;let t=e.jsonExternalUrl?.trim();return t?{website:t}:{}}function wD(e,t){if(!t||!SD(t)){TD(e);return}e.hidden=!1;let n=t.jsonName??t.metadataName??`Unknown token`,r=t.jsonSymbol??t.metadataSymbol??bD,i=t.jsonDescription?.trim()||`No description in metadata.`;kD(e,`[data-submit-preview-name]`,n),kD(e,`[data-submit-preview-symbol]`,r),kD(e,`[data-submit-preview-description]`,i),kD(e,`[data-submit-preview-category]`,t.metadataJsonLoaded?Ey(t.jsonCategory):Ey(null)),ED(e,t,n,r),DD(e,t);let a=CD(t);OD(e,`[data-submit-preview-website]`,a.website),OD(e,`[data-submit-preview-telegram]`,a.telegram),OD(e,`[data-submit-preview-twitter]`,a.twitter)}function TD(e){e.hidden=!0,kD(e,`[data-submit-preview-name]`,bD),kD(e,`[data-submit-preview-symbol]`,bD),kD(e,`[data-submit-preview-description]`,bD),kD(e,`[data-submit-preview-category]`,Ty(null)),kD(e,`[data-submit-preview-website]`,bD),kD(e,`[data-submit-preview-telegram]`,bD),kD(e,`[data-submit-preview-twitter]`,bD);let t=e.querySelector(`[data-submit-preview-logo-wrap]`),n=e.querySelector(`[data-submit-preview-logo-fallback]`);t?.querySelector(`img`)?.remove(),n&&(n.textContent=`🪙`,n.hidden=!1);let r=e.querySelector(`[data-submit-preview-tags-wrap]`),i=e.querySelector(`[data-submit-preview-tags]`);r&&(r.hidden=!0),i&&(i.innerHTML=``)}function ED(e,t,n,r){let i=e.querySelector(`[data-submit-preview-logo-wrap]`),a=e.querySelector(`[data-submit-preview-logo-fallback]`);if(!i||!a)return;i.querySelector(`img`)?.remove(),i.classList.remove(`has-metadata-logo`),a.textContent=r===bD?n.charAt(0).toUpperCase()||`🪙`:r.charAt(0).toUpperCase(),a.hidden=!1;let o=Sy(t.jsonImage??void 0);if(!o)return;let s=document.createElement(`img`);s.className=`token-logo`,s.src=o,s.alt=`${n} logo`,s.width=64,s.height=64,s.addEventListener(`error`,()=>{s.remove(),i.classList.remove(`has-metadata-logo`),a.hidden=!1},{once:!0}),s.addEventListener(`load`,()=>{i.classList.add(`has-metadata-logo`),a.hidden=!0},{once:!0}),i.appendChild(s)}function DD(e,t){let n=e.querySelector(`[data-submit-preview-tags-wrap]`),r=e.querySelector(`[data-submit-preview-tags]`);if(!n||!r)return;let i=t.metadataJsonLoaded?t.jsonTags:[];if(i.length===0){n.hidden=!0,r.innerHTML=``;return}n.hidden=!1,r.innerHTML=Jw(i)}function OD(e,t,n){let r=e.querySelector(t);if(!r)return;let i=n?.trim();if(!i){r.textContent=bD;return}r.innerHTML=`
     <a
       class="submit-launch-preview-link"
       href="${$(i)}"
@@ -511,7 +515,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     >
       ${$(i)}
     </a>
-  `}function vD(e,t,n){let r=e.querySelector(t);r&&(r.textContent=n)}function yD(){return`
+  `}function kD(e,t,n){let r=e.querySelector(t);r&&(r.textContent=n)}function AD(){return`
     <div
       class="submit-launch-modal"
       data-submit-launch-modal
@@ -576,7 +580,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
             ></span>
           </div>
 
-          ${uD()}
+          ${xD()}
 
           <label class="submit-launch-field">
             <span class="submit-launch-label">Launch Status</span>
@@ -635,7 +639,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </form>
       </div>
     </div>
-  `}function bD(e,t){let n=document.querySelector(`[data-submit-launch-modal]`);if(!n)return;let r=n.querySelector(`[data-submit-launch-form]`),i=n.querySelector(`[data-submit-mint]`),a=n.querySelector(`[data-submit-verify-mint]`),o=n.querySelector(`[data-submit-verify-status]`),s=n.querySelector(`[data-submit-preview]`),c=n.querySelector(`[data-submit-launch-submit]`),l=n.querySelector(`[data-submit-error]`);!r||!i||!a||!o||!s||!c||!l||xD({modal:n,form:r,mintInput:i,verifyButton:a,verifyStatus:o,preview:s,submitButton:c,errorElement:l},e,t)}function xD(e,t,n){let{modal:r,form:i,mintInput:a,verifyButton:o,verifyStatus:s,preview:c,submitButton:l,errorElement:u}=e,d=null,f=``,p=!1,m=!1,h=document.querySelectorAll(`[data-open-submit-launch]`);for(let e of h)e.addEventListener(`click`,()=>{g()});for(let e of r.querySelectorAll(`[data-submit-launch-close]`))e.addEventListener(`click`,()=>{_()});a.addEventListener(`input`,()=>{if(S(),a.value.trim()!==f){y();return}T()}),a.addEventListener(`blur`,()=>{let e=a.value.trim();e&&e!==f&&VS(e)&&E()}),o.addEventListener(`click`,()=>{E()}),i.addEventListener(`submit`,e=>{e.preventDefault(),D()}),document.addEventListener(`keydown`,e=>{e.key===`Escape`&&!r.hidden&&_()}),i.addEventListener(`input`,()=>{S(),T()});function g(){v(),r.hidden=!1,r.setAttribute(`aria-hidden`,`false`),a.focus()}function _(){r.hidden=!0,r.setAttribute(`aria-hidden`,`true`),v()}function v(){i.reset(),y(),S()}function y(){d=null,f=``,p=!1,s.textContent=``,s.className=`submit-launch-verify-status`,mD(c),T()}function b(){d=null,f=``,p=!0,mD(c),w(`This mint is already listed.`,`is-error`),T()}function x(e){d=null,f=``,p=!1,mD(c),w(e,`is-error`),T()}function S(){u.hidden=!0,u.textContent=``}function C(e){u.hidden=!1,u.textContent=e}function w(e,t=``){s.textContent=e,s.className=`submit-launch-verify-status ${t}`.trim()}function T(){let e=a.value.trim(),t=i.querySelector(`[data-submit-launch-date]`)?.value.trim();l.disabled=!(d&&f===e&&dD(d)&&!p&&t)}async function E(){if(m)return;S();let e=a.value.trim();if(!e){x(`Enter a mint address first.`);return}if(!VS(e)){x(`Invalid mint address format.`);return}if(_C(e,n())){b();return}m=!0,o.disabled=!0,d=null,f=``,w(`Verifying mint and metadata…`,`is-checking`),mD(c),T();try{let t=await hw(e,{forceRefresh:!0});if(!t.exists){x(`Mint not found on Solana.`);return}if(!t.metadataFound){x(`On-chain metadata account not found.`);return}if(t.error){x(t.error);return}if(_C(e,n())){b();return}d=t,p=!1,f=e,pD(c,t),t.metadataJsonLoaded?w(`Mint and metadata verified.`,`is-success`):w(`Mint verified. Metadata JSON unavailable — preview uses on-chain fields.`,`is-success`),T()}catch{x(`Verification failed. Try again.`)}finally{m=!1,o.disabled=!1}}async function D(){if(p||l.disabled)return;S();let e=a.value.trim();if(_C(e,n())){b(),C(`This mint is already listed.`);return}if(!dD(d)||f!==e){C(`Verify mint and metadata before submitting.`);return}let r=ee(),i=nC({status:r.status,section:r.section,launchDate:r.launchDate});if(!i.valid){C(i.error??`Invalid launch details.`);return}if(!hC({id:gC(r.mintAddress),mintAddress:r.mintAddress,section:r.section,status:r.status,launchDate:r.launchDate,submittedAt:Date.now(),tokenName:d.jsonName??d.metadataName,tokenSymbol:d.jsonSymbol??d.metadataSymbol})){C(`Could not save launch. Check your launch details and try again.`);return}_(),t()}function ee(){return{mintAddress:a.value.trim(),section:i.querySelector(`[data-submit-section]`).value,status:i.querySelector(`[data-submit-status]`).value,launchDate:i.querySelector(`[data-submit-launch-date]`)?.value.trim()??``}}}function SD(){return`
+  `}function jD(e,t){let n=document.querySelector(`[data-submit-launch-modal]`);if(!n)return;let r=n.querySelector(`[data-submit-launch-form]`),i=n.querySelector(`[data-submit-mint]`),a=n.querySelector(`[data-submit-verify-mint]`),o=n.querySelector(`[data-submit-verify-status]`),s=n.querySelector(`[data-submit-preview]`),c=n.querySelector(`[data-submit-launch-submit]`),l=n.querySelector(`[data-submit-error]`);!r||!i||!a||!o||!s||!c||!l||MD({modal:n,form:r,mintInput:i,verifyButton:a,verifyStatus:o,preview:s,submitButton:c,errorElement:l},e,t)}function MD(e,t,n){let{modal:r,form:i,mintInput:a,verifyButton:o,verifyStatus:s,preview:c,submitButton:l,errorElement:u}=e,d=null,f=``,p=!1,m=!1,h=document.querySelectorAll(`[data-open-submit-launch]`);for(let e of h)e.addEventListener(`click`,()=>{g()});for(let e of r.querySelectorAll(`[data-submit-launch-close]`))e.addEventListener(`click`,()=>{_()});a.addEventListener(`input`,()=>{if(S(),a.value.trim()!==f){y();return}T()}),a.addEventListener(`blur`,()=>{let e=a.value.trim();e&&e!==f&&VS(e)&&E()}),o.addEventListener(`click`,()=>{E()}),i.addEventListener(`submit`,e=>{e.preventDefault(),D()}),document.addEventListener(`keydown`,e=>{e.key===`Escape`&&!r.hidden&&_()}),i.addEventListener(`input`,()=>{S(),T()});function g(){v(),r.hidden=!1,r.setAttribute(`aria-hidden`,`false`),a.focus()}function _(){r.hidden=!0,r.setAttribute(`aria-hidden`,`true`),v()}function v(){i.reset(),y(),S()}function y(){d=null,f=``,p=!1,s.textContent=``,s.className=`submit-launch-verify-status`,TD(c),T()}function b(){d=null,f=``,p=!0,TD(c),w(`This mint is already listed.`,`is-error`),T()}function x(e){d=null,f=``,p=!1,TD(c),w(e,`is-error`),T()}function S(){u.hidden=!0,u.textContent=``}function C(e){u.hidden=!1,u.textContent=e}function w(e,t=``){s.textContent=e,s.className=`submit-launch-verify-status ${t}`.trim()}function T(){let e=a.value.trim(),t=i.querySelector(`[data-submit-launch-date]`)?.value.trim();l.disabled=!(d&&f===e&&SD(d)&&!p&&t)}async function E(){if(m)return;S();let e=a.value.trim();if(!e){x(`Enter a mint address first.`);return}if(!VS(e)){x(`Invalid mint address format.`);return}if(_C(e,n())){b();return}m=!0,o.disabled=!0,d=null,f=``,w(`Verifying mint and metadata…`,`is-checking`),TD(c),T();try{let t=await hw(e,{forceRefresh:!0});if(!t.exists){x(`Mint not found on Solana.`);return}if(!t.metadataFound){x(`On-chain metadata account not found.`);return}if(t.error){x(t.error);return}if(_C(e,n())){b();return}d=t,p=!1,f=e,wD(c,t),t.metadataJsonLoaded?w(`Mint and metadata verified.`,`is-success`):w(`Mint verified. Metadata JSON unavailable — preview uses on-chain fields.`,`is-success`),T()}catch{x(`Verification failed. Try again.`)}finally{m=!1,o.disabled=!1}}async function D(){if(p||l.disabled)return;S();let e=a.value.trim();if(_C(e,n())){b(),C(`This mint is already listed.`);return}if(!SD(d)||f!==e){C(`Verify mint and metadata before submitting.`);return}let r=ee(),i=nC({status:r.status,section:r.section,launchDate:r.launchDate});if(!i.valid){C(i.error??`Invalid launch details.`);return}if(!hC({id:gC(r.mintAddress),mintAddress:r.mintAddress,section:r.section,status:r.status,launchDate:r.launchDate,submittedAt:Date.now(),tokenName:d.jsonName??d.metadataName,tokenSymbol:d.jsonSymbol??d.metadataSymbol})){C(`Could not save launch. Check your launch details and try again.`);return}_(),t()}function ee(){return{mintAddress:a.value.trim(),section:i.querySelector(`[data-submit-section]`).value,status:i.querySelector(`[data-submit-status]`).value,launchDate:i.querySelector(`[data-submit-launch-date]`)?.value.trim()??``}}}function ND(){return`
     <button
       type="button"
       class="primary-btn submit-launch-open-btn"
@@ -643,10 +647,10 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     >
       Submit Launch
     </button>
-  `}function CD(){return`
-    ${yD()}
-    ${JE()}
-  `}function wD(e){bD(e,sw),QE(e)}function TD(){SO(v())}function ED(){return`
+  `}function PD(){return`
+    ${AD()}
+    ${aD()}
+  `}function FD(e){jD(e,sw),lD(e)}function ID(){tk(v())}function LD(){return`
     <article class="launch-card launch-card--placeholder">
       <div class="coming-soon-icon" aria-hidden="true">⏳</div>
       <h3>Coming Soon</h3>
@@ -655,7 +659,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         Check back for the next featured project.
       </p>
     </article>
-  `}function DD(e){let t=$(e.tradingStatus),n=$(e.poolStatus),r=e.rowClass??`launch-info-row`;return`
+  `}function RD(e){let t=$(e.tradingStatus),n=$(e.poolStatus),r=e.rowClass??`launch-info-row`;return`
     <div class="${r}">
       <dt>Trading</dt>
       <dd data-market-trading-status>${t}</dd>
@@ -676,40 +680,179 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <dt>Main Pair</dt>
       <dd class="market-pair-value" data-market-pair>—</dd>
     </div>
-  `}function OD(e){return`launch-info-${e}`}function kD(e,t={}){let n=OD(e.id),r=$(e.id),i=e.launchInfo,a=t.embedded??!1,o=a?`launch-info-panel launch-panel--embedded`:`launch-info-panel`,s=a?``:`
+  `}function zD(e){return`launch-info-${e}`}function BD(e,t={}){let n=zD(e.id),r=$(e.id),i=e.launchInfo,a=t.embedded??!1,o=a?`launch-info-panel launch-panel--embedded`:`launch-info-panel`,s=a?``:`
+
       <h4 class="launch-info-heading" id="launch-info-heading-${r}">
+
         Launch Info
+
+      </h4>
+
+    `;return`
+
+    <section
+
+      class="${o}"
+
+      id="${$(n)}"
+
+      ${a?``:`data-market-status-root`}
+
+      aria-labelledby="launch-info-heading-${r}"
+
+    >
+
+      ${s}
+
+      <dl class="launch-info-details">
+
+        <div class="launch-info-row">
+
+          <dt>Launch Status</dt>
+
+          <dd>${$(i.launchStatus)}</dd>
+
+        </div>
+
+        ${a?``:RD({tradingStatus:i.tradingStatus,poolStatus:i.poolStatus})}
+
+        ${Uw()}
+
+        <div class="launch-info-row">
+
+          <dt>Launch Date</dt>
+
+          <dd>${$(i.launchDate)}</dd>
+
+        </div>
+
+      </dl>
+
+      ${qw()}
+
+      ${Vw(e)}
+
+    </section>
+
+  `}var VD=`Technical Risk evaluates: metadata, mint verification, authorities, pool detection`,HD=`Market Risk will evaluate: holders, liquidity, volume, trading activity`;function UD(e){return`
+    <button
+      type="button"
+      class="risk-info-btn risk-info-btn--technical"
+      data-technical-risk-info
+      aria-label="About Technical Risk"
+      title="${VD}"
+    >
+      <span class="risk-info-icon" aria-hidden="true">i</span>
+    </button>
+  `}function WD(e){return`
+    <button
+      type="button"
+      class="risk-info-btn risk-info-btn--market"
+      data-market-risk-info
+      aria-label="About Market Risk"
+      title="${HD}"
+    >
+      <span class="risk-info-icon" aria-hidden="true">i</span>
+    </button>
+  `}var GD=`Coming Soon`;function KD(e){return`launch-market-risk-${e}`}function qD(){return`
+    <ul class="launch-market-risk-future">
+      ${[`Holder concentration`,`Trading volume`,`Liquidity depth`,`Whale wallets`,`Market activity`].map(e=>`<li>${$(e)}</li>`).join(``)}
+    </ul>
+  `}function JD(e,t=!1){let n=$(e),r=t?`launch-market-risk-panel launch-panel--embedded`:`launch-market-risk-panel`,i=t?``:`
+      <h4
+        class="launch-info-heading launch-market-risk-heading"
+        id="launch-market-risk-heading-${n}"
+      >
+        Market Risk
       </h4>
     `;return`
     <section
-      class="${o}"
-      id="${$(n)}"
-      ${a?``:`data-market-status-root`}
-      aria-labelledby="launch-info-heading-${r}"
+      class="${r}"
+      id="${KD(n)}"
+      aria-labelledby="launch-market-risk-heading-${n}"
     >
-      ${s}
-      <dl class="launch-info-details">
-        <div class="launch-info-row">
-          <dt>Launch Status</dt>
-          <dd>${$(i.launchStatus)}</dd>
-        </div>
-        ${a?``:DD({tradingStatus:i.tradingStatus,poolStatus:i.poolStatus})}
-        ${Uw()}
-        <div class="launch-info-row">
-          <dt>Launch Date</dt>
-          <dd>${$(i.launchDate)}</dd>
+      ${i}
+      <dl class="launch-market-risk-details">
+        <div class="launch-market-risk-row">
+          <dt class="launch-overview-stat-label">
+            <span>Market Risk</span>
+            ${WD()}
+          </dt>
+          <dd class="launch-market-risk-level launch-market-risk-level--coming-soon">
+            ${$(GD)}
+          </dd>
         </div>
       </dl>
-      ${qw()}
-      ${Vw(e)}
+      <p class="launch-market-risk-lead">Future analysis:</p>
+      ${qD()}
     </section>
-  `}function AD(e){let t=e.launchInfo;return`
-    <section class="launch-info-panel launch-panel--embedded">
-      <dl class="launch-info-details">
-        ${DD({tradingStatus:t.tradingStatus,poolStatus:t.poolStatus})}
+  `}function YD(e){return`
+    <div class="launch-overview-market-risk" data-launch-market-risk-summary>
+      <div class="launch-overview-stat">
+        <dt class="launch-overview-stat-label">
+          <span>Market Risk</span>
+          ${WD(e)}
+        </dt>
+        <dd class="launch-market-risk-level launch-market-risk-level--coming-soon">
+          ${$(GD)}
+        </dd>
+      </div>
+    </div>
+  `}var XD=`—`;function ZD(e){let t=e.launchInfo;return`
+    <div class="market-data-panel" data-market-data-root>
+      ${QD({tradingStatus:t.tradingStatus,poolStatus:t.poolStatus})}
+      ${$D()}
+    </div>
+    ${JD(e.id,!0)}
+  `}function QD(e){let t=$(e.tradingStatus),n=$(e.poolStatus),r=e.rowClass??`market-data-row launch-info-row`;return`
+    <dl class="market-data-details launch-info-details">
+      <div class="${r}">
+        <dt>Price</dt>
+        <dd class="market-data-value" data-market-detail-price>${XD}</dd>
+      </div>
+      <div class="${r}">
+        <dt>Liquidity</dt>
+        <dd class="market-data-value" data-market-detail-liquidity>${XD}</dd>
+      </div>
+      <div class="${r} market-data-row--full">
+        <dt>Main Pair</dt>
+        <dd class="market-data-value market-pair-value" data-market-detail-pair>${XD}</dd>
+      </div>
+      <div class="${r}">
+        <dt>Pool Status</dt>
+        <dd class="market-data-value" data-market-pool-status>${n}</dd>
+      </div>
+      <div class="${r}">
+        <dt>Trading Status</dt>
+        <dd class="market-data-value" data-market-trading-status>${t}</dd>
+      </div>
+      <div class="${r} market-data-row--full">
+        <dt>Dexscreener</dt>
+        <dd class="market-data-value market-dexscreener-value" data-market-dexscreener-link>${XD}</dd>
+      </div>
+    </dl>
+  `}function $D(){let e=$(WT);return`
+    <section
+      class="market-data-placeholders"
+      aria-label="Holder analysis coming soon"
+    >
+      <h5 class="market-data-subheading">Holder Analysis</h5>
+      <dl class="market-data-details launch-info-details">
+        <div class="market-data-row launch-info-row">
+          <dt>Holder Count</dt>
+          <dd class="market-data-coming-soon">${e}</dd>
+        </div>
+        <div class="market-data-row launch-info-row">
+          <dt>Largest Holder</dt>
+          <dd class="market-data-coming-soon">${e}</dd>
+        </div>
+        <div class="market-data-row launch-info-row">
+          <dt>Top 10 Holders</dt>
+          <dd class="market-data-coming-soon">${e}</dd>
+        </div>
       </dl>
     </section>
-  `}function jD(e){let t=$(e.id),n=$(e.mintAddress),r=$(pE(e.id)),i=[];return fC(e)&&i.push(`
+  `}function eO(e){let t=$(e.id),n=$(e.mintAddress),r=$(wE(e.id)),i=[];return fC(e)&&i.push(`
       <button
         type="button"
         class="launch-manage-menu__item"
@@ -740,14 +883,14 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     >
       Launch Info
     </button>
-  `),i.join(``)}function MD(e){return`
+  `),i.join(``)}function tO(e){return`
     <details class="launch-manage-menu" data-launch-manage-menu>
       <summary class="launch-manage-menu__toggle">Manage</summary>
       <div class="launch-manage-menu__panel">
-        ${jD(e)}
+        ${eO(e)}
       </div>
     </details>
-  `}function ND(e){let t=$(g(e.id));return`
+  `}function nO(e){let t=$(g(e.id));return`
     <div class="launch-card-actions">
       <div class="launch-card-actions__visitor">
         <a
@@ -762,9 +905,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           View Details
         </a>
       </div>
-      ${MD(e)}
+      ${tO(e)}
     </div>
-  `}function PD(e){if(!fC(e))return``;let t=$(e.id);return`
+  `}function rO(e){if(!fC(e))return``;let t=$(e.id);return`
     <div class="launch-admin-actions">
       <button
         type="button"
@@ -781,7 +924,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         Remove Launch
       </button>
     </div>
-  `}function FD(e){let t=$(e.id),n=$(LT(e)),r=$(BT(e));return e.logo?`
+  `}function iO(e){let t=$(e.id),n=$(LT(e)),r=$(BT(e));return e.logo?`
       <img
         class="token-logo"
         src="${$(e.logo)}"
@@ -799,7 +942,33 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         ${r}
       </div>
     </div>
-  `}function ID(e){return e?`technical-risk-notice-heading-${e}`:`technical-risk-notice-heading`}function LD(e){let t=$(ID(e));return`
+  `}var aO=`—/100`,oO=`—`,sO=`—`;function cO(e){return`
+    <dl class="launch-overview-stats">
+      <div class="launch-overview-stat">
+        <dt>Price</dt>
+        <dd data-market-overview-price>${oO}</dd>
+      </div>
+      <div class="launch-overview-stat">
+        <dt>Liquidity</dt>
+        <dd data-market-overview-liquidity>${oO}</dd>
+      </div>
+      <div class="launch-overview-stat">
+        <dt>Score</dt>
+        <dd data-launch-overview-score>${aO}</dd>
+      </div>
+      <div class="launch-overview-stat">
+        <dt class="launch-overview-stat-label">
+          <span>Technical Risk</span>
+          ${UD(e)}
+        </dt>
+        <dd
+          class="launch-risk-level launch-risk-level--unknown"
+          data-launch-overview-risk
+        >${sO}</dd>
+      </div>
+    </dl>
+    ${YD(e)}
+  `}function lO(e){return e?`technical-risk-notice-heading-${e}`:`technical-risk-notice-heading`}function uO(e){let t=$(lO(e));return`
     <aside
       class="technical-risk-notice"
       data-technical-risk-notice
@@ -831,58 +1000,21 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         Always do your own research.
       </p>
     </aside>
-  `}function RD(e){return`
-    <button
-      type="button"
-      class="technical-risk-info-btn"
-      data-technical-risk-info
-      aria-label="About Technical Risk"
-      aria-describedby="${$(ID(e))}"
-      title="Technical Risk checks metadata, authorities, mint verification, and pool detection only. It does not evaluate investment or market risk."
-    >
-      <span class="technical-risk-info-icon" aria-hidden="true">i</span>
-    </button>
-  `}var zD=`—/100`,BD=`—`,VD=`—`;function HD(e){return`
-    <dl class="launch-overview-stats">
-      <div class="launch-overview-stat">
-        <dt>Price</dt>
-        <dd data-market-price>${BD}</dd>
-      </div>
-      <div class="launch-overview-stat">
-        <dt>Liquidity</dt>
-        <dd data-market-liquidity>${BD}</dd>
-      </div>
-      <div class="launch-overview-stat">
-        <dt>Score</dt>
-        <dd data-launch-overview-score>${zD}</dd>
-      </div>
-      <div class="launch-overview-stat">
-        <dt class="launch-overview-stat-label">
-          <span>Technical Risk</span>
-          ${RD(e)}
-        </dt>
-        <dd
-          class="launch-risk-level launch-risk-level--unknown"
-          data-launch-overview-risk
-        >${VD}</dd>
-      </div>
-    </dl>
-  `}function UD(e){return FD(e)}function WD(e){let t=$(e.mintAddress);return`
+  `}function dO(e){return iO(e)}function fO(e){let t=$(e.mintAddress);return`
     ${e.status===`preparing`||e.status===`live`||e.status===`ended`?`
       <div class="mint-panel mint-panel--embedded">
         <span class="mint-label">Mint Address</span>
         <code class="mint-address">${t}</code>
       </div>
     `:``}
-    ${rE(e.id)}
-  `}function GD(e,t){let n=$(e.id),r=$(LT(e)),i=$(RT(e)),a=$(zT(e)),o=ew(e),s=gT(e);return`
+    ${pE(e.id)}
+  `}function pO(e,t){let n=$(e.id),r=$(LT(e)),i=$(RT(e)),a=$(zT(e)),o=ew(e),s=gT(e);return`
     <article
       class="launch-card launch-card--link"
       id="launch-${n}"
       data-token-card="${n}"
       data-launch-rank-score="${o??0}"
       data-launch-verification-priority="${s}"
-      data-market-status-root
       data-token-category-slug="${$(Dy(Cy))}"
       tabindex="0"
       role="link"
@@ -892,7 +1024,7 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         ${sT(e)}
 
         <div class="token-header">
-          ${UD(e)}
+          ${dO(e)}
           <div class="token-title-block">
             <h3 data-token-name>${r}</h3>
             ${cT(e)}
@@ -905,25 +1037,25 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
           <p data-token-description>${a}</p>
         </div>
 
-        ${HD(e.id)}
+        ${cO(e.id)}
       </div>
 
       <div class="launch-card-accordions">
-        ${dE(pE(e.id),`Launch Info`,kD(e,{embedded:!0}))}
-        ${dE(mE(e.id),`Market Data`,AD(e))}
-        ${dE(hE(e.id),`Analytics`,$w(e.id,!0))}
-        ${LD(e.id)}
-        ${dE(gE(e.id),`Technical Checks`,kT(e.id,!0))}
-        ${dE(_E(e.id),`Metadata / Mint Verification`,WD(e))}
+        ${SE(wE(e.id),`Launch Info`,BD(e,{embedded:!0}))}
+        ${SE(TE(e.id),`Market Data`,ZD(e))}
+        ${SE(EE(e.id),`Analytics`,$w(e.id,!0))}
+        ${uO(e.id)}
+        ${SE(DE(e.id),`Technical Checks`,kT(e.id,!0))}
+        ${SE(OE(e.id),`Metadata / Mint Verification`,fO(e))}
       </div>
 
-      ${ND(e)}
+      ${nO(e)}
     </article>
-  `}function KD(e){return e.length===0?``:`
+  `}function mO(e){return e.length===0?``:`
     <div class="launch-card-list">
-      ${e.map((e,t)=>GD(e,t+1)).join(``)}
+      ${e.map((e,t)=>pO(e,t+1)).join(``)}
     </div>
-  `}function qD(e){return e.logoUrl?`
+  `}function hO(e){return e.logoUrl?`
       <img
         class="tool-card-logo"
         src="${$(e.logoUrl)}"
@@ -934,16 +1066,16 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     <span class="tool-card-logo-fallback" aria-hidden="true">
       ${$(e.iconFallback)}
     </span>
-  `}function JD(e,t,n){let r=e.isCurrent?``:`<span class="tool-card-action">Open tool</span>`;return`
+  `}function gO(e,t,n){let r=e.isCurrent?``:`<span class="tool-card-action">Open tool</span>`;return`
     <div class="tool-card-body">
       <h3 class="tool-card-title">${t}</h3>
       <div class="tool-card-logo-wrap">
-        ${qD(e)}
+        ${hO(e)}
       </div>
       <p class="tool-card-description">${n}</p>
       ${r}
     </div>
-  `}function YD(e){let t=$(e.name),n=JD(e,t,$(e.description));return e.isCurrent?`
+  `}function _O(e){let t=$(e.name),n=gO(e,t,$(e.description));return e.isCurrent?`
       <article
         class="tool-card tool-card--current"
         aria-label="${t} — current page"
@@ -961,11 +1093,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     >
       ${n}
     </a>
-  `}function XD(e){return`
+  `}function vO(e){return`
     <div class="tools-grid">
-      ${e.map(e=>YD(e)).join(``)}
+      ${e.map(e=>_O(e)).join(``)}
     </div>
-  `}function ZD(){return`
+  `}function yO(){return`
     <section class="hero-card">
       <h1>CBS Token Launcher</h1>
       <p class="hero-text">
@@ -973,11 +1105,11 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         and submit tokens created with CBS Token Builder.
       </p>
       <div class="hero-actions">
-        ${SD()}
-        ${VE()}
+        ${ND()}
+        ${QE()}
       </div>
     </section>
-  `}function QD(e){return e.length===0?``:`
+  `}function bO(e){return e.length===0?``:`
     <section
       class="page-section"
       data-launch-section="featured"
@@ -986,9 +1118,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <h2 class="section-title" id="featured-heading">
         Featured Launches
       </h2>
-      ${KD(e)}
+      ${mO(e)}
     </section>
-  `}function $D(e){return e.length===0?``:`
+  `}function xO(e){return e.length===0?``:`
     <section
       class="page-section"
       data-launch-section="ecosystem"
@@ -997,9 +1129,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <h2 class="section-title" id="ecosystem-heading">
         CBS Ecosystem Tokens
       </h2>
-      ${KD(e)}
+      ${mO(e)}
     </section>
-  `}function eO(e){return`
+  `}function SO(e){return`
     <section
       class="page-section"
       data-launch-section="upcoming"
@@ -1008,9 +1140,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <h2 class="section-title" id="upcoming-heading">
         Upcoming Launches
       </h2>
-      ${e.length>0?KD(e):ED()}
+      ${e.length>0?mO(e):LD()}
     </section>
-  `}function tO(e){return`
+  `}function CO(e){return`
     <section
       class="page-section"
       aria-labelledby="tools-heading"
@@ -1018,13 +1150,13 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
       <h2 class="section-title" id="tools-heading">
         CBS Tools
       </h2>
-      ${XD(e)}
+      ${vO(e)}
     </section>
-  `}function nO(){return`
+  `}function wO(){return`
     <footer class="site-footer">
       <p>Always verify the official mint address before interacting with any token.</p>
     </footer>
-  `}function rO(){let e=sw(),t=uw(e),n=dw(e),r=fw(e),i=[...t,...n,...r];document.querySelector(`#app`).innerHTML=`
+  `}function TO(){let e=sw(),t=uw(e),n=dw(e),r=fw(e),i=[...t,...n,...r];document.querySelector(`#app`).innerHTML=`
     <main class="app-shell" id="top">
       <img
         class="site-banner"
@@ -1032,15 +1164,102 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         alt="CBS Token Launcher"
       />
 
-      ${ZD()}
-      ${QD(t)}
-      ${$D(n)}
-      ${eO(r)}
-      ${tO(T)}
-      ${nO()}
+      ${yO()}
+      ${bO(t)}
+      ${xO(n)}
+      ${SO(r)}
+      ${CO(T)}
+      ${wO()}
     </main>
-    ${CD()}
-  `,yE(i),wD(TD),HE(TD)}var iO=`Loading…`,aO=`—`;function oO(e,t){let n=document.querySelector(`[data-token-detail="${e.id}"]`);if(!n)return;let r=t.jsonName??t.metadataName??e.name??LT(e),i=t.jsonSymbol??t.metadataSymbol??e.symbol??aO,a=t.jsonDescription??e.description??aO;fO(n,`[data-token-name]`,r),fO(n,`[data-token-symbol]`,i),fO(n,`[data-token-description]`,a),HT(e.id,Sy(t.jsonImage??void 0),BT(e),r),fO(n,`[data-token-decimals]`,lO(t)),fO(n,`[data-token-supply]`,uO(t)),fO(n,`[data-token-metadata-uri]`,dO(t)),t.error?sO(n,t.error,`token-chain-status--error`):t.exists?pO(n):sO(n,`Mint not found`,`token-chain-status--missing`),Hw(n,e,t),Kw(n,t),Xw(n,t),yT(e),FT(e)}function sO(e,t,n){let r=e.querySelector(`[data-token-chain-status]`);r&&(r.hidden=!1,r.textContent=t,r.className=`token-chain-status ${n}`)}function cO(e){let t=document.querySelector(`[data-token-detail="${e.id}"]`);if(!t)return;fO(t,`[data-token-decimals]`,iO),fO(t,`[data-token-supply]`,iO),fO(t,`[data-token-metadata-uri]`,iO);let n=t.querySelector(`[data-token-chain-status]`);n&&(n.hidden=!1,n.textContent=`Loading on-chain data…`,n.className=`token-chain-status`)}function lO(e){return e.error||!e.exists||e.decimals===null?aO:String(e.decimals)}function uO(e){return e.error||!e.exists||e.supply===null?aO:tE(e.supply,e.decimals??0)}function dO(e){return e.error||!e.exists?aO:e.metadataFound?e.metadataUri??aO:`Metadata not found`}function fO(e,t,n,r){let i=e.querySelector(t);i&&(i.textContent=n,r&&i.classList.add(r))}function pO(e){let t=e.querySelector(`[data-token-chain-status]`);t&&(t.textContent=``,t.hidden=!0)}function mO(e){return e.section===`featured`?uw():e.section===`upcoming`?fw():dw()}function hO(e){return`
+    ${PD()}
+  `,AE(i),FD(ID),$E(ID)}function EO(e){return`token-detail-overview-${e}`}function DO(e){return`token-detail-market-${e}`}function OO(e){return`token-detail-technical-${e}`}function kO(e){return`token-detail-metadata-${e}`}function AO(e,t,n,r=!1){return`
+    <details
+      class="token-detail-accordion"
+      id="${$(e)}"
+      data-token-detail-accordion${r?` open`:``}
+    >
+      <summary class="token-detail-accordion__summary">${$(t)}</summary>
+      <div class="token-detail-accordion__body">
+        ${n}
+      </div>
+    </details>
+  `}function jO(e,t){let n=$(LT(e)),r=$(RT(e)),i=$(zT(e)),a=ew(e);return`
+    ${sT(e)}
+
+    <div class="token-header token-header--detail token-header--detail-section">
+      ${iO(e)}
+      <div class="token-title-block">
+        <h1 data-token-name>${n}</h1>
+        ${cT(e)}
+        ${uT(t,a)}
+        <p class="token-symbol" data-token-symbol>${r}</p>
+      </div>
+    </div>
+
+    <div class="launch-details token-detail-overview-description">
+      <p data-token-description>${i}</p>
+    </div>
+
+    <dl class="token-detail-details">
+      ${Uw({rowClass:`token-detail-row`})}
+    </dl>
+
+    ${qw()}
+
+    ${Vw(e)}
+
+    <p
+      class="token-chain-status"
+      data-token-chain-status
+      aria-live="polite"
+      hidden
+    ></p>
+  `}function MO(e){return ZD(e)}function NO(e){return`
+    ${uO(e.id)}
+    <div class="token-detail-tech-panels">
+      <div data-launch-analytics-root>
+        ${$w(e.id,!0)}
+      </div>
+      <div data-launch-risk-root>
+        ${kT(e.id,!0)}
+      </div>
+    </div>
+  `}function PO(e){return`
+    <dl class="token-detail-details">
+      <div class="token-detail-row token-detail-row--full">
+        <dt>Mint Address</dt>
+        <dd>
+          <code class="mint-address">${$(e.mintAddress)}</code>
+        </dd>
+      </div>
+      <div class="token-detail-row token-detail-row--full">
+        <dt>Metadata URI</dt>
+        <dd class="verify-metadata-uri" data-token-metadata-uri>—</dd>
+      </div>
+      <div class="token-detail-row">
+        <dt>Supply</dt>
+        <dd data-token-supply>—</dd>
+      </div>
+      <div class="token-detail-row">
+        <dt>Decimals</dt>
+        <dd data-token-decimals>—</dd>
+      </div>
+      <div class="token-detail-row token-detail-row--full">
+        <dt>Raw Metadata</dt>
+        <dd
+          class="verify-metadata-raw token-detail-metadata-raw"
+          data-token-metadata-raw
+        >—</dd>
+      </div>
+    </dl>
+  `}function FO(e,t){return`
+    <div class="token-detail-accordions">
+      ${AO(EO(e.id),`Overview`,jO(e,t),!0)}
+      ${AO(DO(e.id),`Market`,MO(e))}
+      ${AO(OO(e.id),`Technical Checks`,NO(e))}
+      ${AO(kO(e.id),`Metadata`,PO(e))}
+    </div>
+  `}var IO=`Loading…`,LO=`—`;function RO(e,t){let n=document.querySelector(`[data-token-detail="${e.id}"]`);if(!n)return;let r=t.jsonName??t.metadataName??e.name??LT(e),i=t.jsonSymbol??t.metadataSymbol??e.symbol??LO,a=t.jsonDescription??e.description??LO;GO(n,`[data-token-name]`,r),GO(n,`[data-token-symbol]`,i),GO(n,`[data-token-description]`,a),HT(e.id,Sy(t.jsonImage??void 0),BT(e),r),GO(n,`[data-token-decimals]`,VO(t)),GO(n,`[data-token-supply]`,HO(t)),GO(n,`[data-token-metadata-uri]`,UO(t)),GO(n,`[data-token-metadata-raw]`,WO(t)),t.error?zO(n,t.error,`token-chain-status--error`):t.exists?KO(n):zO(n,`Mint not found`,`token-chain-status--missing`),Hw(n,e,t),Kw(n,t),Xw(n,t),yT(e),FT(e)}function zO(e,t,n){let r=e.querySelector(`[data-token-chain-status]`);r&&(r.hidden=!1,r.textContent=t,r.className=`token-chain-status ${n}`)}function BO(e){let t=document.querySelector(`[data-token-detail="${e.id}"]`);if(!t)return;GO(t,`[data-token-decimals]`,IO),GO(t,`[data-token-supply]`,IO),GO(t,`[data-token-metadata-uri]`,IO),GO(t,`[data-token-metadata-raw]`,IO);let n=t.querySelector(`[data-token-chain-status]`);n&&(n.hidden=!1,n.textContent=`Loading on-chain data…`,n.className=`token-chain-status`)}function VO(e){return e.error||!e.exists||e.decimals===null?LO:String(e.decimals)}function HO(e){return e.error||!e.exists||e.supply===null?LO:dE(e.supply,e.decimals??0)}function UO(e){return e.error||!e.exists?LO:e.metadataFound?e.metadataUri??LO:`Metadata not found`}function WO(e){return e.error||!e.exists?LO:yE(e)}function GO(e,t,n,r){let i=e.querySelector(t);i&&(i.textContent=n,r&&i.classList.add(r))}function KO(e){let t=e.querySelector(`[data-token-chain-status]`);t&&(t.textContent=``,t.hidden=!0)}function qO(e){return e.section===`featured`?uw():e.section===`upcoming`?fw():dw()}function JO(e){return`
     <main class="app-shell" id="top">
       <img
         class="site-banner"
@@ -1062,106 +1281,21 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </div>
       </section>
 
-      ${nO()}
+      ${wO()}
     </main>
-  `}function gO(e){let t=$(e.id),n=$(LT(e)),r=$(RT(e)),i=$(zT(e)),a=$(e.mintAddress),o=e.launchInfo,s=$(w(e.mintAddress)),c=ew(e),l=iw(e,mO(e));return`
+  `}function YO(e){let t=$(e.id),n=$(w(e.mintAddress)),r=ew(e),i=iw(e,qO(e));return`
     <article
       class="token-detail-card launch-card"
       data-token-detail="${t}"
-      data-launch-rank-score="${c??0}"
+      data-launch-rank-score="${r??0}"
       data-token-category-slug="${$(Dy(Cy))}"
     >
-      ${sT(e)}
+      ${FO(e,i)}
 
-      <div class="token-header token-header--detail">
-        ${FD(e)}
-        <div class="token-title-block">
-          <h1 data-token-name>${n}</h1>
-          ${cT(e)}
-          ${uT(l,c)}
-          <p class="token-symbol" data-token-symbol>${r}</p>
-        </div>
-      </div>
-
-      <div class="launch-details">
-        <p data-token-description>${i}</p>
-      </div>
-
-      <p
-        class="token-chain-status"
-        data-token-chain-status
-        aria-live="polite"
-        hidden
-      ></p>
-
-      <section class="token-detail-section" aria-labelledby="on-chain-heading-${t}">
-        <h2 class="token-detail-heading" id="on-chain-heading-${t}">
-          On-Chain Data
-        </h2>
-        <dl class="token-detail-details">
-          <div class="token-detail-row token-detail-row--full">
-            <dt>Mint Address</dt>
-            <dd>
-              <code class="mint-address">${a}</code>
-            </dd>
-          </div>
-          <div class="token-detail-row">
-            <dt>Decimals</dt>
-            <dd data-token-decimals>—</dd>
-          </div>
-          <div class="token-detail-row">
-            <dt>Supply</dt>
-            <dd data-token-supply>—</dd>
-          </div>
-          <div class="token-detail-row token-detail-row--full">
-            <dt>Metadata URI</dt>
-            <dd class="verify-metadata-uri" data-token-metadata-uri>—</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section
-        class="token-detail-section"
-        aria-labelledby="launch-heading-${t}"
-        data-market-status-root
-      >
-        <h2 class="token-detail-heading" id="launch-heading-${t}">
-          Launch Info
-        </h2>
-        <dl class="token-detail-details">
-          <div class="token-detail-row">
-            <dt>Launch Status</dt>
-            <dd>${$(o.launchStatus)}</dd>
-          </div>
-          ${DD({tradingStatus:o.tradingStatus,poolStatus:o.poolStatus,rowClass:`token-detail-row`})}
-          ${Uw({rowClass:`token-detail-row`})}
-        </dl>
-        ${qw()}
-        ${Vw(e)}
-      </section>
-
-      <section
-        class="token-detail-section"
-        data-launch-analytics-root
-        aria-labelledby="launch-analytics-heading-${t}"
-      >
-        ${$w(e.id)}
-      </section>
-
-      ${LD(e.id)}
-
-      <section
-        class="token-detail-section"
-        data-launch-risk-root
-        aria-labelledby="launch-risk-heading-${t}"
-      >
-        ${kT(e.id)}
-      </section>
-
-      <div class="actions">
+      <div class="token-detail-actions actions">
         <a
           class="primary-btn"
-          href="${s}"
+          href="${n}"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -1176,9 +1310,9 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
         </button>
       </div>
 
-      ${PD(e)}
+      ${rO(e)}
     </article>
-  `}function _O(e){let t=pw(e);return t?(document.title=`${LT(t)} — CBS Token Launcher`,`
+  `}function XO(e){let t=pw(e);return t?(document.title=`${LT(t)} — CBS Token Launcher`,`
     <main class="app-shell" id="top">
       <img
         class="site-banner"
@@ -1188,8 +1322,8 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
 
       <a class="back-link" href="/" data-router-link>← Back to launcher</a>
 
-      ${gO(t)}
+      ${YO(t)}
 
-      ${nO()}
+      ${wO()}
     </main>
-  `):(document.title=`Token not found — CBS Token Launcher`,hO(e))}function vO(e){document.querySelector(`[data-refresh-token-detail="${e.id}"]`)?.addEventListener(`click`,()=>{yO(e,{forceRefresh:!0})}),yO(e)}async function yO(e,t={}){await Promise.all([xO(e,t),bO(e,t)])}async function bO(e,t={}){if(!t.forceRefresh){let t=NC(e.mintAddress);if(t){KT(e,t);return}}qT(e),KT(e,await kw(e.mintAddress,t))}async function xO(e,t={}){let n=document.querySelector(`[data-refresh-token-detail="${e.id}"]`);if(!t.forceRefresh){let t=TC(e.mintAddress);if(t){oO(e,t);return}cO(e)}n&&(n.disabled=!0);try{oO(e,await hw(e.mintAddress,t))}finally{n&&(n.disabled=!1)}}function SO(e){let t=document.querySelector(`#app`);if(!t)return;if(e.name===`home`){document.title=`CBS Token Launcher`,rO(),window.scrollTo(0,0);return}t.innerHTML=_O(e.tokenId)+CD();let n=pw(e.tokenId);n&&vO(n),wD(TD),window.scrollTo(0,0)}x(SO);
+  `):(document.title=`Token not found — CBS Token Launcher`,JO(e))}function ZO(e){document.querySelector(`[data-refresh-token-detail="${e.id}"]`)?.addEventListener(`click`,()=>{QO(e,{forceRefresh:!0})}),QO(e)}async function QO(e,t={}){await Promise.all([ek(e,t),$O(e,t)])}async function $O(e,t={}){if(!t.forceRefresh){let t=NC(e.mintAddress);if(t){ZT(e,t);return}}QT(e),ZT(e,await kw(e.mintAddress,t))}async function ek(e,t={}){let n=document.querySelector(`[data-refresh-token-detail="${e.id}"]`);if(!t.forceRefresh){let t=TC(e.mintAddress);if(t){RO(e,t);return}BO(e)}n&&(n.disabled=!0);try{RO(e,await hw(e.mintAddress,t))}finally{n&&(n.disabled=!1)}}function tk(e){let t=document.querySelector(`#app`);if(!t)return;if(e.name===`home`){document.title=`CBS Token Launcher`,TO(),window.scrollTo(0,0);return}t.innerHTML=XO(e.tokenId)+PD();let n=pw(e.tokenId);n&&ZO(n),FD(ID),window.scrollTo(0,0)}x(tk);
