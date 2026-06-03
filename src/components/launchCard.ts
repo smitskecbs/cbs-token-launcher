@@ -7,7 +7,8 @@ import {
 import { escapeHtml } from '../utils/html'
 import { renderLaunchAnalyticsPanel } from './launchAnalyticsPanel'
 import { renderLaunchRiskPanel } from './launchRiskPanel'
-import { renderLaunchInfoPanel, renderMarketDataPanel } from './launchInfoPanel'
+import { renderLaunchInfoPanel } from './launchInfoPanel'
+import { renderMarketDataPanel } from './marketDataPanel'
 import { renderLaunchCardActions } from './launchAdminActions'
 import { renderTokenLogo } from './tokenLogo'
 import { renderVerifyPanel } from './mintVerificationPanel'
@@ -75,7 +76,6 @@ export function renderLaunchCard(
       data-token-card="${id}"
       data-launch-rank-score="${score ?? 0}"
       data-launch-verification-priority="${verificationPriority}"
-      data-market-status-root
       data-token-category-slug="${escapeHtml(categoryToFilterSlug(DEFAULT_METADATA_CATEGORY))}"
       tabindex="0"
       role="link"

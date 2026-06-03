@@ -10,6 +10,7 @@ import {
 import { applyOfficialLinksFromMetadata } from './officialLinks'
 import { applyTokenCategory } from './tokenCategoryField'
 import { applyTokenTags } from './tokenTagsField'
+import { formatRawMetadataText } from './mintVerificationPanel'
 import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
 import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
 
@@ -59,6 +60,7 @@ export function applyTokenDetailFromResult(
   setText(page, '[data-token-decimals]', formatDecimals(result))
   setText(page, '[data-token-supply]', formatSupplyValue(result))
   setText(page, '[data-token-metadata-uri]', formatMetadataUri(result))
+  setText(page, '[data-token-metadata-raw]', formatRawMetadataDisplay(result))
 
   if (result.error) {
     showChainStatus(page, result.error, 'token-chain-status--error')
@@ -103,6 +105,7 @@ export function setTokenDetailLoading(launch: Launch): void {
   setText(page, '[data-token-decimals]', LOADING)
   setText(page, '[data-token-supply]', LOADING)
   setText(page, '[data-token-metadata-uri]', LOADING)
+  setText(page, '[data-token-metadata-raw]', LOADING)
 
   const status = page.querySelector<HTMLElement>('[data-token-chain-status]')
 
@@ -143,6 +146,14 @@ function formatMetadataUri(result: ReadTokenMintResult): string {
   }
 
   return result.metadataUri ?? EMPTY
+}
+
+function formatRawMetadataDisplay(result: ReadTokenMintResult): string {
+  if (result.error || !result.exists) {
+    return EMPTY
+  }
+
+  return formatRawMetadataText(result)
 }
 
 function setText(

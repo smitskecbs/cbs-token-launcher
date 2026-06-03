@@ -203,6 +203,15 @@ function renderExpandedMetadataRows(
 }
 
 function renderRawMetadataBlock(result: ReadTokenMintResult): string {
+  return `
+    <div class="verify-detail verify-detail--full">
+      <dt>Raw Metadata</dt>
+      <dd class="verify-metadata-raw">${escapeHtml(formatRawMetadataText(result))}</dd>
+    </div>
+  `
+}
+
+export function formatRawMetadataText(result: ReadTokenMintResult): string {
   const lines: string[] = [
     `On-chain name: ${result.metadataName ?? '—'}`,
     `On-chain symbol: ${result.metadataSymbol ?? '—'}`,
@@ -236,12 +245,7 @@ function renderRawMetadataBlock(result: ReadTokenMintResult): string {
     lines.push('JSON metadata: unavailable')
   }
 
-  return `
-    <div class="verify-detail verify-detail--full">
-      <dt>Raw Metadata</dt>
-      <dd class="verify-metadata-raw">${escapeHtml(lines.join('\n'))}</dd>
-    </div>
-  `
+  return lines.join('\n')
 }
 
 function renderCacheFooter(launchId?: string): string {

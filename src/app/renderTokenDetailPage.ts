@@ -7,31 +7,12 @@ import {
   getLaunchById,
   getUpcomingLaunches,
 } from '../services/launchService'
-import {
-  getLaunchDisplayDescription,
-  getLaunchDisplayName,
-  getLaunchDisplaySymbol,
-} from '../components/applyLaunchCardMetadata'
-import { renderTokenLogo } from '../components/tokenLogo'
+import { getLaunchDisplayName } from '../components/applyLaunchCardMetadata'
 import { escapeHtml } from '../utils/html'
 import { renderFooter } from '../components/sections'
-import { renderLaunchAnalyticsPanel } from '../components/launchAnalyticsPanel'
-import { renderLaunchRiskPanel } from '../components/launchRiskPanel'
-import { renderTechnicalRiskNotice } from '../components/technicalRiskNotice'
-import { renderLaunchOfficialLinksPanel } from '../components/officialLinks'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
-import { renderMarketStatusFields } from '../components/marketStatusFields'
-import { renderTokenCategoryField } from '../components/tokenCategoryField'
-import { renderTokenTagsPanel } from '../components/tokenTagsField'
-import {
-  renderLaunchBadges,
-  renderLaunchRankMeta,
-  renderVerificationBadge,
-} from '../components/launchBadges'
-import {
-  getLaunchRankInSection,
-  getLaunchRankScore,
-} from '../services/launchRankingService'
+import { renderTokenDetailSections } from '../components/tokenDetailSections'
+import { getLaunchRankInSection, getLaunchRankScore } from '../services/launchRankingService'
 import {
   categoryToFilterSlug,
   DEFAULT_METADATA_CATEGORY,
@@ -91,11 +72,6 @@ function renderNotFound(tokenId: string): string {
 
 function renderTokenDetailCard(launch: Launch): string {
   const id = escapeHtml(launch.id)
-  const name = escapeHtml(getLaunchDisplayName(launch))
-  const symbol = escapeHtml(getLaunchDisplaySymbol(launch))
-  const description = escapeHtml(getLaunchDisplayDescription(launch))
-  const mintAddress = escapeHtml(launch.mintAddress)
-  const info = launch.launchInfo
   const solscanUrl = escapeHtml(getSolscanTokenUrl(launch.mintAddress))
   const score = getLaunchRankScore(launch)
   const sectionRank = getLaunchRankInSection(
@@ -110,98 +86,9 @@ function renderTokenDetailCard(launch: Launch): string {
       data-launch-rank-score="${score ?? 0}"
       data-token-category-slug="${escapeHtml(categoryToFilterSlug(DEFAULT_METADATA_CATEGORY))}"
     >
-      ${renderLaunchBadges(launch)}
+      ${renderTokenDetailSections(launch, sectionRank)}
 
-      <div class="token-header token-header--detail">
-        ${renderTokenLogo(launch)}
-        <div class="token-title-block">
-          <h1 data-token-name>${name}</h1>
-          ${renderVerificationBadge(launch)}
-          ${renderLaunchRankMeta(sectionRank, score)}
-          <p class="token-symbol" data-token-symbol>${symbol}</p>
-        </div>
-      </div>
-
-      <div class="launch-details">
-        <p data-token-description>${description}</p>
-      </div>
-
-      <p
-        class="token-chain-status"
-        data-token-chain-status
-        aria-live="polite"
-        hidden
-      ></p>
-
-      <section class="token-detail-section" aria-labelledby="on-chain-heading-${id}">
-        <h2 class="token-detail-heading" id="on-chain-heading-${id}">
-          On-Chain Data
-        </h2>
-        <dl class="token-detail-details">
-          <div class="token-detail-row token-detail-row--full">
-            <dt>Mint Address</dt>
-            <dd>
-              <code class="mint-address">${mintAddress}</code>
-            </dd>
-          </div>
-          <div class="token-detail-row">
-            <dt>Decimals</dt>
-            <dd data-token-decimals>—</dd>
-          </div>
-          <div class="token-detail-row">
-            <dt>Supply</dt>
-            <dd data-token-supply>—</dd>
-          </div>
-          <div class="token-detail-row token-detail-row--full">
-            <dt>Metadata URI</dt>
-            <dd class="verify-metadata-uri" data-token-metadata-uri>—</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section
-        class="token-detail-section"
-        aria-labelledby="launch-heading-${id}"
-        data-market-status-root
-      >
-        <h2 class="token-detail-heading" id="launch-heading-${id}">
-          Launch Info
-        </h2>
-        <dl class="token-detail-details">
-          <div class="token-detail-row">
-            <dt>Launch Status</dt>
-            <dd>${escapeHtml(info.launchStatus)}</dd>
-          </div>
-          ${renderMarketStatusFields({
-            tradingStatus: info.tradingStatus,
-            poolStatus: info.poolStatus,
-            rowClass: 'token-detail-row',
-          })}
-          ${renderTokenCategoryField({ rowClass: 'token-detail-row' })}
-        </dl>
-        ${renderTokenTagsPanel()}
-        ${renderLaunchOfficialLinksPanel(launch)}
-      </section>
-
-      <section
-        class="token-detail-section"
-        data-launch-analytics-root
-        aria-labelledby="launch-analytics-heading-${id}"
-      >
-        ${renderLaunchAnalyticsPanel(launch.id)}
-      </section>
-
-      ${renderTechnicalRiskNotice(launch.id)}
-
-      <section
-        class="token-detail-section"
-        data-launch-risk-root
-        aria-labelledby="launch-risk-heading-${id}"
-      >
-        ${renderLaunchRiskPanel(launch.id)}
-      </section>
-
-      <div class="actions">
+      <div class="token-detail-actions actions">
         <a
           class="primary-btn"
           href="${solscanUrl}"

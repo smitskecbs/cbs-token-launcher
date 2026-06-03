@@ -19,6 +19,10 @@ export interface MarketStatusResult {
   liquiditySource: MarketDataSource | null
   /** Shown when Dexscreener has no pool but a fallback has quote data */
   poolDataNote: string | null
+  /** 24h volume in USD — required for market risk when available */
+  volume24hUsd?: number | null
+  /** Top holder concentration % — required for market risk when available */
+  topHolderConcentrationPercent?: number | null
   error: string | null
 }
 

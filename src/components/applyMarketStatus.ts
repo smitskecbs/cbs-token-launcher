@@ -1,28 +1,36 @@
 import type { Launch } from '../types/launch'
 import type { MarketStatusResult } from '../types/marketStatus'
 import { MARKET_STATUS } from '../types/marketStatus'
+import { MARKET_DATA_UNAVAILABLE } from '../types/marketData'
 import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
 import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
-import { formatLiquidityUsd } from '../utils/formatLiquidityUsd'
-import { formatTokenPriceUsd } from '../utils/formatTokenPrice'
+import { formatLiquidity, hasValidMarketLiquidity } from '../utils/formatLiquidity'
+import { formatPrice, hasValidMarketPrice } from '../utils/formatPrice'
 import { escapeHtml } from '../utils/html'
 
-const EMPTY = '—'
+const OVERVIEW_PENDING = '—'
 
 export function applyMarketStatus(
   launch: Launch,
   result: MarketStatusResult,
 ): void {
-  applyMarketStatusToRoot(
+  applyMarketOverview(
     document.querySelector<HTMLElement>(
-      `[data-token-card="${launch.id}"]`,
+      `[data-token-card="${launch.id}"] .launch-card-overview`,
     ),
     result,
   )
 
-  applyMarketStatusToRoot(
+  applyMarketDataPanel(
     document.querySelector<HTMLElement>(
-      `[data-token-detail="${launch.id}"] [data-market-status-root]`,
+      `[data-token-card="${launch.id}"] [data-market-data-root]`,
+    ),
+    result,
+  )
+
+  applyMarketDataPanel(
+    document.querySelector<HTMLElement>(
+      `[data-token-detail="${launch.id}"] [data-market-data-root]`,
     ),
     result,
   )
@@ -33,30 +41,44 @@ export function applyMarketStatus(
 
 export function setMarketStatusChecking(launch: Launch): void {
   const checking = MARKET_STATUS.CHECKING
-  const checkingDisplay = {
-    tradingStatus: checking,
-    poolStatus: checking,
+
+  const overviewDisplay = {
     price: checking,
-    pairHtml: `<span class="market-pair-empty">${escapeHtml(checking)}</span>`,
     liquidity: checking,
   }
 
-  applyMarketStatusFields(
+  const detailDisplay = {
+    tradingStatus: checking,
+    poolStatus: checking,
+    price: checking,
+    pairText: checking,
+    liquidity: checking,
+    dexscreenerHtml: `<span class="market-data-empty">${escapeHtml(checking)}</span>`,
+  }
+
+  applyMarketOverviewFields(
     document.querySelector<HTMLElement>(
-      `[data-token-card="${launch.id}"]`,
+      `[data-token-card="${launch.id}"] .launch-card-overview`,
     ),
-    checkingDisplay,
+    overviewDisplay,
   )
 
-  applyMarketStatusFields(
+  applyMarketDataFields(
     document.querySelector<HTMLElement>(
-      `[data-token-detail="${launch.id}"] [data-market-status-root]`,
+      `[data-token-card="${launch.id}"] [data-market-data-root]`,
     ),
-    checkingDisplay,
+    detailDisplay,
+  )
+
+  applyMarketDataFields(
+    document.querySelector<HTMLElement>(
+      `[data-token-detail="${launch.id}"] [data-market-data-root]`,
+    ),
+    detailDisplay,
   )
 }
 
-function applyMarketStatusToRoot(
+function applyMarketOverview(
   root: HTMLElement | null,
   result: MarketStatusResult,
 ): void {
@@ -64,79 +86,136 @@ function applyMarketStatusToRoot(
     return
   }
 
-  applyMarketStatusFields(root, {
-    tradingStatus: result.tradingStatus,
-    poolStatus: result.poolStatus,
-    price: renderPriceText(result),
-    pairHtml: renderPairHtml(result),
-    liquidity: renderLiquidityText(result),
+  applyMarketOverviewFields(root, {
+    price: renderOverviewPriceText(result),
+    liquidity: renderOverviewLiquidityText(result),
   })
 }
 
-function renderPriceText(result: MarketStatusResult): string {
-  if (result.error && result.priceUsd === null) {
-    return MARKET_STATUS.UNAVAILABLE
+function applyMarketDataPanel(
+  root: HTMLElement | null,
+  result: MarketStatusResult,
+): void {
+  if (!root) {
+    return
   }
 
-  if (result.priceUsd === null) {
-    return EMPTY
-  }
-
-  return formatTokenPriceUsd(result.priceUsd)
+  applyMarketDataFields(root, {
+    tradingStatus: result.tradingStatus,
+    poolStatus: result.poolStatus,
+    price: renderDetailPriceText(result),
+    pairText: renderMainPairText(result),
+    liquidity: renderDetailLiquidityText(result),
+    dexscreenerHtml: renderDexscreenerLinkHtml(result),
+  })
 }
 
-function renderLiquidityText(result: MarketStatusResult): string {
-  if (result.error && result.liquidityUsd === null) {
-    return MARKET_STATUS.UNAVAILABLE
+function renderOverviewPriceText(result: MarketStatusResult): string {
+  if (result.error && !hasValidMarketPrice(result.priceUsd)) {
+    return MARKET_DATA_UNAVAILABLE
   }
 
-  if (result.liquidityUsd === null) {
-    return EMPTY
+  if (!hasValidMarketPrice(result.priceUsd)) {
+    return OVERVIEW_PENDING
   }
 
-  return formatLiquidityUsd(result.liquidityUsd)
+  return formatPrice(result.priceUsd, { compact: true })
 }
 
-function renderPairHtml(result: MarketStatusResult): string {
+function renderOverviewLiquidityText(result: MarketStatusResult): string {
+  if (result.error && !hasValidMarketLiquidity(result.liquidityUsd)) {
+    return MARKET_DATA_UNAVAILABLE
+  }
+
+  if (!hasValidMarketLiquidity(result.liquidityUsd)) {
+    return OVERVIEW_PENDING
+  }
+
+  return formatLiquidity(result.liquidityUsd, { compact: true })
+}
+
+function renderDetailPriceText(result: MarketStatusResult): string {
+  if (!hasValidMarketPrice(result.priceUsd)) {
+    return MARKET_DATA_UNAVAILABLE
+  }
+
+  return formatPrice(result.priceUsd)
+}
+
+function renderDetailLiquidityText(result: MarketStatusResult): string {
+  if (!hasValidMarketLiquidity(result.liquidityUsd)) {
+    return MARKET_DATA_UNAVAILABLE
+  }
+
+  return formatLiquidity(result.liquidityUsd)
+}
+
+function renderMainPairText(result: MarketStatusResult): string {
   if (result.error && !result.tradable) {
-    return `<span class="market-pair-empty">${escapeHtml(MARKET_STATUS.UNAVAILABLE)}</span>`
+    return MARKET_DATA_UNAVAILABLE
   }
 
   if (result.pairName && result.tradable) {
-    const pairName = escapeHtml(result.pairName)
-
-    if (result.pairUrl) {
-      return `
-        <span class="market-pair-name">${pairName}</span>
-        <a class="market-pair-link" href="${escapeHtml(result.pairUrl)}" target="_blank" rel="noopener noreferrer">Dexscreener</a>
-      `
-    }
-
-    return `<span class="market-pair-name">${pairName}</span>`
+    return result.pairName
   }
 
   if (result.poolDataNote) {
-    return `<span class="market-pair-empty">${escapeHtml(result.poolDataNote)}</span>`
+    return result.poolDataNote
   }
 
   if (!result.tradable) {
-    return `<span class="market-pair-empty">${escapeHtml(MARKET_STATUS.NO_PAIR)}</span>`
+    return MARKET_STATUS.NO_PAIR
   }
 
-  return `<span class="market-pair-empty">${escapeHtml(EMPTY)}</span>`
+  return MARKET_DATA_UNAVAILABLE
 }
 
-interface MarketStatusDisplay {
-  tradingStatus: string
-  poolStatus: string
+function renderDexscreenerLinkHtml(result: MarketStatusResult): string {
+  if (result.pairUrl) {
+    const url = escapeHtml(result.pairUrl)
+
+    return `
+      <a
+        class="market-dexscreener-link"
+        href="${url}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >View on Dexscreener</a>
+    `
+  }
+
+  return `<span class="market-data-empty">${escapeHtml(MARKET_DATA_UNAVAILABLE)}</span>`
+}
+
+interface MarketOverviewDisplay {
   price: string
-  pairHtml: string
   liquidity: string
 }
 
-function applyMarketStatusFields(
+interface MarketDataDisplay {
+  tradingStatus: string
+  poolStatus: string
+  price: string
+  pairText: string
+  liquidity: string
+  dexscreenerHtml: string
+}
+
+function applyMarketOverviewFields(
   root: HTMLElement | null,
-  display: MarketStatusDisplay,
+  display: MarketOverviewDisplay,
+): void {
+  if (!root) {
+    return
+  }
+
+  setText(root, '[data-market-overview-price]', display.price)
+  setText(root, '[data-market-overview-liquidity]', display.liquidity)
+}
+
+function applyMarketDataFields(
+  root: HTMLElement | null,
+  display: MarketDataDisplay,
 ): void {
   if (!root) {
     return
@@ -144,9 +223,10 @@ function applyMarketStatusFields(
 
   setText(root, '[data-market-trading-status]', display.tradingStatus)
   setText(root, '[data-market-pool-status]', display.poolStatus)
-  setText(root, '[data-market-price]', display.price)
-  setText(root, '[data-market-liquidity]', display.liquidity)
-  setPairHtml(root, display.pairHtml)
+  setText(root, '[data-market-detail-price]', display.price)
+  setText(root, '[data-market-detail-liquidity]', display.liquidity)
+  setText(root, '[data-market-detail-pair]', display.pairText)
+  setDexscreenerHtml(root, display.dexscreenerHtml)
 }
 
 function setText(
@@ -159,8 +239,10 @@ function setText(
   }
 }
 
-function setPairHtml(root: HTMLElement, html: string): void {
-  const element = root.querySelector<HTMLElement>('[data-market-pair]')
+function setDexscreenerHtml(root: HTMLElement, html: string): void {
+  const element = root.querySelector<HTMLElement>(
+    '[data-market-dexscreener-link]',
+  )
 
   if (element) {
     element.innerHTML = html

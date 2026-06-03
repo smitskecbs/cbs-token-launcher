@@ -1,4 +1,5 @@
-import { renderTechnicalRiskInfoIcon } from './technicalRiskNotice'
+import { renderTechnicalRiskInfoIcon } from './riskTooltips'
+import { renderLaunchOverviewMarketRisk } from './launchMarketRiskPanel'
 
 const EMPTY_SCORE = '—/100'
 const EMPTY_VALUE = '—'
@@ -10,11 +11,11 @@ export function renderLaunchCardOverview(launchId?: string): string {
     <dl class="launch-overview-stats">
       <div class="launch-overview-stat">
         <dt>Price</dt>
-        <dd data-market-price>${EMPTY_VALUE}</dd>
+        <dd data-market-overview-price>${EMPTY_VALUE}</dd>
       </div>
       <div class="launch-overview-stat">
         <dt>Liquidity</dt>
-        <dd data-market-liquidity>${EMPTY_VALUE}</dd>
+        <dd data-market-overview-liquidity>${EMPTY_VALUE}</dd>
       </div>
       <div class="launch-overview-stat">
         <dt>Score</dt>
@@ -31,5 +32,6 @@ export function renderLaunchCardOverview(launchId?: string): string {
         >${EMPTY_LEVEL}</dd>
       </div>
     </dl>
+    ${renderLaunchOverviewMarketRisk(launchId)}
   `
 }

@@ -44,20 +44,3 @@ export function renderTechnicalRiskNotice(launchId?: string): string {
     </aside>
   `
 }
-
-export function renderTechnicalRiskInfoIcon(launchId?: string): string {
-  const id = escapeHtml(noticeHeadingId(launchId))
-
-  return `
-    <button
-      type="button"
-      class="technical-risk-info-btn"
-      data-technical-risk-info
-      aria-label="About Technical Risk"
-      aria-describedby="${id}"
-      title="Technical Risk checks metadata, authorities, mint verification, and pool detection only. It does not evaluate investment or market risk."
-    >
-      <span class="technical-risk-info-icon" aria-hidden="true">i</span>
-    </button>
-  `
-}

@@ -1,5 +1,31 @@
 import { escapeHtml } from '../utils/html'
 
+/** Market fields for token detail pages */
+export function renderTokenDetailMarketFields(options: {
+  tradingStatus: string
+}): string {
+  const tradingStatus = escapeHtml(options.tradingStatus)
+
+  return `
+    <div class="token-detail-row">
+      <dt>Price</dt>
+      <dd data-market-price>—</dd>
+    </div>
+    <div class="token-detail-row">
+      <dt>Liquidity</dt>
+      <dd data-market-liquidity>—</dd>
+    </div>
+    <div class="token-detail-row token-detail-row--full">
+      <dt>Pair</dt>
+      <dd class="market-pair-value" data-market-pair>—</dd>
+    </div>
+    <div class="token-detail-row">
+      <dt>Trading Status</dt>
+      <dd data-market-trading-status>${tradingStatus}</dd>
+    </div>
+  `
+}
+
 /** Shared trading/pool/liquidity/pair/price fields for cards and detail pages */
 export function renderMarketStatusFields(options: {
   tradingStatus: string
