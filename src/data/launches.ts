@@ -36,4 +36,26 @@ export const launches: Launch[] = [
       },
     },
   },
+  {
+    id: 'mango',
+    mintAddress: '29KN57rM6tV2aWdo1agZcF6ynPXB1dhHdKHNrrAmaNGo',
+    status: 'preparing',
+    section: 'upcoming',
+    featured: true,
+    createdAt: Date.parse('2025-01-15T00:00:00.000Z'),
+    name: 'ManGo',
+    symbol: 'MNGO',
+    description:
+      'ManGo is the first public example token created with CBS tools, but it is a separate meme project outside CBS Coin.',
+    logoFallback: 'M',
+    launchInfo: {
+      launchStatus: 'Coming Soon',
+      tradingStatus: 'Trading not live yet',
+      poolStatus: 'Liquidity pool not created yet',
+      launchDate: 'Official launch coming soon',
+      officialLinks: {
+        website: 'https://mangomeme.fun',
+      },
+    },
+  },
 ]
