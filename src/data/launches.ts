@@ -21,6 +21,8 @@ export const launches: Launch[] = [
     mintAddress: 'B9z8cEWFmc7LvQtjKsaLoKqW5MJmGRCWqs1DPKupCfkk',
     status: 'live',
     section: 'ecosystem',
+    featured: true,
+    createdAt: Date.parse('2024-01-01T00:00:00.000Z'),
     verificationLevel: 'cbs-verified',
     autoLoadMetadata: true,
     logoFallback: 'C',

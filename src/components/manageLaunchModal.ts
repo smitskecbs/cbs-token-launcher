@@ -91,6 +91,15 @@ export function renderManageLaunchModal(): string {
             />
           </label>
 
+          <label class="submit-launch-field submit-launch-field--checkbox">
+            <input
+              type="checkbox"
+              name="featured"
+              data-manage-featured
+            />
+            <span class="submit-launch-label">Featured launch</span>
+          </label>
+
           <label class="submit-launch-field">
             <span class="submit-launch-label">Verification Level</span>
             <select
@@ -144,6 +153,7 @@ interface ManageLaunchModalElements {
   sectionSelect: HTMLSelectElement
   launchDateInput: HTMLInputElement
   verificationLevelSelect: HTMLSelectElement
+  featuredCheckbox: HTMLInputElement
   errorElement: HTMLElement
 }
 
@@ -188,6 +198,9 @@ export function attachManageLaunchModal(
   const verificationLevelSelect = modal.querySelector<HTMLSelectElement>(
     '[data-manage-verification-level]',
   )
+  const featuredCheckbox = modal.querySelector<HTMLInputElement>(
+    '[data-manage-featured]',
+  )
   const errorElement = modal.querySelector<HTMLElement>(
     '[data-manage-error]',
   )
@@ -201,6 +214,7 @@ export function attachManageLaunchModal(
     !sectionSelect ||
     !launchDateInput ||
     !verificationLevelSelect ||
+    !featuredCheckbox ||
     !errorElement
   ) {
     return
@@ -216,6 +230,7 @@ export function attachManageLaunchModal(
     sectionSelect,
     launchDateInput,
     verificationLevelSelect,
+    featuredCheckbox,
     errorElement,
   })
 
@@ -323,6 +338,8 @@ function openManageLaunchEditModal(launchId: string): void {
     record?.launchDate ?? launch.launchInfo.launchDate
   ui.verificationLevelSelect.value =
     launch.verificationLevel ?? record?.verificationLevel ?? 'normal'
+  ui.featuredCheckbox.checked =
+    launch.featured === true || record?.featured === true
 
   ui.modal.hidden = false
   ui.modal.setAttribute('aria-hidden', 'false')
@@ -389,6 +406,7 @@ function saveManageLaunchChanges(): void {
     launchDate,
     verificationLevel:
       ui.verificationLevelSelect.value as LaunchVerificationLevel,
+    featured: ui.featuredCheckbox.checked,
   })
 
   if (!updated) {

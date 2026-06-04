@@ -4,6 +4,7 @@ import {
   MARKET_DATA_UNAVAILABLE,
 } from '../types/marketData'
 import { escapeHtml } from '../utils/html'
+import { renderCreatePoolAction } from './createPoolModal'
 import { renderLaunchMarketRiskPanel } from './launchMarketRiskPanel'
 
 const INITIAL_VALUE = '—'
@@ -17,6 +18,7 @@ export function renderMarketDataPanel(launch: Launch): string {
         tradingStatus: info.tradingStatus,
         poolStatus: info.poolStatus,
       })}
+      ${renderCreatePoolAction(launch)}
       ${renderMarketDataHolderPlaceholders()}
     </div>
     ${renderLaunchMarketRiskPanel(launch.id, true)}

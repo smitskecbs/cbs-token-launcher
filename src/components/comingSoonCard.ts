@@ -1,7 +1,7 @@
 /** Empty state when no upcoming launches are in the catalog */
 export function renderComingSoonCard(): string {
   return `
-    <article class="launch-card launch-card--placeholder">
+    <article class="launch-card launch-card--placeholder" data-launch-filter-placeholder>
       <div class="coming-soon-icon" aria-hidden="true">⏳</div>
       <h3>Coming Soon</h3>
       <p class="coming-soon-text">

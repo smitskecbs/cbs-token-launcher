@@ -7,6 +7,8 @@ import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
 import { formatLiquidity, hasValidMarketLiquidity } from '../utils/formatLiquidity'
 import { formatPrice, hasValidMarketPrice } from '../utils/formatPrice'
 import { escapeHtml } from '../utils/html'
+import { canPreparePoolCreation } from '../services/poolCreationEligibility'
+import { updateCreatePoolActionVisibility } from './createPoolModal'
 
 const OVERVIEW_PENDING = '—'
 
@@ -35,8 +37,7 @@ export function applyMarketStatus(
     result,
   )
 
-  refreshLaunchAnalytics(launch)
-  refreshLaunchRisk(launch)
+  updateCreatePoolActions(launch, result)
 }
 
 export function setMarketStatusChecking(launch: Launch): void {
@@ -75,6 +76,48 @@ export function setMarketStatusChecking(launch: Launch): void {
       `[data-token-detail="${launch.id}"] [data-market-data-root]`,
     ),
     detailDisplay,
+  )
+
+  hideCreatePoolActions(launch)
+}
+
+function updateCreatePoolActions(
+  launch: Launch,
+  result: MarketStatusResult,
+): void {
+  const visible = canPreparePoolCreation(result)
+
+  updateCreatePoolActionVisibility(
+    document.querySelector<HTMLElement>(
+      `[data-token-card="${launch.id}"] [data-market-data-root]`,
+    ),
+    visible,
+  )
+
+  updateCreatePoolActionVisibility(
+    document.querySelector<HTMLElement>(
+      `[data-token-detail="${launch.id}"] [data-market-data-root]`,
+    ),
+    visible,
+  )
+
+  refreshLaunchAnalytics(launch)
+  refreshLaunchRisk(launch)
+}
+
+function hideCreatePoolActions(launch: Launch): void {
+  updateCreatePoolActionVisibility(
+    document.querySelector<HTMLElement>(
+      `[data-token-card="${launch.id}"] [data-market-data-root]`,
+    ),
+    false,
+  )
+
+  updateCreatePoolActionVisibility(
+    document.querySelector<HTMLElement>(
+      `[data-token-detail="${launch.id}"] [data-market-data-root]`,
+    ),
+    false,
   )
 }
 

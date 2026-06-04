@@ -49,6 +49,10 @@ export interface Launch {
   mintAddress: string
   status: LaunchStatus
   section: LaunchSection
+  /** Highlight in the Featured Launches homepage section */
+  featured?: boolean
+  /** Catalog creation time (Unix ms) for built-in launches */
+  createdAt?: number
   /** Load token metadata from mint on page load (uses cache when available) */
   autoLoadMetadata?: boolean
   launchInfo: LaunchInfo

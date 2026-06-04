@@ -3,45 +3,37 @@ import { cbsTools } from '../data/tools'
 import { attachLaunchCardHandlers } from '../components/launchCardHandlers'
 import { attachLaunchDataActions } from '../components/launchDataActions'
 import { attachAppModals, renderAppModals } from '../components/appModals'
-import { handleCatalogChange } from './handleCatalogChange'
 import {
-  getEcosystemTokens,
-  getFeaturedLaunches,
-  getLaunchCatalog,
-  getUpcomingLaunches,
-} from '../services/launchService'
+  attachLaunchFilters,
+  renderLaunchFiltersPanel,
+} from '../components/launchFiltersPanel'
+import { handleCatalogChange } from './handleCatalogChange'
+import { getLaunchCatalog } from '../services/launchService'
+import {
+  getAllHomepageLaunches,
+  resolveHomepageSections,
+} from '../services/homepageSectionsService'
 import {
   renderCbsEcosystemTokensSection,
   renderCbsToolsSection,
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
+  renderNewLaunchesSection,
+  renderTrendingLaunchesSection,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
 
 /**
  * Compose and mount the CBS Token Launcher homepage.
  *
- * Data flow:
- *   data/launches.ts → launchService (filter by status) → launch cards → DOM
- *
- * Every launch card is rendered from the `launches` catalog — add or remove
- * entries in data/launches.ts without changing page structure.
- *
- * Future Phase: call enrichAllLaunches(launches) before render to merge
- * on-chain metadata and market data into each card.
- * Category filtering: applyCategoryFilter() + categoryService helpers.
+ * Each launch appears in one homepage section only.
+ * Priority: Featured > Trending > New > Upcoming > Ecosystem
  */
 export function renderApp(): void {
   const catalog = getLaunchCatalog()
-  const featuredLaunches = getFeaturedLaunches(catalog)
-  const ecosystemTokens = getEcosystemTokens(catalog)
-  const upcomingLaunches = getUpcomingLaunches(catalog)
-  const renderedLaunches = [
-    ...featuredLaunches,
-    ...ecosystemTokens,
-    ...upcomingLaunches,
-  ]
+  const homepage = resolveHomepageSections(catalog)
+  const renderedLaunches = getAllHomepageLaunches(homepage)
 
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
@@ -52,9 +44,12 @@ export function renderApp(): void {
       />
 
       ${renderHeroSection()}
-      ${renderFeaturedLaunchesSection(featuredLaunches)}
-      ${renderCbsEcosystemTokensSection(ecosystemTokens)}
-      ${renderUpcomingLaunchesSection(upcomingLaunches)}
+      ${renderLaunchFiltersPanel()}
+      ${renderFeaturedLaunchesSection(homepage.featured)}
+      ${renderTrendingLaunchesSection(homepage.trending)}
+      ${renderNewLaunchesSection(homepage.newLaunches)}
+      ${renderUpcomingLaunchesSection(homepage.upcoming)}
+      ${renderCbsEcosystemTokensSection(homepage.ecosystem)}
       ${renderCbsToolsSection(cbsTools)}
       ${renderFooter()}
     </main>
@@ -62,6 +57,9 @@ export function renderApp(): void {
   `
 
   attachLaunchCardHandlers(renderedLaunches)
+  attachLaunchFilters(renderedLaunches, {
+    initialCount: renderedLaunches.length,
+  })
   attachAppModals(handleCatalogChange)
   attachLaunchDataActions(handleCatalogChange)
 }

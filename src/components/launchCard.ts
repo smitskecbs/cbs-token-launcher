@@ -1,4 +1,5 @@
 import type { Launch } from '../types/launch'
+import type { HomepageSectionId } from '../types/homepage'
 import {
   getLaunchDisplayDescription,
   getLaunchDisplayName,
@@ -19,7 +20,10 @@ import {
   getLaunchCardVerificationPriority,
 } from './launchBadges'
 import { getLaunchRankScore } from '../services/launchRankingService'
-import { categoryToFilterSlug, DEFAULT_METADATA_CATEGORY } from '../utils/metadataCategory'
+import {
+  buildLaunchSearchText,
+  getLaunchFilterCategorySlug,
+} from '../services/launchFilterService'
 import {
   launchAnalyticsAccordionId,
   launchInfoAccordionId,
@@ -60,14 +64,21 @@ function renderMetadataAccordionContent(launch: Launch): string {
 /** Reusable launch card — metadata fields update after Verify Mint */
 export function renderLaunchCard(
   launch: Launch,
-  sectionRank?: number,
+  options: {
+    sectionRank?: number
+    homepageSection?: HomepageSectionId | null
+  } = {},
 ): string {
+  const sectionRank = options.sectionRank
+  const homepageSection = options.homepageSection ?? null
   const id = escapeHtml(launch.id)
   const name = escapeHtml(getLaunchDisplayName(launch))
   const symbol = escapeHtml(getLaunchDisplaySymbol(launch))
   const description = escapeHtml(getLaunchDisplayDescription(launch))
   const score = getLaunchRankScore(launch)
   const verificationPriority = getLaunchCardVerificationPriority(launch)
+  const searchText = escapeHtml(buildLaunchSearchText(launch))
+  const categorySlug = escapeHtml(getLaunchFilterCategorySlug(launch))
 
   return `
     <article
@@ -76,13 +87,17 @@ export function renderLaunchCard(
       data-token-card="${id}"
       data-launch-rank-score="${score ?? 0}"
       data-launch-verification-priority="${verificationPriority}"
-      data-token-category-slug="${escapeHtml(categoryToFilterSlug(DEFAULT_METADATA_CATEGORY))}"
+      data-launch-search="${searchText}"
+      data-launch-status="${escapeHtml(launch.status)}"
+      data-launch-section="${escapeHtml(launch.section)}"
+      data-token-category-slug="${categorySlug}"
+      ${homepageSection ? `data-homepage-section="${escapeHtml(homepageSection)}"` : ''}
       tabindex="0"
       role="link"
       aria-label="View ${name} details"
     >
       <div class="launch-card-overview">
-        ${renderLaunchBadges(launch)}
+        ${renderLaunchBadges(launch, homepageSection)}
 
         <div class="token-header">
           ${renderLogo(launch)}
@@ -135,7 +150,10 @@ export function renderLaunchCard(
   `
 }
 
-export function renderLaunchCardList(launches: Launch[]): string {
+export function renderLaunchCardList(
+  launches: Launch[],
+  homepageSection?: HomepageSectionId,
+): string {
   if (launches.length === 0) {
     return ''
   }
@@ -143,7 +161,12 @@ export function renderLaunchCardList(launches: Launch[]): string {
   return `
     <div class="launch-card-list">
       ${launches
-        .map((launch, index) => renderLaunchCard(launch, index + 1))
+        .map((launch, index) =>
+          renderLaunchCard(launch, {
+            sectionRank: index + 1,
+            homepageSection,
+          }),
+        )
         .join('')}
     </div>
   `

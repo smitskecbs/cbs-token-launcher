@@ -2,17 +2,20 @@ import bannerUrl from '../assets/launcher-banner.png'
 import type { Launch } from '../types/launch'
 import { getSolscanTokenUrl } from '../config/urls'
 import {
-  getEcosystemTokens,
-  getFeaturedLaunches,
+  getHomepageSectionLaunches,
   getLaunchById,
-  getUpcomingLaunches,
+  getLaunchCatalog,
 } from '../services/launchService'
 import { getLaunchDisplayName } from '../components/applyLaunchCardMetadata'
 import { escapeHtml } from '../utils/html'
 import { renderFooter } from '../components/sections'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
-import { getLaunchRankInSection, getLaunchRankScore } from '../services/launchRankingService'
+import {
+  getLaunchRankInSection,
+  getLaunchRankScore,
+} from '../services/launchRankingService'
+import { resolveHomepageSections } from '../services/homepageSectionsService'
 import {
   categoryToFilterSlug,
   DEFAULT_METADATA_CATEGORY,
@@ -31,15 +34,7 @@ import { getCachedMintVerification } from '../services/mintVerificationCache'
 import { getCachedMarketStatus } from '../services/marketStatusCache'
 
 function getSectionLaunchesForRank(launch: Launch) {
-  if (launch.section === 'featured') {
-    return getFeaturedLaunches()
-  }
-
-  if (launch.section === 'upcoming') {
-    return getUpcomingLaunches()
-  }
-
-  return getEcosystemTokens()
+  return getHomepageSectionLaunches(launch)
 }
 
 function renderNotFound(tokenId: string): string {
@@ -74,9 +69,13 @@ function renderTokenDetailCard(launch: Launch): string {
   const id = escapeHtml(launch.id)
   const solscanUrl = escapeHtml(getSolscanTokenUrl(launch.mintAddress))
   const score = getLaunchRankScore(launch)
+  const resolved = resolveHomepageSections(getLaunchCatalog())
+  const homepageSection =
+    resolved.launchSectionById.get(launch.id) ?? null
   const sectionRank = getLaunchRankInSection(
     launch,
     getSectionLaunchesForRank(launch),
+    homepageSection,
   )
 
   return `

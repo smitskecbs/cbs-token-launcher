@@ -26,6 +26,7 @@ export interface SubmittedLaunchRecord {
   updatedAt?: number
   tokenName: string | null
   tokenSymbol: string | null
+  featured?: boolean
   verificationLevel?: LaunchVerificationLevel
 }
 
@@ -85,6 +86,7 @@ function sanitizeSubmittedLaunchRecord(
       typeof record.tokenName === 'string' ? record.tokenName : null,
     tokenSymbol:
       typeof record.tokenSymbol === 'string' ? record.tokenSymbol : null,
+    featured: record.featured === true,
     verificationLevel: isValidVerificationLevel(
       record.verificationLevel ?? '',
     )
@@ -179,6 +181,7 @@ export interface EditableLaunchFields {
   section: LaunchSection
   launchDate: string
   verificationLevel: LaunchVerificationLevel
+  featured?: boolean
 }
 
 export function updateSubmittedLaunchRecord(
@@ -204,6 +207,7 @@ export function updateSubmittedLaunchRecord(
     section: fields.section,
     launchDate: fields.launchDate.trim(),
     verificationLevel: fields.verificationLevel,
+    featured: fields.featured === true,
     updatedAt: Date.now(),
   }
 
@@ -290,6 +294,7 @@ export function submittedRecordToLaunch(
     logoFallback: symbol?.charAt(0).toUpperCase() ?? '🪙',
     locallyManaged: true,
     submittedAt: record.submittedAt,
+    featured: record.featured === true,
     verificationLevel: normalizeVerificationLevel(record.verificationLevel),
     launchInfo: {
       launchStatus: STATUS_LAUNCH_LABELS[record.status],

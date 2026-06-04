@@ -46,6 +46,7 @@ function recordToExport(record: SubmittedLaunchRecord): ExportedLaunch {
     launchDate: record.launchDate.trim(),
     createdAt: record.submittedAt,
     updatedAt: record.updatedAt ?? record.submittedAt,
+    featured: record.featured === true,
     verificationLevel: record.verificationLevel ?? 'normal',
   }
 }
@@ -140,6 +141,7 @@ function parseImportedLaunch(value: unknown): ExportedLaunch | null {
     launchDate,
     createdAt,
     updatedAt,
+    featured: entry.featured === true,
     verificationLevel: verificationLevelRaw as LaunchVerificationLevel,
   }
 }
@@ -195,6 +197,7 @@ function exportToSubmittedRecord(
     updatedAt: item.updatedAt,
     tokenName: null,
     tokenSymbol: null,
+    featured: item.featured === true,
     verificationLevel: item.verificationLevel ?? 'normal',
   }
 }

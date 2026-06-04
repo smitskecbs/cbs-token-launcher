@@ -2,6 +2,7 @@ import type { Launch } from '../types/launch'
 import {
   getEcosystemTokens,
   getFeaturedLaunches,
+  getHomepageSectionLaunches,
   getLaunchCatalog,
   getUpcomingLaunches,
 } from './launchService'
@@ -20,19 +21,16 @@ import {
   getVerificationSortPriority,
   isRankSortedSection,
 } from './launchRankingService'
+import type { HomepageSectionId } from '../types/homepage'
+import { getLaunchHomepageSection, resolveHomepageSections } from './homepageSectionsService'
 
 function getSectionLaunches(launch: Launch): Launch[] {
-  const catalog = getLaunchCatalog()
+  return getHomepageSectionLaunches(launch)
+}
 
-  if (launch.section === 'featured') {
-    return getFeaturedLaunches(catalog)
-  }
-
-  if (launch.section === 'upcoming') {
-    return getUpcomingLaunches(catalog)
-  }
-
-  return getEcosystemTokens(catalog)
+function getHomepageSectionId(launch: Launch): HomepageSectionId | null {
+  const resolved = resolveHomepageSections(getLaunchCatalog())
+  return getLaunchHomepageSection(launch, resolved)
 }
 
 export function refreshLaunchRanking(launch: Launch): void {
@@ -40,6 +38,7 @@ export function refreshLaunchRanking(launch: Launch): void {
   const marketResult = getCachedMarketStatus(launch.mintAddress)
   const analytics = computeLaunchAnalytics(mintResult, marketResult)
   const score = analytics.launchScore
+  const homepageSection = getHomepageSectionId(launch)
 
   applyLaunchBadges(launch.id, launch)
 
@@ -52,18 +51,22 @@ export function refreshLaunchRanking(launch: Launch): void {
     )
   }
 
-  if (isRankSortedSection(launch.section)) {
-    reorderRankedSectionCards(launch.section)
+  if (homepageSection && isRankSortedSection(homepageSection)) {
+    reorderRankedSectionCards(homepageSection)
     return
   }
 
   const sectionRank = getLaunchRankInSection(
     launch,
     getSectionLaunches(launch),
+    homepageSection,
   )
 
   applyLaunchRankDisplay(launch.id, sectionRank, score)
-  updateSectionRankLabels(launch.section)
+
+  if (homepageSection) {
+    updateSectionRankLabels(homepageSection)
+  }
 }
 
 export function applyInitialLaunchRanking(
@@ -74,4 +77,19 @@ export function applyInitialLaunchRanking(
 
   applyLaunchBadges(launch.id, launch)
   applyLaunchRankDisplay(launch.id, sectionRank, score)
+}
+
+/** @deprecated Use getHomepageSectionLaunches */
+export function getLegacySectionLaunches(launch: Launch): Launch[] {
+  const catalog = getLaunchCatalog()
+
+  if (launch.section === 'featured') {
+    return getFeaturedLaunches(catalog)
+  }
+
+  if (launch.section === 'upcoming') {
+    return getUpcomingLaunches(catalog)
+  }
+
+  return getEcosystemTokens(catalog)
 }

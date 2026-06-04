@@ -6,14 +6,19 @@ import { getCachedMarketStatus } from './marketStatusCache'
 import { computeLaunchAnalytics } from './launchAnalyticsService'
 import { isLocallyManagedLaunch } from './submittedLaunchesStorage'
 
+import type { HomepageSectionId } from '../types/homepage'
+
 export type LaunchBadgeId =
   | 'live'
   | 'preparing'
   | 'upcoming'
+  | 'ended'
+  | 'featured'
+  | 'trending'
+  | 'new'
   | 'verified'
   | 'cbs-verified'
   | 'ecosystem'
-  | 'ended'
 
 export interface LaunchBadge {
   id: LaunchBadgeId
@@ -94,9 +99,35 @@ export function getLaunchRankScore(launch: Launch): number | null {
 
 export function getLaunchBadges(
   launch: Launch,
-  chainVerified = false,
+  options: {
+    chainVerified?: boolean
+    homepageSection?: HomepageSectionId | null
+  } = {},
 ): LaunchBadge[] {
   const badges: LaunchBadge[] = []
+  const homepageSection = options.homepageSection ?? null
+  const chainVerified = options.chainVerified ?? false
+
+  if (
+    launch.featured === true ||
+    homepageSection === 'featured'
+  ) {
+    badges.push({ id: 'featured', label: 'Featured' })
+  }
+
+  if (homepageSection === 'trending') {
+    badges.push({ id: 'trending', label: 'Trending' })
+  }
+
+  if (homepageSection === 'new') {
+    badges.push({ id: 'new', label: 'New' })
+  }
+
+  const verificationBadge = getVerificationBadge(launch, chainVerified)
+
+  if (verificationBadge?.id === 'verified') {
+    badges.push({ id: 'verified', label: 'Verified' })
+  }
 
   if (launch.status === 'live') {
     badges.push({ id: 'live', label: 'Live' })
@@ -116,12 +147,11 @@ export function getLaunchBadges(
 
   if (
     launch.section === 'ecosystem' &&
+    homepageSection === 'ecosystem' &&
     !isLocallyManagedLaunch(launch)
   ) {
     badges.push({ id: 'ecosystem', label: 'CBS Ecosystem' })
   }
-
-  void chainVerified
 
   return badges
 }
@@ -153,19 +183,28 @@ export function sortLaunchesByRank(launches: Launch[]): Launch[] {
 export function getLaunchRankInSection(
   launch: Launch,
   sectionLaunches: Launch[],
+  sectionId?: HomepageSectionId | LaunchSection | null,
 ): number {
   const sorted =
-    launch.section === 'ecosystem'
+    sectionId === 'ecosystem' || launch.section === 'ecosystem'
       ? sectionLaunches
-      : sortLaunchesByRank(sectionLaunches)
+      : sectionId === 'new'
+        ? sectionLaunches
+        : sortLaunchesByRank(sectionLaunches)
 
   const index = sorted.findIndex((entry) => entry.id === launch.id)
 
   return index >= 0 ? index + 1 : 0
 }
 
-export function isRankSortedSection(section: LaunchSection): boolean {
-  return section === 'featured' || section === 'upcoming'
+export function isRankSortedSection(
+  section: HomepageSectionId | LaunchSection,
+): boolean {
+  return (
+    section === 'featured' ||
+    section === 'upcoming' ||
+    section === 'trending'
+  )
 }
 
 export function formatLaunchRankScore(score: number | null): string {

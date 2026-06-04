@@ -8,6 +8,7 @@ export interface ExportedLaunch {
   launchDate: string
   createdAt: number
   updatedAt: number
+  featured?: boolean
   verificationLevel?: LaunchVerificationLevel
 }
 

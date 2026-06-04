@@ -1,5 +1,6 @@
 import type { Launch } from '../types/launch'
-import { escapeHtml } from '../utils/html'
+import type { HomepageSectionId } from '../types/homepage'
+import { getCachedMintVerification } from '../services/mintVerificationCache'
 import {
   formatLaunchRankScore,
   getLaunchBadges,
@@ -8,10 +9,18 @@ import {
   isLaunchVerified,
   type LaunchBadge,
 } from '../services/launchRankingService'
-import { getCachedMintVerification } from '../services/mintVerificationCache'
+import { escapeHtml } from '../utils/html'
 
-export function renderLaunchBadges(launch: Launch): string {
-  const badges = getLaunchBadges(launch)
+export function renderLaunchBadges(
+  launch: Launch,
+  homepageSection?: HomepageSectionId | null,
+): string {
+  const mintResult = getCachedMintVerification(launch.mintAddress)
+  const chainVerified = isLaunchVerified(mintResult)
+  const badges = getLaunchBadges(launch, {
+    homepageSection,
+    chainVerified,
+  })
 
   if (badges.length === 0) {
     return '<div class="launch-badges" data-launch-badges hidden></div>'
@@ -73,10 +82,11 @@ export function renderLaunchRankMeta(
 }
 
 export function applyLaunchBadges(launchId: string, launch: Launch): void {
-  const statusHtml = renderLaunchBadges(launch)
-  const verificationHtml = renderVerificationBadge(launch)
-
   for (const root of getBadgeRoots(launchId)) {
+    const homepageSection = readHomepageSection(root)
+    const statusHtml = renderLaunchBadges(launch, homepageSection)
+    const verificationHtml = renderVerificationBadge(launch)
+
     const statusContainer = root.querySelector<HTMLElement>(
       '[data-launch-badges]',
     )
@@ -124,6 +134,22 @@ export function applyLaunchRankDisplay(
   }
 }
 
+function readHomepageSection(root: HTMLElement): HomepageSectionId | null {
+  const value = root.dataset.homepageSection
+
+  if (
+    value === 'featured' ||
+    value === 'trending' ||
+    value === 'new' ||
+    value === 'upcoming' ||
+    value === 'ecosystem'
+  ) {
+    return value
+  }
+
+  return null
+}
+
 function getBadgeRoots(launchId: string): HTMLElement[] {
   return [
     document.getElementById(`launch-${launchId}`),
@@ -133,7 +159,7 @@ function getBadgeRoots(launchId: string): HTMLElement[] {
   ].filter((root): root is HTMLElement => root !== null)
 }
 
-export function reorderRankedSectionCards(section: string): void {
+export function reorderRankedSectionCards(section: HomepageSectionId): void {
   const sectionElement = document.querySelector<HTMLElement>(
     `[data-launch-section="${section}"]`,
   )
@@ -172,12 +198,12 @@ export function reorderRankedSectionCards(section: string): void {
   updateSectionRankLabels(section)
 }
 
-export function updateSectionRankLabels(section: string): void {
+export function updateSectionRankLabels(section: HomepageSectionId): void {
   const sectionElement = document.querySelector<HTMLElement>(
     `[data-launch-section="${section}"]`,
   )
   const cards = [
-    ...sectionElement?.querySelectorAll<HTMLElement>('.launch-card') ?? [],
+    ...(sectionElement?.querySelectorAll<HTMLElement>('.launch-card') ?? []),
   ]
 
   cards.forEach((card, index) => {

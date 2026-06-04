@@ -8,63 +8,50 @@ import { enrichLaunchWithMarketData } from './integrations/marketData'
 
 import { getSubmittedLaunchesAsLaunches } from './submittedLaunchesStorage'
 
-import { sortLaunchesByRank, getVerificationSortPriority } from './launchRankingService'
+import {
+  getAllHomepageLaunches,
+  getLaunchesForHomepageSection,
+  resolveHomepageSections,
+} from './homepageSectionsService'
 
 /** Static catalog entries plus locally submitted launches */
 export function getLaunchCatalog(): Launch[] {
   return [...launches, ...getSubmittedLaunchesAsLaunches()]
 }
 
-function getLaunchDisplayName(launch: Launch): string {
-  return (
-    launch.name?.trim() ||
-    launch.symbol?.trim() ||
-    launch.id
-  ).toLowerCase()
-}
-
-function sortEcosystemTokens(items: Launch[]): Launch[] {
-  return [...items].sort((left, right) => {
-    const leftVerification = getVerificationSortPriority(left)
-    const rightVerification = getVerificationSortPriority(right)
-
-    if (rightVerification !== leftVerification) {
-      return rightVerification - leftVerification
-    }
-
-    return getLaunchDisplayName(left).localeCompare(
-      getLaunchDisplayName(right),
-      undefined,
-      { sensitivity: 'base' },
-    )
-  })
-}
-
-/** Featured Launches — CBS verified first, then highest ranked */
+/** Featured Launches — featured flag or featured section, deduplicated */
 export function getFeaturedLaunches(
   catalog: Launch[] = getLaunchCatalog(),
 ): Launch[] {
-  return sortLaunchesByRank(
-    catalog.filter((launch) => launch.section === 'featured'),
-  )
+  return resolveHomepageSections(catalog).featured
 }
 
-/** CBS Ecosystem Tokens — CBS verified first, then alphabetical */
+/** CBS Ecosystem Tokens — ecosystem section, deduplicated */
 export function getEcosystemTokens(
   catalog: Launch[] = getLaunchCatalog(),
 ): Launch[] {
-  return sortEcosystemTokens(
-    catalog.filter((launch) => launch.section === 'ecosystem'),
-  )
+  return resolveHomepageSections(catalog).ecosystem
 }
 
-/** Upcoming Launches — CBS verified first, then highest ranked */
+/** Upcoming Launches — upcoming section, deduplicated */
 export function getUpcomingLaunches(
   catalog: Launch[] = getLaunchCatalog(),
 ): Launch[] {
-  return sortLaunchesByRank(
-    catalog.filter((launch) => launch.section === 'upcoming'),
-  )
+  return resolveHomepageSections(catalog).upcoming
+}
+
+/** New Launches — sorted by creation date, deduplicated */
+export function getNewLaunches(
+  catalog: Launch[] = getLaunchCatalog(),
+): Launch[] {
+  return resolveHomepageSections(catalog).newLaunches
+}
+
+/** Trending Launches — placeholder until analytics are wired */
+export function getTrendingLaunches(
+  catalog: Launch[] = getLaunchCatalog(),
+): Launch[] {
+  return resolveHomepageSections(catalog).trending
 }
 
 export function getLaunchesByStatus(
@@ -79,6 +66,20 @@ export function getLaunchById(
   catalog: Launch[] = getLaunchCatalog(),
 ): Launch | undefined {
   return catalog.find((launch) => launch.id === id)
+}
+
+export function getHomepageSectionLaunches(
+  launch: Launch,
+  catalog: Launch[] = getLaunchCatalog(),
+): Launch[] {
+  const resolved = resolveHomepageSections(catalog)
+  const sectionId = resolved.launchSectionById.get(launch.id)
+
+  if (!sectionId) {
+    return []
+  }
+
+  return getLaunchesForHomepageSection(sectionId, resolved)
 }
 
 /**
@@ -96,4 +97,4 @@ export async function enrichAllLaunches(
   return Promise.all(catalog.map((launch) => enrichLaunch(launch)))
 }
 
-
+export { getAllHomepageLaunches, resolveHomepageSections }

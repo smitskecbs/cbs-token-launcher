@@ -10,6 +10,12 @@ import { applyTokenCategory } from './tokenCategoryField'
 import { applyTokenTags } from './tokenTagsField'
 import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
 import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
+import {
+  buildLaunchSearchText,
+  getLaunchFilterCategorySlug,
+} from '../services/launchFilterService'
+import { getLaunchCatalog } from '../services/launchService'
+import { reapplyLaunchFilters } from './launchFiltersPanel'
 
 function getLaunchPlaceholder(launch: Launch) {
   return launch.autoLoadMetadata
@@ -110,6 +116,11 @@ export function applyLaunchCardFromResult(
   applyOfficialLinksFromMetadata(card, launch, result)
   applyTokenCategory(card, result)
   applyTokenTags(card, result)
+
+  card.dataset.launchSearch = buildLaunchSearchText(launch, result)
+  card.dataset.tokenCategorySlug = getLaunchFilterCategorySlug(launch, result)
+
+  reapplyLaunchFilters(getLaunchCatalog())
   refreshLaunchAnalytics(launch)
   refreshLaunchRisk(launch)
 }
