@@ -1,11 +1,9 @@
 /**
  * Solana RPC configuration for CBS Token Launcher.
  *
- * SECURITY: Any `VITE_*` value is compiled into the browser bundle and is visible
- * to anyone who loads the GitHub Pages app. Never put Pinata JWTs, upload secrets,
- * or other private keys in `VITE_` variables. Use a backend for uploads.
- *
- * Helius RPC URLs may remain here temporarily until a backend RPC proxy exists.
+ * SECURITY: Mainnet RPC uses the server-side `/api/rpc` proxy on Vercel.
+ * Never put Helius API keys or other secrets in `VITE_*` variables.
+ * Devnet may use a public RPC URL in the browser.
  */
 export type SolanaNetwork =
   | 'devnet'
@@ -16,6 +14,9 @@ const SOLSCAN_ORIGIN =
 
 const DEVNET_RPC_FALLBACK =
   'https://api.devnet.solana.com'
+
+/** Browser-facing mainnet JSON-RPC path (proxied by api/rpc on Vercel). */
+export const MAINNET_RPC_PROXY_PATH = '/api/rpc'
 
 function trimEnv(value: unknown): string | undefined {
   if (typeof value !== 'string') {
@@ -31,14 +32,20 @@ const HELIUS_DEVNET_RPC =
   trimEnv(import.meta.env.VITE_HELIUS_DEVNET_RPC) ??
   DEVNET_RPC_FALLBACK
 
-const HELIUS_MAINNET_RPC =
-  trimEnv(import.meta.env.VITE_HELIUS_MAINNET_RPC)
-
 export const MAINNET_RPC_NOT_CONFIGURED_MESSAGE =
   'Mainnet RPC is not configured.'
 
+function resolveMainnetRpcUrl(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}${MAINNET_RPC_PROXY_PATH}`
+  }
+
+  return MAINNET_RPC_PROXY_PATH
+}
+
+/** Mainnet uses the Vercel proxy; devnet uses a public or env-configured URL. */
 export function isMainnetRpcConfigured(): boolean {
-  return Boolean(HELIUS_MAINNET_RPC)
+  return true
 }
 
 export const SOLANA_NETWORKS: Record<
@@ -54,7 +61,7 @@ export const SOLANA_NETWORKS: Record<
   },
 
   mainnet: {
-    rpc: HELIUS_MAINNET_RPC ?? '',
+    rpc: resolveMainnetRpcUrl(),
     explorer: SOLSCAN_ORIGIN,
   },
 }
@@ -63,11 +70,7 @@ export function getRpc(
   network: SolanaNetwork,
 ): string {
   if (network === 'mainnet') {
-    if (!HELIUS_MAINNET_RPC) {
-      throw new Error(MAINNET_RPC_NOT_CONFIGURED_MESSAGE)
-    }
-
-    return HELIUS_MAINNET_RPC
+    return resolveMainnetRpcUrl()
   }
 
   return HELIUS_DEVNET_RPC
