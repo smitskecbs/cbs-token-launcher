@@ -1,3 +1,12 @@
+/**
+ * Solana RPC configuration for CBS Token Launcher.
+ *
+ * SECURITY: Any `VITE_*` value is compiled into the browser bundle and is visible
+ * to anyone who loads the GitHub Pages app. Never put Pinata JWTs, upload secrets,
+ * or other private keys in `VITE_` variables. Use a backend for uploads.
+ *
+ * Helius RPC URLs may remain here temporarily until a backend RPC proxy exists.
+ */
 export type SolanaNetwork =
   | 'devnet'
   | 'mainnet'
@@ -8,11 +17,7 @@ const SOLSCAN_ORIGIN =
 const DEVNET_RPC_FALLBACK =
   'https://api.devnet.solana.com'
 
-function readEnvRpc(
-  name: string,
-): string | undefined {
-  const value = import.meta.env[name]
-
+function trimEnv(value: unknown): string | undefined {
   if (typeof value !== 'string') {
     return undefined
   }
@@ -23,11 +28,11 @@ function readEnvRpc(
 }
 
 const HELIUS_DEVNET_RPC =
-  readEnvRpc('VITE_HELIUS_DEVNET_RPC') ??
+  trimEnv(import.meta.env.VITE_HELIUS_DEVNET_RPC) ??
   DEVNET_RPC_FALLBACK
 
 const HELIUS_MAINNET_RPC =
-  readEnvRpc('VITE_HELIUS_MAINNET_RPC')
+  trimEnv(import.meta.env.VITE_HELIUS_MAINNET_RPC)
 
 export const MAINNET_RPC_NOT_CONFIGURED_MESSAGE =
   'Mainnet RPC is not configured.'
