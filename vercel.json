@@ -4,6 +4,9 @@
   "functions": {
     "api/submit-launch.js": {
       "maxDuration": 10
+    },
+    "api/list-launch-submissions.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

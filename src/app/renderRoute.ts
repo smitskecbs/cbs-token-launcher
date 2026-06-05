@@ -3,6 +3,10 @@ import { renderApp } from './renderApp'
 import { handleCatalogChange } from './handleCatalogChange'
 import { attachAppModals, renderAppModals } from '../components/appModals'
 import {
+  attachAdminSubmissionsPage,
+  renderAdminSubmissionsPage,
+} from './renderAdminSubmissionsPage'
+import {
   attachTokenDetailHandlers,
   renderTokenDetailPage,
 } from './renderTokenDetailPage'
@@ -18,6 +22,14 @@ export function renderRoute(route: AppRoute): void {
   if (route.name === 'home') {
     document.title = 'CBS Token Launcher'
     renderApp()
+    window.scrollTo(0, 0)
+    return
+  }
+
+  if (route.name === 'admin-submissions') {
+    document.title = 'Launch Submissions — CBS Token Launcher'
+    app.innerHTML = renderAdminSubmissionsPage()
+    attachAdminSubmissionsPage()
     window.scrollTo(0, 0)
     return
   }

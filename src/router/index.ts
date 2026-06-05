@@ -1,12 +1,23 @@
 export type AppRoute =
   | { name: 'home' }
   | { name: 'token'; tokenId: string }
+  | { name: 'admin-submissions' }
 
 export function getTokenDetailPath(tokenId: string): string {
   return `/token/${encodeURIComponent(tokenId)}`
 }
 
+export const ADMIN_SUBMISSIONS_PATH = '/admin/submissions'
+
+export function getAdminSubmissionsPath(): string {
+  return ADMIN_SUBMISSIONS_PATH
+}
+
 export function parseRoute(pathname: string): AppRoute {
+  if (pathname === ADMIN_SUBMISSIONS_PATH || pathname === `${ADMIN_SUBMISSIONS_PATH}/`) {
+    return { name: 'admin-submissions' }
+  }
+
   const tokenMatch = pathname.match(/^\/token\/([^/]+)\/?$/)
 
   if (tokenMatch) {

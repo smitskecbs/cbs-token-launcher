@@ -2454,6 +2454,112 @@ h3 {
   margin-top: 4px;
 }
 
+.admin-submissions-card {
+  width: 100%;
+  max-width: 720px;
+  text-align: left;
+}
+
+.admin-submissions-lead {
+  margin-bottom: 16px;
+}
+
+.admin-submissions-count {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #666666;
+}
+
+.admin-submissions-state {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.admin-submissions-state--loading {
+  color: #666666;
+}
+
+.admin-submissions-state--error {
+  color: #b42318;
+  font-weight: 700;
+}
+
+.admin-submissions-state--empty {
+  color: #666666;
+}
+
+.admin-submissions-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(216, 111, 0, 0.16);
+  border-radius: 16px;
+  background: #fffaf5;
+}
+
+.admin-submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-submissions-table th,
+.admin-submissions-table td {
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(216, 111, 0, 0.12);
+}
+
+.admin-submissions-table th {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888888;
+  background: rgba(255, 179, 71, 0.08);
+}
+
+.admin-submissions-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-submissions-mint {
+  display: inline-block;
+  max-width: 220px;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #444444;
+}
+
+.admin-submissions-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+  background: rgba(255, 179, 71, 0.12);
+  color: #b85a00;
+}
+
+.admin-submissions-status--pending {
+  background: rgba(255, 179, 71, 0.16);
+  color: #d86f00;
+}
+
+.admin-submissions-status--approved {
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+}
+
+.admin-submissions-status--rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b42318;
+}
+
 @media (max-width: 640px) {
   .app-shell {
     padding: 12px 14px 24px;

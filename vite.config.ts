@@ -1,8 +1,55 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { listLaunchSubmissions } from './api/lib/launchSubmissionsDb.js'
 import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
 } from './api/lib/submitLaunchCore.js'
+
+function listLaunchSubmissionsProxyPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'dev-list-launch-submissions-proxy',
+    configureServer(server) {
+      server.middlewares.use(
+        '/api/list-launch-submissions',
+        async (req, res, next) => {
+          if (!req.url?.startsWith('/api/list-launch-submissions')) {
+            next()
+            return
+          }
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204
+            res.end()
+            return
+          }
+
+          if (req.method !== 'GET') {
+            res.statusCode = 405
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'Method not allowed' }))
+            return
+          }
+
+          const result = await listLaunchSubmissions(env)
+
+          res.statusCode = result.ok ? 200 : result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(
+            JSON.stringify(
+              result.ok
+                ? {
+                    ok: true,
+                    count: result.count,
+                    submissions: result.submissions,
+                  }
+                : { error: result.message },
+            ),
+          )
+        },
+      )
+    },
+  }
+}
 
 function submitLaunchProxyPlugin(env: Record<string, string>): Plugin {
   return {
@@ -139,6 +186,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
       submitLaunchProxyPlugin(env),
+      listLaunchSubmissionsProxyPlugin(env),
     ],
   }
 })
