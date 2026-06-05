@@ -182,7 +182,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     appType: 'spa',
-    base: './',
+    // Absolute base so nested SPA routes (/admin/submissions, /token/:id)
+    // load /assets/* from site root instead of a relative subpath.
+    base: '/',
     plugins: [
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
       submitLaunchProxyPlugin(env),
