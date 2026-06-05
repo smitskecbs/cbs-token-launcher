@@ -41,7 +41,6 @@ export const launches: Launch[] = [
     mintAddress: '29KN57rM6tV2aWdo1agZcF6ynPXB1dhHdKHNrrAmaNGo',
     status: 'preparing',
     section: 'upcoming',
-    featured: true,
     createdAt: Date.parse('2025-01-15T00:00:00.000Z'),
     name: 'ManGo',
     symbol: 'MNGO',
