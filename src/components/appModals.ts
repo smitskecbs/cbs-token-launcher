@@ -10,8 +10,6 @@ import {
   attachSubmitLaunchModal,
   renderSubmitLaunchModal,
 } from './submitLaunchModal'
-import { getLaunchCatalog } from '../services/launchService'
-
 export function renderAppModals(): string {
   return `
     ${renderSubmitLaunchModal()}
@@ -21,7 +19,7 @@ export function renderAppModals(): string {
 }
 
 export function attachAppModals(onCatalogChange: () => void): void {
-  attachSubmitLaunchModal(onCatalogChange, getLaunchCatalog)
+  attachSubmitLaunchModal()
   attachManageLaunchModal(onCatalogChange)
   attachCreatePoolModal()
 }
