@@ -2545,12 +2545,79 @@ h3 {
   color: #b85a00;
 }
 
+.admin-submissions-stats-wrap {
+  margin-bottom: 12px;
+}
+
+.admin-submissions-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-submissions-stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(216, 111, 0, 0.14);
+  background: #fffaf5;
+}
+
+.admin-submissions-stat-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.admin-submissions-stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.admin-submissions-stat--pending .admin-submissions-stat-value {
+  color: #d86f00;
+}
+
+.admin-submissions-stat--coming_soon .admin-submissions-stat-value {
+  color: #2563eb;
+}
+
+.admin-submissions-stat--live .admin-submissions-stat-value {
+  color: #15803d;
+}
+
+.admin-submissions-stat--rejected .admin-submissions-stat-value {
+  color: #b42318;
+}
+
+.admin-submissions-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.admin-submissions-action {
+  font-size: 12px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
 .admin-submissions-status--pending {
   background: rgba(255, 179, 71, 0.16);
   color: #d86f00;
 }
 
-.admin-submissions-status--approved {
+.admin-submissions-status--coming_soon {
+  background: rgba(37, 99, 235, 0.14);
+  color: #2563eb;
+}
+
+.admin-submissions-status--live {
   background: rgba(34, 197, 94, 0.14);
   color: #15803d;
 }
@@ -2564,6 +2631,14 @@ h3 {
   .app-shell {
     padding: 12px 14px 24px;
     gap: 14px;
+  }
+
+  .admin-submissions-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-submissions-actions {
+    min-width: 0;
   }
 
   .hero-card,

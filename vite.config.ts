@@ -1,5 +1,8 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
-import { listLaunchSubmissions } from './api/lib/launchSubmissionsDb.js'
+import {
+  listLaunchSubmissions,
+  updateLaunchSubmissionStatus,
+} from './api/lib/launchSubmissionsDb.js'
 import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
@@ -45,6 +48,74 @@ function listLaunchSubmissionsProxyPlugin(env: Record<string, string>): Plugin {
                 : { error: result.message },
             ),
           )
+        },
+      )
+    },
+  }
+}
+
+function updateLaunchSubmissionStatusProxyPlugin(
+  env: Record<string, string>,
+): Plugin {
+  return {
+    name: 'dev-update-launch-submission-status-proxy',
+    configureServer(server) {
+      server.middlewares.use(
+        '/api/update-launch-submission-status',
+        async (req, res, next) => {
+          if (!req.url?.startsWith('/api/update-launch-submission-status')) {
+            next()
+            return
+          }
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204
+            res.end()
+            return
+          }
+
+          if (req.method !== 'PATCH') {
+            res.statusCode = 405
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'Method not allowed' }))
+            return
+          }
+
+          try {
+            const chunks: Buffer[] = []
+
+            await new Promise<void>((resolve, reject) => {
+              req.on('data', (chunk: Buffer) => chunks.push(chunk))
+              req.on('end', () => resolve())
+              req.on('error', reject)
+            })
+
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : null
+            const result = await updateLaunchSubmissionStatus(
+              env,
+              body?.id,
+              body?.status,
+            )
+
+            res.statusCode = result.ok ? 200 : result.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify(
+                result.ok
+                  ? {
+                      ok: true,
+                      id: result.id,
+                      status: result.statusValue,
+                    }
+                  : { error: result.message },
+              ),
+            )
+          } catch {
+            res.statusCode = 400
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'Invalid request body.' }))
+          }
         },
       )
     },
@@ -189,6 +260,7 @@ export default defineConfig(({ mode }) => {
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
       submitLaunchProxyPlugin(env),
       listLaunchSubmissionsProxyPlugin(env),
+      updateLaunchSubmissionStatusProxyPlugin(env),
     ],
   }
 })

@@ -7,6 +7,9 @@
     },
     "api/list-launch-submissions.js": {
       "maxDuration": 10
+    },
+    "api/update-launch-submission-status.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

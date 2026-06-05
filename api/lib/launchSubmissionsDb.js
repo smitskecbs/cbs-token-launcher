@@ -2,10 +2,47 @@ import {
   buildLaunchSubmissionsRestUrl,
   getJsonWithHttps,
   logMissingSupabaseEnv,
+  patchJsonWithHttps,
   readSupabaseEnv,
 } from './supabaseHttps.js'
+import { isValidSubmissionStatus } from './submissionStatuses.js'
 
-const LOG_PREFIX = '[list-launch-submissions]'
+const LIST_LOG_PREFIX = '[list-launch-submissions]'
+const UPDATE_LOG_PREFIX = '[update-launch-submission-status]'
+
+function isValidSubmissionId(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  )
+}
+
+function getSupabaseConfig(env, logPrefix) {
+  const { supabaseUrl, serviceRoleKey } = readSupabaseEnv(env)
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    logMissingSupabaseEnv(env, logPrefix)
+    return null
+  }
+
+  const baseUrl = buildLaunchSubmissionsRestUrl(supabaseUrl)
+
+  if (!baseUrl) {
+    console.error(`${logPrefix} Invalid SUPABASE_URL host configuration`)
+    return null
+  }
+
+  return { serviceRoleKey, baseUrl }
+}
+
+function buildAuthHeaders(serviceRoleKey) {
+  return {
+    apikey: serviceRoleKey,
+    Authorization: `Bearer ${serviceRoleKey}`,
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    Prefer: 'return=minimal',
+  }
+}
 
 function mapSubmissionRow(row) {
   return {
@@ -19,21 +56,9 @@ function mapSubmissionRow(row) {
 }
 
 export async function listLaunchSubmissions(env) {
-  const { supabaseUrl, serviceRoleKey } = readSupabaseEnv(env)
+  const config = getSupabaseConfig(env, LIST_LOG_PREFIX)
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    logMissingSupabaseEnv(env, LOG_PREFIX)
-    return {
-      ok: false,
-      status: 500,
-      message: 'Submission service is not configured.',
-    }
-  }
-
-  const baseUrl = buildLaunchSubmissionsRestUrl(supabaseUrl)
-
-  if (!baseUrl) {
-    console.error(`${LOG_PREFIX} Invalid SUPABASE_URL host configuration`)
+  if (!config) {
     return {
       ok: false,
       status: 500,
@@ -46,23 +71,22 @@ export async function listLaunchSubmissions(env) {
     order: 'created_at.desc',
   })
 
-  const restUrl = `${baseUrl}?${query.toString()}`
+  const restUrl = `${config.baseUrl}?${query.toString()}`
 
   try {
     console.log(
-      `${LOG_PREFIX} Supabase GET host: ${new URL(restUrl).host}`,
+      `${LIST_LOG_PREFIX} Supabase GET host: ${new URL(restUrl).host}`,
     )
 
-    const upstream = await getJsonWithHttps(restUrl, {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      Accept: 'application/json',
-    })
+    const upstream = await getJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+    )
 
     if (upstream.status < 200 || upstream.status >= 300) {
       const errorText = upstream.body.trim().slice(0, 500)
       console.error(
-        `${LOG_PREFIX} Supabase status: ${upstream.status}`,
+        `${LIST_LOG_PREFIX} Supabase status: ${upstream.status}`,
         errorText || '(empty response body)',
       )
 
@@ -78,7 +102,7 @@ export async function listLaunchSubmissions(env) {
     try {
       rows = JSON.parse(upstream.body)
     } catch {
-      console.error(`${LOG_PREFIX} Supabase response was not valid JSON`)
+      console.error(`${LIST_LOG_PREFIX} Supabase response was not valid JSON`)
       return {
         ok: false,
         status: 502,
@@ -87,7 +111,7 @@ export async function listLaunchSubmissions(env) {
     }
 
     if (!Array.isArray(rows)) {
-      console.error(`${LOG_PREFIX} Supabase response was not an array`)
+      console.error(`${LIST_LOG_PREFIX} Supabase response was not an array`)
       return {
         ok: false,
         status: 502,
@@ -97,7 +121,7 @@ export async function listLaunchSubmissions(env) {
 
     const submissions = rows.map(mapSubmissionRow)
 
-    console.log(`${LOG_PREFIX} loaded ${submissions.length} submissions`)
+    console.log(`${LIST_LOG_PREFIX} loaded ${submissions.length} submissions`)
 
     return {
       ok: true,
@@ -107,7 +131,7 @@ export async function listLaunchSubmissions(env) {
     }
   } catch (error) {
     console.error(
-      `${LOG_PREFIX} Supabase request failed:`,
+      `${LIST_LOG_PREFIX} Supabase request failed:`,
       error instanceof Error ? error.message : 'unknown error',
     )
 
@@ -115,6 +139,91 @@ export async function listLaunchSubmissions(env) {
       ok: false,
       status: 502,
       message: 'Could not load submissions right now. Please try again later.',
+    }
+  }
+}
+
+export async function updateLaunchSubmissionStatus(env, submissionId, status) {
+  const trimmedId = typeof submissionId === 'string' ? submissionId.trim() : ''
+  const trimmedStatus = typeof status === 'string' ? status.trim() : ''
+
+  if (!isValidSubmissionId(trimmedId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id is invalid.',
+    }
+  }
+
+  if (!isValidSubmissionStatus(trimmedStatus)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission status is invalid.',
+    }
+  }
+
+  const config = getSupabaseConfig(env, UPDATE_LOG_PREFIX)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Submission service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    id: `eq.${trimmedId}`,
+  })
+
+  const restUrl = `${config.baseUrl}?${query.toString()}`
+
+  try {
+    console.log(
+      `${UPDATE_LOG_PREFIX} Supabase PATCH host: ${new URL(restUrl).host}`,
+    )
+
+    const upstream = await patchJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+      { status: trimmedStatus },
+    )
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${UPDATE_LOG_PREFIX} Supabase status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not update submission status. Please try again later.',
+      }
+    }
+
+    console.log(
+      `${UPDATE_LOG_PREFIX} updated ${trimmedId} to ${trimmedStatus}`,
+    )
+
+    return {
+      ok: true,
+      status: 200,
+      id: trimmedId,
+      statusValue: trimmedStatus,
+    }
+  } catch (error) {
+    console.error(
+      `${UPDATE_LOG_PREFIX} Supabase request failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not update submission status. Please try again later.',
     }
   }
 }

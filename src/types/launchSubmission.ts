@@ -1,9 +1,11 @@
+import type { LaunchSubmissionStatus } from '../utils/launchSubmissionStatus'
+
 export interface LaunchSubmissionSummary {
   id: string
   projectName: string
   tokenSymbol: string
   mintAddress: string
-  status: string
+  status: LaunchSubmissionStatus | string
   createdAt: string
 }
 
