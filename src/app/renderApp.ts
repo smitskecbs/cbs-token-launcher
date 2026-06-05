@@ -8,7 +8,7 @@ import {
   renderLaunchFiltersPanel,
 } from '../components/launchFiltersPanel'
 import { handleCatalogChange } from './handleCatalogChange'
-import { getLaunchCatalog } from '../services/launchService'
+import { loadLaunchCatalog } from '../services/launchService'
 import {
   getAllHomepageLaunches,
   resolveHomepageSections,
@@ -30,8 +30,8 @@ import {
  * Each launch appears in one homepage section only.
  * Priority: Featured > Trending > New > Upcoming > Ecosystem
  */
-export function renderApp(): void {
-  const catalog = getLaunchCatalog()
+export async function renderApp(): Promise<void> {
+  const catalog = await loadLaunchCatalog({ refresh: true })
   const homepage = resolveHomepageSections(catalog)
   const renderedLaunches = getAllHomepageLaunches(homepage)
 
@@ -62,4 +62,12 @@ export function renderApp(): void {
   })
   attachAppModals(handleCatalogChange)
   attachLaunchDataActions(handleCatalogChange)
+}
+
+export function renderHomepageLoadingState(): void {
+  document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
+    <main class="app-shell" id="top">
+      <p class="hero-text homepage-loading-state">Loading launches…</p>
+    </main>
+  `
 }

@@ -8,15 +8,75 @@ import { enrichLaunchWithMarketData } from './integrations/marketData'
 
 import { getSubmittedLaunchesAsLaunches } from './submittedLaunchesStorage'
 
+import { fetchHomepageLaunches } from './homepageLaunchesService'
+
+import { mapSubmissionToLaunch } from './mapSubmissionToLaunch'
+
 import {
   getAllHomepageLaunches,
   getLaunchesForHomepageSection,
   resolveHomepageSections,
 } from './homepageSectionsService'
 
-/** Static catalog entries plus locally submitted launches */
-export function getLaunchCatalog(): Launch[] {
+let cachedCatalog: Launch[] | null = null
+
+/** Built-in catalog plus any locally submitted launches */
+export function getStaticLaunchCatalog(): Launch[] {
   return [...launches, ...getSubmittedLaunchesAsLaunches()]
+}
+
+function mergeLaunchCatalog(
+  staticCatalog: Launch[],
+  remoteLaunches: Launch[],
+): Launch[] {
+  const seenMints = new Set(
+    staticCatalog.map((launch) => launch.mintAddress.trim()),
+  )
+  const merged = [...staticCatalog]
+
+  for (const launch of remoteLaunches) {
+    const mintAddress = launch.mintAddress.trim()
+
+    if (!mintAddress || seenMints.has(mintAddress)) {
+      continue
+    }
+
+    merged.push(launch)
+    seenMints.add(mintAddress)
+  }
+
+  return merged
+}
+
+export interface LoadLaunchCatalogOptions {
+  refresh?: boolean
+}
+
+/** Load catalog from static entries plus Supabase homepage launches */
+export async function loadLaunchCatalog(
+  options: LoadLaunchCatalogOptions = {},
+): Promise<Launch[]> {
+  if (!options.refresh && cachedCatalog) {
+    return cachedCatalog
+  }
+
+  const staticCatalog = getStaticLaunchCatalog()
+  const remoteResult = await fetchHomepageLaunches()
+
+  if (!remoteResult.ok) {
+    cachedCatalog = staticCatalog
+    return cachedCatalog
+  }
+
+  const remoteLaunches = remoteResult.launches.map(mapSubmissionToLaunch)
+  cachedCatalog = mergeLaunchCatalog(staticCatalog, remoteLaunches)
+
+  return cachedCatalog
+}
+
+/** Static catalog entries plus locally submitted launches and cached Supabase launches */
+export function getLaunchCatalog(): Launch[] {
+  return cachedCatalog ?? getStaticLaunchCatalog()
 }
 
 /** Featured Launches — featured flag or featured section, deduplicated */

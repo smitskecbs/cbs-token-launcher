@@ -1,5 +1,5 @@
 import type { AppRoute } from '../router'
-import { renderApp } from './renderApp'
+import { renderApp, renderHomepageLoadingState } from './renderApp'
 import { handleCatalogChange } from './handleCatalogChange'
 import { attachAppModals, renderAppModals } from '../components/appModals'
 import {
@@ -10,7 +10,7 @@ import {
   attachTokenDetailHandlers,
   renderTokenDetailPage,
 } from './renderTokenDetailPage'
-import { getLaunchById } from '../services/launchService'
+import { getLaunchById, loadLaunchCatalog } from '../services/launchService'
 
 export function renderRoute(route: AppRoute): void {
   const app = document.querySelector<HTMLDivElement>('#app')
@@ -21,8 +21,10 @@ export function renderRoute(route: AppRoute): void {
 
   if (route.name === 'home') {
     document.title = 'CBS Token Launcher'
-    renderApp()
-    window.scrollTo(0, 0)
+    renderHomepageLoadingState()
+    void renderApp().then(() => {
+      window.scrollTo(0, 0)
+    })
     return
   }
 
@@ -34,9 +36,23 @@ export function renderRoute(route: AppRoute): void {
     return
   }
 
-  app.innerHTML = renderTokenDetailPage(route.tokenId) + renderAppModals()
+  void renderTokenRoute(route.tokenId)
+}
 
-  const launch = getLaunchById(route.tokenId)
+async function renderTokenRoute(tokenId: string): Promise<void> {
+  if (tokenId.startsWith('submission-') && !getLaunchById(tokenId)) {
+    await loadLaunchCatalog({ refresh: true })
+  }
+
+  const app = document.querySelector<HTMLDivElement>('#app')
+
+  if (!app) {
+    return
+  }
+
+  app.innerHTML = renderTokenDetailPage(tokenId) + renderAppModals()
+
+  const launch = getLaunchById(tokenId)
 
   if (launch) {
     attachTokenDetailHandlers(launch)

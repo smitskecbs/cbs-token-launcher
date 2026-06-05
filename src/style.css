@@ -2545,6 +2545,13 @@ h3 {
   color: #b85a00;
 }
 
+.homepage-loading-state {
+  width: 100%;
+  max-width: 720px;
+  margin: 48px 0;
+  text-align: center;
+}
+
 .admin-submissions-stats-wrap {
   margin-bottom: 12px;
 }

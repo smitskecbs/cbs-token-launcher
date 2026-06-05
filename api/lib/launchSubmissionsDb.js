@@ -8,6 +8,7 @@ import {
 import { isValidSubmissionStatus } from './submissionStatuses.js'
 
 const LIST_LOG_PREFIX = '[list-launch-submissions]'
+const HOMEPAGE_LOG_PREFIX = '[homepage-launches]'
 const UPDATE_LOG_PREFIX = '[update-launch-submission-status]'
 
 function isValidSubmissionId(value) {
@@ -55,28 +56,36 @@ function mapSubmissionRow(row) {
   }
 }
 
-export async function listLaunchSubmissions(env) {
-  const config = getSupabaseConfig(env, LIST_LOG_PREFIX)
+function mapHomepageSubmissionRow(row) {
+  return {
+    id: row.id,
+    projectName: row.project_name,
+    tokenSymbol: row.token_symbol,
+    mintAddress: row.mint_address,
+    status: row.status,
+    description: row.description ?? null,
+    website: row.website ?? null,
+    telegram: row.telegram ?? null,
+    x: row.x ?? null,
+    createdAt: row.created_at,
+  }
+}
+
+async function fetchSubmissionRows(env, logPrefix, query) {
+  const config = getSupabaseConfig(env, logPrefix)
 
   if (!config) {
     return {
       ok: false,
       status: 500,
-      message: 'Submission service is not configured.',
+      message: 'Launch service is not configured.',
     }
   }
-
-  const query = new URLSearchParams({
-    select: 'id,project_name,token_symbol,mint_address,status,created_at',
-    order: 'created_at.desc',
-  })
 
   const restUrl = `${config.baseUrl}?${query.toString()}`
 
   try {
-    console.log(
-      `${LIST_LOG_PREFIX} Supabase GET host: ${new URL(restUrl).host}`,
-    )
+    console.log(`${logPrefix} Supabase GET host: ${new URL(restUrl).host}`)
 
     const upstream = await getJsonWithHttps(
       restUrl,
@@ -86,14 +95,14 @@ export async function listLaunchSubmissions(env) {
     if (upstream.status < 200 || upstream.status >= 300) {
       const errorText = upstream.body.trim().slice(0, 500)
       console.error(
-        `${LIST_LOG_PREFIX} Supabase status: ${upstream.status}`,
+        `${logPrefix} Supabase status: ${upstream.status}`,
         errorText || '(empty response body)',
       )
 
       return {
         ok: false,
         status: 502,
-        message: 'Could not load submissions right now. Please try again later.',
+        message: 'Could not load launches right now. Please try again later.',
       }
     }
 
@@ -102,44 +111,87 @@ export async function listLaunchSubmissions(env) {
     try {
       rows = JSON.parse(upstream.body)
     } catch {
-      console.error(`${LIST_LOG_PREFIX} Supabase response was not valid JSON`)
+      console.error(`${logPrefix} Supabase response was not valid JSON`)
       return {
         ok: false,
         status: 502,
-        message: 'Could not load submissions right now. Please try again later.',
+        message: 'Could not load launches right now. Please try again later.',
       }
     }
 
     if (!Array.isArray(rows)) {
-      console.error(`${LIST_LOG_PREFIX} Supabase response was not an array`)
+      console.error(`${logPrefix} Supabase response was not an array`)
       return {
         ok: false,
         status: 502,
-        message: 'Could not load submissions right now. Please try again later.',
+        message: 'Could not load launches right now. Please try again later.',
       }
     }
 
-    const submissions = rows.map(mapSubmissionRow)
-
-    console.log(`${LIST_LOG_PREFIX} loaded ${submissions.length} submissions`)
-
-    return {
-      ok: true,
-      status: 200,
-      count: submissions.length,
-      submissions,
-    }
+    return { ok: true, status: 200, rows }
   } catch (error) {
     console.error(
-      `${LIST_LOG_PREFIX} Supabase request failed:`,
+      `${logPrefix} Supabase request failed:`,
       error instanceof Error ? error.message : 'unknown error',
     )
 
     return {
       ok: false,
       status: 502,
-      message: 'Could not load submissions right now. Please try again later.',
+      message: 'Could not load launches right now. Please try again later.',
     }
+  }
+}
+
+export async function listLaunchSubmissions(env) {
+  const query = new URLSearchParams({
+    select: 'id,project_name,token_symbol,mint_address,status,created_at',
+    order: 'created_at.desc',
+  })
+
+  const result = await fetchSubmissionRows(env, LIST_LOG_PREFIX, query)
+
+  if (!result.ok) {
+    return result
+  }
+
+  const submissions = result.rows.map(mapSubmissionRow)
+
+  console.log(`${LIST_LOG_PREFIX} loaded ${submissions.length} submissions`)
+
+  return {
+    ok: true,
+    status: 200,
+    count: submissions.length,
+    submissions,
+  }
+}
+
+export async function listHomepageLaunches(env) {
+  const query = new URLSearchParams({
+    select:
+      'id,project_name,token_symbol,mint_address,status,description,website,telegram,x,created_at',
+    status: 'in.(coming_soon,live)',
+    order: 'created_at.desc',
+  })
+
+  const result = await fetchSubmissionRows(env, HOMEPAGE_LOG_PREFIX, query)
+
+  if (!result.ok) {
+    return result
+  }
+
+  const launches = result.rows
+    .filter((row) => row.status === 'coming_soon' || row.status === 'live')
+    .map(mapHomepageSubmissionRow)
+
+  console.log(`${HOMEPAGE_LOG_PREFIX} loaded ${launches.length} homepage launches`)
+
+  return {
+    ok: true,
+    status: 200,
+    count: launches.length,
+    launches,
   }
 }
 

@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import {
+  listHomepageLaunches,
   listLaunchSubmissions,
   updateLaunchSubmissionStatus,
 } from './api/lib/launchSubmissionsDb.js'
@@ -7,6 +8,49 @@ import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
 } from './api/lib/submitLaunchCore.js'
+
+function homepageLaunchesProxyPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'dev-homepage-launches-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/homepage-launches', async (req, res, next) => {
+        if (!req.url?.startsWith('/api/homepage-launches')) {
+          next()
+          return
+        }
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
+        if (req.method !== 'GET') {
+          res.statusCode = 405
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'Method not allowed' }))
+          return
+        }
+
+        const result = await listHomepageLaunches(env)
+
+        res.statusCode = result.ok ? 200 : result.status
+        res.setHeader('Content-Type', 'application/json')
+        res.end(
+          JSON.stringify(
+            result.ok
+              ? {
+                  ok: true,
+                  count: result.count,
+                  launches: result.launches,
+                }
+              : { error: result.message },
+          ),
+        )
+      })
+    },
+  }
+}
 
 function listLaunchSubmissionsProxyPlugin(env: Record<string, string>): Plugin {
   return {
@@ -259,6 +303,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
       submitLaunchProxyPlugin(env),
+      homepageLaunchesProxyPlugin(env),
       listLaunchSubmissionsProxyPlugin(env),
       updateLaunchSubmissionStatusProxyPlugin(env),
     ],
