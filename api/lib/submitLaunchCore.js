@@ -1,3 +1,5 @@
+import https from 'node:https'
+
 const MAX_LENGTH = {
   projectName: 120,
   tokenSymbol: 20,
@@ -8,6 +10,12 @@ const MAX_LENGTH = {
   description: 2000,
   contactEmail: 254,
 }
+
+export const SUPABASE_FETCH_TIMEOUT_MS = 8000
+
+const LOG_PREFIX = '[submit-launch]'
+
+console.log(`${LOG_PREFIX} core module loaded`)
 
 function trimString(value) {
   return typeof value === 'string' ? value.trim() : ''
@@ -32,6 +40,97 @@ function isValidOptionalUrl(value) {
   } catch {
     return false
   }
+}
+
+/** Ensure SUPABASE_URL is an absolute https URL for outbound requests. */
+export function normalizeSupabaseUrl(rawUrl) {
+  const trimmed = trimString(rawUrl)
+
+  if (!trimmed) {
+    return null
+  }
+
+  const withScheme = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`
+
+  try {
+    const parsed = new URL(withScheme)
+    return `${parsed.origin}${parsed.pathname}`.replace(/\/$/, '')
+  } catch {
+    return null
+  }
+}
+
+export function buildLaunchSubmissionsUrl(supabaseUrl) {
+  const normalized = normalizeSupabaseUrl(supabaseUrl)
+
+  if (!normalized) {
+    return null
+  }
+
+  return `${normalized}/rest/v1/launch_submissions`
+}
+
+function logMissingEnv(env) {
+  const missing = []
+
+  if (!trimString(env?.SUPABASE_URL)) {
+    missing.push('SUPABASE_URL')
+  }
+
+  if (!trimString(env?.SUPABASE_SERVICE_ROLE_KEY)) {
+    missing.push('SUPABASE_SERVICE_ROLE_KEY')
+  }
+
+  if (missing.length > 0) {
+    console.error(`${LOG_PREFIX} Missing env: ${missing.join(', ')}`)
+  }
+}
+
+function postJsonWithHttps(restUrl, headers, body) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(restUrl)
+    const payload = JSON.stringify(body)
+
+    const request = https.request(
+      {
+        protocol: parsed.protocol,
+        hostname: parsed.hostname,
+        port: parsed.port || 443,
+        path: `${parsed.pathname}${parsed.search}`,
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Length': Buffer.byteLength(payload),
+        },
+        timeout: SUPABASE_FETCH_TIMEOUT_MS,
+      },
+      (response) => {
+        const chunks = []
+
+        response.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+
+        response.on('end', () => {
+          resolve({
+            status: response.statusCode ?? 0,
+            body: Buffer.concat(chunks).toString('utf8'),
+          })
+        })
+      },
+    )
+
+    request.on('timeout', () => {
+      request.destroy()
+      reject(new Error(`Supabase request timed out after ${SUPABASE_FETCH_TIMEOUT_MS}ms`))
+    })
+
+    request.on('error', reject)
+    request.write(payload)
+    request.end()
+  })
 }
 
 export function validateSubmitLaunchPayload(body) {
@@ -113,10 +212,16 @@ export function validateSubmitLaunchPayload(body) {
 }
 
 export async function insertSubmitLaunchRecord(env, record) {
-  const supabaseUrl = env.SUPABASE_URL?.trim()
-  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+  const supabaseUrl = trimString(env?.SUPABASE_URL)
+  const serviceRoleKey = trimString(env?.SUPABASE_SERVICE_ROLE_KEY)
+
+  console.log(`${LOG_PREFIX} env configured:`, {
+    supabaseUrl: Boolean(supabaseUrl),
+    serviceRoleKey: Boolean(serviceRoleKey),
+  })
 
   if (!supabaseUrl || !serviceRoleKey) {
+    logMissingEnv(env)
     return {
       ok: false,
       status: 500,
@@ -124,22 +229,41 @@ export async function insertSubmitLaunchRecord(env, record) {
     }
   }
 
+  const hadScheme = /^https?:\/\//i.test(supabaseUrl)
+  const restUrl = buildLaunchSubmissionsUrl(supabaseUrl)
+
+  if (!restUrl) {
+    console.error(`${LOG_PREFIX} Invalid SUPABASE_URL host configuration`)
+    return {
+      ok: false,
+      status: 500,
+      message: 'Submission service is not configured.',
+    }
+  }
+
+  const host = new URL(restUrl).host
+  console.log(`${LOG_PREFIX} Supabase POST host: ${host}`)
+  console.log(`${LOG_PREFIX} Supabase URL had https scheme in env: ${hadScheme}`)
+
   try {
-    const upstream = await fetch(
-      `${supabaseUrl.replace(/\/$/, '')}/rest/v1/launch_submissions`,
+    const upstream = await postJsonWithHttps(
+      restUrl,
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: serviceRoleKey,
-          Authorization: `Bearer ${serviceRoleKey}`,
-          Prefer: 'return=minimal',
-        },
-        body: JSON.stringify(record),
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
       },
+      record,
     )
 
-    if (!upstream.ok) {
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${LOG_PREFIX} Supabase status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
       return {
         ok: false,
         status: 502,
@@ -148,7 +272,12 @@ export async function insertSubmitLaunchRecord(env, record) {
     }
 
     return { ok: true, status: 201 }
-  } catch {
+  } catch (error) {
+    console.error(
+      `${LOG_PREFIX} Supabase request failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
     return {
       ok: false,
       status: 502,
