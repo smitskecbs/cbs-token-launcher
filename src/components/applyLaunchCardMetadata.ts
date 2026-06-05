@@ -17,6 +17,9 @@ import {
 import { getLaunchCatalog } from '../services/launchService'
 import { reapplyLaunchFilters } from './launchFiltersPanel'
 
+/** Session cache of logo URLs that already loaded successfully in this tab */
+const loadedTokenLogoUrls = new Set<string>()
+
 function getLaunchPlaceholder(launch: Launch) {
   return launch.autoLoadMetadata
     ? LAUNCH_CARD_AUTO_LOAD_PLACEHOLDER
@@ -177,6 +180,7 @@ export function applyTokenLogo(
   }
 
   const showImageOnly = () => {
+    loadedTokenLogoUrls.add(imageUrl)
     wrap.classList.add('has-metadata-logo')
     fallbackEl!.hidden = true
     fallbackEl!.style.display = 'none'
@@ -193,6 +197,11 @@ export function applyTokenLogo(
   )
 
   wrap.appendChild(img)
+
+  if (loadedTokenLogoUrls.has(imageUrl)) {
+    showImageOnly()
+    return
+  }
 
   if (img.complete) {
     if (img.naturalWidth > 0) {

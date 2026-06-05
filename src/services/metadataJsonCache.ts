@@ -1,9 +1,9 @@
 import type { TokenMetadataJson } from '../solana/fetchTokenMetadataJson'
+import { LAUNCHER_CACHE_TTL_MS } from './launcherCacheTtl'
 
 const CACHE_PREFIX = 'cbs-launcher:metadata-json:'
-const CACHE_TTL_MS = 10 * 60 * 1000
 
-export const METADATA_JSON_CACHE_TTL_MS = CACHE_TTL_MS
+export const METADATA_JSON_CACHE_TTL_MS = LAUNCHER_CACHE_TTL_MS
 
 interface CachedMetadataJsonEntry {
   data: TokenMetadataJson
@@ -37,7 +37,7 @@ function readEntry(
 }
 
 function isFresh(entry: CachedMetadataJsonEntry): boolean {
-  return Date.now() - entry.cachedAt < CACHE_TTL_MS
+  return Date.now() - entry.cachedAt < LAUNCHER_CACHE_TTL_MS
 }
 
 export function getCachedMetadataJson(

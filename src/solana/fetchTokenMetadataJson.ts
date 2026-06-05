@@ -32,7 +32,7 @@ export interface FetchTokenMetadataJsonOptions {
 
 /**
  * Fetch and parse JSON from an on-chain metadata URI.
- * Results are cached for 10 minutes to reduce HTTP requests.
+ * Results are cached in localStorage (30 minutes) to reduce HTTP requests.
  */
 export async function fetchTokenMetadataJson(
   metadataUri: string,

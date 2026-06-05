@@ -1,9 +1,9 @@
 import type { MarketStatusResult } from '../types/marketStatus'
+import { LAUNCHER_CACHE_TTL_MS } from './launcherCacheTtl'
 
 const CACHE_PREFIX = 'cbs-launcher:market-status:'
-const CACHE_TTL_MS = 10 * 60 * 1000
 
-export const MARKET_STATUS_CACHE_TTL_MS = CACHE_TTL_MS
+export const MARKET_STATUS_CACHE_TTL_MS = LAUNCHER_CACHE_TTL_MS
 
 interface CachedMarketStatusEntry {
   result: MarketStatusResult
@@ -39,7 +39,7 @@ function readEntry(mintAddress: string): CachedMarketStatusEntry | null {
 }
 
 function isFresh(entry: CachedMarketStatusEntry): boolean {
-  return Date.now() - entry.cachedAt < CACHE_TTL_MS
+  return Date.now() - entry.cachedAt < LAUNCHER_CACHE_TTL_MS
 }
 
 export function getCachedMarketStatus(

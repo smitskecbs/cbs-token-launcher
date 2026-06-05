@@ -1,9 +1,9 @@
 import type { HolderOverviewResult } from '../types/holderOverview'
+import { LAUNCHER_CACHE_TTL_MS } from './launcherCacheTtl'
 
 const CACHE_PREFIX = 'cbs-launcher:holder-overview:'
-const CACHE_TTL_MS = 10 * 60 * 1000
 
-export const HOLDER_OVERVIEW_CACHE_TTL_MS = CACHE_TTL_MS
+export const HOLDER_OVERVIEW_CACHE_TTL_MS = LAUNCHER_CACHE_TTL_MS
 
 interface CachedHolderOverviewEntry {
   result: HolderOverviewResult
@@ -39,7 +39,7 @@ function readEntry(mintAddress: string): CachedHolderOverviewEntry | null {
 }
 
 function isFresh(entry: CachedHolderOverviewEntry): boolean {
-  return Date.now() - entry.cachedAt < CACHE_TTL_MS
+  return Date.now() - entry.cachedAt < LAUNCHER_CACHE_TTL_MS
 }
 
 export function getCachedHolderOverview(

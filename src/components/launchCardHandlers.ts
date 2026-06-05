@@ -39,11 +39,13 @@ export function attachLaunchCardHandlers(
 ): void {
   for (const launch of catalog) {
     attachLaunchCardNavigation(launch)
+    restoreCachedLaunchCardData(launch)
 
-    if (shouldAutoLoadMetadata(launch)) {
+    if (
+      shouldAutoLoadMetadata(launch) &&
+      !isLaunchCardDataFullyCached(launch)
+    ) {
       void loadAutoLaunchCardData(launch)
-    } else {
-      restoreCachedLaunchCardData(launch)
     }
 
     const button = document.querySelector<HTMLButtonElement>(
@@ -194,6 +196,17 @@ interface VerifyMintOptions {
   forceRefresh?: boolean
 }
 
+/** True when auto-load layers have fresh localStorage entries (no network needed). */
+function isLaunchCardDataFullyCached(launch: Launch): boolean {
+  if (shouldAutoLoadMetadata(launch)) {
+    if (!getCachedMintVerification(launch.mintAddress)) {
+      return false
+    }
+  }
+
+  return getCachedMarketStatus(launch.mintAddress) !== null
+}
+
 /** Restore cached metadata and market data without network calls */
 function restoreCachedLaunchCardData(launch: Launch): void {
   const cached = getCachedMintVerification(launch.mintAddress)
@@ -249,25 +262,33 @@ async function runMintVerification(
 ): Promise<void> {
   const panel = document.getElementById(verifyPanelId(launch.id))
 
-  if (!panel) {
-    return
-  }
-
   if (!options.forceRefresh) {
     const cached = getCachedMintVerification(launch.mintAddress)
 
     if (cached) {
-      showVerificationResult(launch, panel, cached, true)
+      if (panel) {
+        showVerificationResult(launch, panel, cached, true)
+      } else {
+        applyLaunchCardFromResult(launch, cached)
+      }
+
       return
     }
   } else {
     clearCachedMintVerification(launch.mintAddress)
   }
 
-  showVerifyChecking(panel)
+  if (panel) {
+    showVerifyChecking(panel)
+  }
 
   const result = await loadMintVerification(launch.mintAddress, options)
-  showVerificationResult(launch, panel, result, false)
+
+  if (panel) {
+    showVerificationResult(launch, panel, result, false)
+  } else {
+    applyLaunchCardFromResult(launch, result)
+  }
 }
 
 async function runMarketStatusCheck(

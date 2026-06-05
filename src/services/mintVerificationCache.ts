@@ -1,9 +1,9 @@
 import type { ReadTokenMintResult } from '../solana/verifyMint'
+import { LAUNCHER_CACHE_TTL_MS } from './launcherCacheTtl'
 
 const CACHE_PREFIX = 'cbs-launcher:mint-verify:'
-const CACHE_TTL_MS = 10 * 60 * 1000
 
-export const MINT_VERIFICATION_CACHE_TTL_MS = CACHE_TTL_MS
+export const MINT_VERIFICATION_CACHE_TTL_MS = LAUNCHER_CACHE_TTL_MS
 
 interface CachedMintVerificationEntry {
   result: ReadTokenMintResult
@@ -41,7 +41,7 @@ function readEntry(
 }
 
 function isFresh(entry: CachedMintVerificationEntry): boolean {
-  return Date.now() - entry.cachedAt < CACHE_TTL_MS
+  return Date.now() - entry.cachedAt < LAUNCHER_CACHE_TTL_MS
 }
 
 /** Read a fresh cached verification result, or null if missing / expired */
