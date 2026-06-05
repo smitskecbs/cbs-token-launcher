@@ -6,6 +6,7 @@ export interface HomepageLaunchSubmission {
   status: 'coming_soon' | 'live'
   description: string | null
   website: string | null
+  logoUrl: string | null
   telegram: string | null
   x: string | null
   createdAt: string

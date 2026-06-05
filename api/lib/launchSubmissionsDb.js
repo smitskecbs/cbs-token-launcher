@@ -52,6 +52,7 @@ function mapSubmissionRow(row) {
     tokenSymbol: row.token_symbol,
     mintAddress: row.mint_address,
     status: row.status,
+    logoUrl: row.logo_url ?? null,
     createdAt: row.created_at,
   }
 }
@@ -65,6 +66,7 @@ function mapHomepageSubmissionRow(row) {
     status: row.status,
     description: row.description ?? null,
     website: row.website ?? null,
+    logoUrl: row.logo_url ?? null,
     telegram: row.telegram ?? null,
     x: row.x ?? null,
     createdAt: row.created_at,
@@ -145,7 +147,8 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
-    select: 'id,project_name,token_symbol,mint_address,status,created_at',
+    select:
+      'id,project_name,token_symbol,mint_address,status,logo_url,created_at',
     order: 'created_at.desc',
   })
 
@@ -170,7 +173,7 @@ export async function listLaunchSubmissions(env) {
 export async function listHomepageLaunches(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,description,website,telegram,x,created_at',
+      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,created_at',
     status: 'in.(coming_soon,live)',
     order: 'created_at.desc',
   })

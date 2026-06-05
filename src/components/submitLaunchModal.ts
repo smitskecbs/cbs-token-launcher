@@ -83,6 +83,18 @@ export function renderSubmitLaunchModal(): string {
           </label>
 
           <label class="submit-launch-field">
+            <span class="submit-launch-label">Logo URL</span>
+            <input
+              class="submit-launch-input"
+              type="url"
+              name="logoUrl"
+              data-submit-logo-url
+              placeholder="https://example.com/logo.png"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="submit-launch-field">
             <span class="submit-launch-label">Website</span>
             <input
               class="submit-launch-input"
@@ -321,6 +333,9 @@ function wireSubmitLaunchModal(ui: SubmitLaunchModalElements): void {
         )?.value ?? '',
       mintAddress:
         form.querySelector<HTMLInputElement>('[data-submit-mint]')?.value ?? '',
+      logoUrl:
+        form.querySelector<HTMLInputElement>('[data-submit-logo-url]')?.value ??
+        '',
       website:
         form.querySelector<HTMLInputElement>('[data-submit-website]')?.value ??
         '',

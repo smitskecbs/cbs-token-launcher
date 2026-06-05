@@ -5,6 +5,7 @@ const MAX_LENGTH = {
   tokenSymbol: 20,
   mintAddress: 64,
   website: 500,
+  logoUrl: 500,
   telegram: 200,
   x: 200,
   description: 2000,
@@ -138,6 +139,7 @@ export function validateSubmitLaunchPayload(body) {
   const tokenSymbol = trimString(body?.tokenSymbol)
   const mintAddress = trimString(body?.mintAddress)
   const website = trimString(body?.website)
+  const logoUrl = trimString(body?.logoUrl)
   const telegram = trimString(body?.telegram)
   const x = trimString(body?.x)
   const description = trimString(body?.description)
@@ -179,6 +181,10 @@ export function validateSubmitLaunchPayload(body) {
     return { ok: false, message: 'Website URL is invalid.' }
   }
 
+  if (logoUrl && (!isValidOptionalUrl(logoUrl) || logoUrl.length > MAX_LENGTH.logoUrl)) {
+    return { ok: false, message: 'Logo URL is invalid.' }
+  }
+
   if (telegram.length > MAX_LENGTH.telegram) {
     return { ok: false, message: 'Telegram value is too long.' }
   }
@@ -201,6 +207,7 @@ export function validateSubmitLaunchPayload(body) {
       token_symbol: tokenSymbol,
       mint_address: mintAddress,
       website: website || null,
+      logo_url: logoUrl || null,
       telegram: telegram || null,
       x: x || null,
       description,

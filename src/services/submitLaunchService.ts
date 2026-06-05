@@ -7,6 +7,7 @@ export interface SubmitLaunchPayload {
   tokenSymbol: string
   mintAddress: string
   website?: string
+  logoUrl?: string
   telegram?: string
   x?: string
   description: string
@@ -32,6 +33,7 @@ function toPayload(values: SubmitLaunchFormValues): SubmitLaunchPayload {
     mintAddress: values.mintAddress,
     description: values.description,
     ...(values.website ? { website: values.website } : {}),
+    ...(values.logoUrl ? { logoUrl: values.logoUrl } : {}),
     ...(values.telegram ? { telegram: values.telegram } : {}),
     ...(values.x ? { x: values.x } : {}),
     ...(values.contactEmail ? { contactEmail: values.contactEmail } : {}),

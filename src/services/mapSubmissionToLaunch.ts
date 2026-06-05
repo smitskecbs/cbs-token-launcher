@@ -45,6 +45,7 @@ export function mapSubmissionToLaunch(
     name,
     symbol,
     description: submission.description?.trim() || undefined,
+    logo: submission.logoUrl?.trim() || undefined,
     createdAt: hasCreatedAt ? createdAtMs : undefined,
     submittedAt: hasCreatedAt ? createdAtMs : undefined,
     logoFallback: logoSource.charAt(0).toUpperCase(),

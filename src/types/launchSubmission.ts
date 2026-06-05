@@ -6,6 +6,7 @@ export interface LaunchSubmissionSummary {
   tokenSymbol: string
   mintAddress: string
   status: LaunchSubmissionStatus | string
+  logoUrl: string | null
   createdAt: string
 }
 

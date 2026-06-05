@@ -4,6 +4,7 @@ export interface SubmitLaunchFormValues {
   projectName: string
   tokenSymbol: string
   mintAddress: string
+  logoUrl: string
   website: string
   telegram: string
   x: string
@@ -22,6 +23,7 @@ const MAX_LENGTH = {
   tokenSymbol: 20,
   description: 2000,
   website: 500,
+  logoUrl: 500,
   telegram: 200,
   x: 200,
   contactEmail: 254,
@@ -55,6 +57,7 @@ export function validateSubmitLaunchForm(
   const tokenSymbol = trimField(values.tokenSymbol)
   const mintAddress = trimField(values.mintAddress)
   const website = trimField(values.website)
+  const logoUrl = trimField(values.logoUrl)
   const telegram = trimField(values.telegram)
   const x = trimField(values.x)
   const description = trimField(values.description)
@@ -100,6 +103,14 @@ export function validateSubmitLaunchForm(
     return { valid: false, error: 'Website URL is too long.' }
   }
 
+  if (logoUrl && !isValidOptionalUrl(logoUrl)) {
+    return { valid: false, error: 'Logo URL is invalid.' }
+  }
+
+  if (logoUrl.length > MAX_LENGTH.logoUrl) {
+    return { valid: false, error: 'Logo URL is too long.' }
+  }
+
   if (telegram.length > MAX_LENGTH.telegram) {
     return { valid: false, error: 'Telegram value is too long.' }
   }
@@ -122,6 +133,7 @@ export function validateSubmitLaunchForm(
       projectName,
       tokenSymbol,
       mintAddress,
+      logoUrl,
       website,
       telegram,
       x,
