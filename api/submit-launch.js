@@ -58,6 +58,8 @@ export default async function handler(req, res) {
     return
   }
 
+  console.log('[submit-launch] validation passed')
+
   const result = await insertSubmitLaunchRecord(process.env, validation.data)
 
   if (!result.ok) {

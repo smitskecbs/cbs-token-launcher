@@ -271,6 +271,7 @@ export async function insertSubmitLaunchRecord(env, record) {
       }
     }
 
+    console.log(`${LOG_PREFIX} Supabase insert succeeded`)
     return { ok: true, status: 201 }
   } catch (error) {
     console.error(
