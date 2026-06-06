@@ -1234,6 +1234,61 @@ h3 {
   align-items: stretch;
 }
 
+.launcher-statistics-section {
+  width: 100%;
+}
+
+.launcher-statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.launcher-stat-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px 14px;
+  border: 1px solid rgba(216, 111, 0, 0.2);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 40px rgba(216, 111, 0, 0.08);
+  text-align: center;
+}
+
+.launcher-stat-card__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #888888;
+  line-height: 1.35;
+}
+
+.launcher-stat-card__value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #b85a00;
+}
+
+.launcher-stat-card__value--loading {
+  color: #d8d0c8;
+  animation: launcher-stat-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes launcher-stat-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 .latest-updates-list {
   width: 100%;
 }

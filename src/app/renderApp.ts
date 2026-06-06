@@ -18,6 +18,10 @@ import {
   attachMangoDonationSection,
   renderMangoDonationSection,
 } from '../components/mangoDonationSection'
+import {
+  attachLauncherStatisticsSection,
+  renderLauncherStatisticsSection,
+} from '../components/launcherStatisticsSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import {
   renderCbsEcosystemTokensSection,
@@ -55,6 +59,7 @@ export async function renderApp(): Promise<void> {
       />
 
       ${renderHeroSection()}
+      ${renderLauncherStatisticsSection(catalog)}
       ${renderLaunchPipelineSection()}
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
@@ -71,6 +76,7 @@ export async function renderApp(): Promise<void> {
   `
 
   attachMangoDonationSection()
+  attachLauncherStatisticsSection()
   attachLaunchCardHandlers(renderedLaunches)
   attachLaunchFilters(renderedLaunches, {
     initialCount: renderedLaunches.length,

@@ -141,10 +141,33 @@ function parseLatestLimit(value) {
   return Math.min(parsed, 20)
 }
 
+function parseCountTotal(value) {
+  const normalized = trimString(value).toLowerCase()
+
+  return normalized === 'total'
+}
+
+function parseContentRangeTotal(contentRange) {
+  if (typeof contentRange !== 'string') {
+    return null
+  }
+
+  const match = contentRange.match(/\/(\d+)\s*$/)
+
+  if (!match) {
+    return null
+  }
+
+  const parsed = Number.parseInt(match[1], 10)
+
+  return Number.isFinite(parsed) ? parsed : null
+}
+
 export async function listLaunchUpdates(env, queryParams = {}) {
   const submissionId = trimString(queryParams.submissionId)
   const launchId = trimString(queryParams.launchId)
   const latestLimit = parseLatestLimit(queryParams.latest)
+  const countTotal = parseCountTotal(queryParams.count)
 
   if (submissionId && launchId) {
     return {
@@ -155,11 +178,15 @@ export async function listLaunchUpdates(env, queryParams = {}) {
   }
 
   if (!submissionId && !launchId) {
+    if (countTotal) {
+      return countLaunchUpdates(env)
+    }
+
     if (!latestLimit) {
       return {
         ok: false,
         status: 400,
-        message: 'Submission id, launch id, or latest limit is required.',
+        message: 'Submission id, launch id, latest limit, or count is required.',
       }
     }
 
@@ -299,6 +326,73 @@ async function listLatestLaunchUpdates(env, limit) {
   } catch (error) {
     console.error(
       `${LOG_PREFIX} latest list failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not load launch updates right now.',
+    }
+  }
+}
+
+async function countLaunchUpdates(env) {
+  const config = getSupabaseConfig(env)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Launch updates service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    select: 'id',
+    limit: '0',
+  })
+  const restUrl = `${config.updatesUrl}?${query.toString()}`
+
+  try {
+    const upstream = await getJsonWithHttps(restUrl, {
+      ...buildAuthHeaders(config.serviceRoleKey),
+      Prefer: 'count=exact',
+    })
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${LOG_PREFIX} count status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    const contentRange = upstream.headers?.['content-range']
+    const totalCount = parseContentRangeTotal(contentRange)
+
+    if (totalCount === null) {
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      totalCount,
+    }
+  } catch (error) {
+    console.error(
+      `${LOG_PREFIX} count failed:`,
       error instanceof Error ? error.message : 'unknown error',
     )
 

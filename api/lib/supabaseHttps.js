@@ -84,6 +84,7 @@ export function getJsonWithHttps(restUrl, headers) {
           resolve({
             status: response.statusCode ?? 0,
             body: Buffer.concat(chunks).toString('utf8'),
+            headers: response.headers,
           })
         })
       },

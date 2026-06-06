@@ -149,15 +149,26 @@ async function handlePublicLaunchUpdates(req, res, env) {
     typeof req.query?.launchId === 'string' ? req.query.launchId.trim() : ''
   const latest =
     typeof req.query?.latest === 'string' ? req.query.latest.trim() : ''
+  const count =
+    typeof req.query?.count === 'string' ? req.query.count.trim() : ''
 
   const result = await listLaunchUpdates(env, {
     submissionId,
     launchId,
     latest,
+    count,
   })
 
   if (!result.ok) {
     res.status(result.status).json({ error: result.message })
+    return
+  }
+
+  if (typeof result.totalCount === 'number') {
+    res.status(200).json({
+      ok: true,
+      totalCount: result.totalCount,
+    })
     return
   }
 
