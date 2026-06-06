@@ -2285,6 +2285,82 @@ h3 {
   box-shadow: 0 2px 8px rgba(216, 111, 0, 0.14);
 }
 
+.launch-pipeline-card {
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(216, 111, 0, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 250, 245, 0.92);
+  box-shadow: 0 6px 22px rgba(216, 111, 0, 0.05);
+}
+
+.launch-pipeline-lead {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #666666;
+  text-align: left;
+}
+
+.launch-pipeline-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.launch-pipeline-step {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 12px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(216, 111, 0, 0.12);
+  background: #ffffff;
+  text-align: center;
+}
+
+.launch-pipeline-step-number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #d86f00;
+  background: rgba(255, 179, 71, 0.16);
+}
+
+.launch-pipeline-step-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #444444;
+}
+
+@media (max-width: 640px) {
+  .launch-pipeline-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .launch-pipeline-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .launch-pipeline-step {
+    grid-template-columns: 28px 1fr;
+    grid-template-rows: auto;
+    align-items: center;
+    justify-items: start;
+    gap: 10px;
+    text-align: left;
+  }
+}
+
 .mango-donation-section {
   width: 100%;
   max-width: 720px;
@@ -2308,10 +2384,31 @@ h3 {
 }
 
 .mango-donation-text {
-  margin: 0 0 14px;
+  margin: 0 0 10px;
   font-size: 14px;
   line-height: 1.5;
   color: #666666;
+}
+
+.mango-donation-points {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.mango-donation-points li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #b85a00;
+  background: rgba(216, 111, 0, 0.08);
+  border: 1px solid rgba(216, 111, 0, 0.12);
 }
 
 .mango-donation-wallet-label {
@@ -2351,6 +2448,13 @@ h3 {
   font-size: 12px;
   font-weight: 700;
   color: #15803d;
+}
+
+.mango-donation-disclaimer {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #888888;
 }
 
 .site-footer {

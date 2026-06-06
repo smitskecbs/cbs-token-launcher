@@ -13,6 +13,7 @@ import {
   getAllHomepageLaunches,
   resolveHomepageSections,
 } from '../services/homepageSectionsService'
+import { renderLaunchPipelineSection } from '../components/launchPipelineSection'
 import {
   attachMangoDonationSection,
   renderMangoDonationSection,
@@ -55,6 +56,7 @@ export async function renderApp(): Promise<void> {
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsEcosystemTokensSection(homepage.ecosystem)}
       ${renderCbsToolsSection(cbsTools)}
+      ${renderLaunchPipelineSection()}
       ${renderMangoDonationSection()}
       ${renderFooter()}
     </main>
