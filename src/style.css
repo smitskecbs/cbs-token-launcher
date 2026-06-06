@@ -3136,6 +3136,19 @@ h3 {
   margin-top: 4px;
 }
 
+.admin-builtin-debug-marker {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 2px dashed #d86f00;
+  border-radius: 10px;
+  background: #fff3cd;
+  color: #8a3b00;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
 .admin-builtin-launches {
   margin: 16px 0 20px;
   padding: 16px 18px;

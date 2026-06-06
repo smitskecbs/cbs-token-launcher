@@ -679,7 +679,12 @@ function ensureBuiltinLaunchesSection(ui: AdminPageElements): void {
     ui.statsWrap.insertAdjacentElement('afterend', ui.builtinLaunchesHost)
   }
 
-  ui.builtinLaunchesHost.innerHTML = renderBuiltinLaunchesSection()
+  ui.builtinLaunchesHost.innerHTML = `
+    <p class="admin-builtin-debug-marker" data-admin-builtin-debug>
+      BUILT-IN HOST DEBUG
+    </p>
+    ${renderBuiltinLaunchesSection()}
+  `
   ui.builtinLaunchesHost.hidden = false
 
   const section = ui.builtinLaunchesHost.querySelector<HTMLElement>(
