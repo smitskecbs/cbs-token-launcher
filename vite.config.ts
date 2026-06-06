@@ -9,6 +9,7 @@ import {
   verifyAdminSessionToken,
 } from './api/lib/adminSession.js'
 import {
+  deleteLaunchSubmission,
   listHomepageLaunches,
   listLaunchSubmissions,
   updateLaunchSubmissionDetails,
@@ -253,6 +254,72 @@ function listLaunchSubmissionsProxyPlugin(env: Record<string, string>): Plugin {
                 : { error: result.message },
             ),
           )
+        },
+      )
+    },
+  }
+}
+
+function deleteLaunchSubmissionProxyPlugin(
+  env: Record<string, string>,
+): Plugin {
+  return {
+    name: 'dev-delete-launch-submission-proxy',
+    configureServer(server) {
+      server.middlewares.use(
+        '/api/delete-launch-submission',
+        async (req, res, next) => {
+          if (!req.url?.startsWith('/api/delete-launch-submission')) {
+            next()
+            return
+          }
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204
+            res.end()
+            return
+          }
+
+          if (req.method !== 'DELETE') {
+            sendJson(res, 405, { error: 'Method not allowed' })
+            return
+          }
+
+          const auth = checkAdminAuth(req, env)
+
+          if (!auth.ok) {
+            sendJson(res, auth.status, { error: auth.message })
+            return
+          }
+
+          try {
+            const chunks: Buffer[] = []
+
+            await new Promise<void>((resolve, reject) => {
+              req.on('data', (chunk: Buffer) => chunks.push(chunk))
+              req.on('end', () => resolve())
+              req.on('error', reject)
+            })
+
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : null
+            const result = await deleteLaunchSubmission(env, body?.id)
+
+            res.statusCode = result.ok ? 200 : result.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify(
+                result.ok
+                  ? {
+                      ok: true,
+                      id: result.id,
+                    }
+                  : { error: result.message },
+              ),
+            )
+          } catch {
+            sendJson(res, 400, { error: 'Invalid request body.' })
+          }
         },
       )
     },
@@ -700,6 +767,7 @@ export default defineConfig(({ mode }) => {
       homepageLaunchesProxyPlugin(env),
       adminLoginProxyPlugin(env),
       listLaunchSubmissionsProxyPlugin(env),
+      deleteLaunchSubmissionProxyPlugin(env),
       updateLaunchSubmissionStatusProxyPlugin(env),
       updateLaunchSubmissionDetailsProxyPlugin(env),
       updateLaunchSubmissionFeaturedProxyPlugin(env),

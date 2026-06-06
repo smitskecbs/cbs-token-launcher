@@ -151,3 +151,47 @@ export function patchJsonWithHttps(restUrl, headers, body) {
     request.end()
   })
 }
+
+export function deleteJsonWithHttps(restUrl, headers) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(restUrl)
+
+    const request = https.request(
+      {
+        protocol: parsed.protocol,
+        hostname: parsed.hostname,
+        port: parsed.port || 443,
+        path: `${parsed.pathname}${parsed.search}`,
+        method: 'DELETE',
+        headers,
+        timeout: SUPABASE_HTTPS_TIMEOUT_MS,
+      },
+      (response) => {
+        const chunks = []
+
+        response.on('data', (chunk) => {
+          chunks.push(chunk)
+        })
+
+        response.on('end', () => {
+          resolve({
+            status: response.statusCode ?? 0,
+            body: Buffer.concat(chunks).toString('utf8'),
+          })
+        })
+      },
+    )
+
+    request.on('timeout', () => {
+      request.destroy()
+      reject(
+        new Error(
+          `Supabase request timed out after ${SUPABASE_HTTPS_TIMEOUT_MS}ms`,
+        ),
+      )
+    })
+
+    request.on('error', reject)
+    request.end()
+  })
+}

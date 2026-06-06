@@ -12,6 +12,7 @@ import {
 import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 import { updateLaunchSubmissionStatus } from '../services/updateLaunchSubmissionStatusService'
 import { updateLaunchSubmissionFeatured } from '../services/updateLaunchSubmissionFeaturedService'
+import { deleteLaunchSubmission } from '../services/deleteLaunchSubmissionService'
 import { updateLaunchSubmissionVerified } from '../services/updateLaunchSubmissionVerifiedService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
@@ -137,7 +138,23 @@ function renderStatusActions(
     })
     .join('')
 
-  return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${statusButtons}</div>`
+  const isRejected = submission.status === 'rejected'
+  const deleteButtonClass = isRejected
+    ? ' admin-submissions-action--delete-highlight'
+    : ''
+
+  const deleteButton = `
+    <button
+      type="button"
+      class="admin-submissions-action admin-submissions-action--delete${deleteButtonClass}"
+      data-admin-delete-submission
+      data-submission-id="${escapeHtml(submission.id)}"
+    >
+      Delete
+    </button>
+  `
+
+  return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${statusButtons}${deleteButton}</div>`
 }
 
 function renderSubmissionRow(
@@ -196,6 +213,45 @@ function renderStatusStats(counts: ReturnType<typeof countLaunchSubmissionStatus
         <span class="admin-submissions-stat-value">${counts.rejected}</span>
       </div>
     </div>
+  `
+}
+
+function renderAdminDeleteConfirmDialog(): string {
+  return `
+    <dialog
+      class="admin-delete-dialog"
+      data-admin-delete-dialog
+      aria-labelledby="admin-delete-dialog-title"
+    >
+      <form method="dialog" class="admin-delete-dialog-panel">
+        <h2 class="admin-delete-dialog-title" id="admin-delete-dialog-title">
+          Delete submission permanently?
+        </h2>
+        <p class="admin-delete-dialog-copy">
+          Project:
+          <strong data-admin-delete-project-name></strong>
+        </p>
+        <p class="admin-delete-dialog-copy">
+          This action cannot be undone.
+        </p>
+        <div class="admin-delete-dialog-actions">
+          <button
+            type="button"
+            class="secondary-btn"
+            data-admin-delete-cancel
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="admin-submissions-action admin-submissions-action--delete"
+            data-admin-delete-confirm
+          >
+            Delete
+          </button>
+        </div>
+      </form>
+    </dialog>
   `
 }
 
@@ -323,6 +379,7 @@ export function renderAdminSubmissionsPage(): string {
       </section>
 
       ${renderAdminEditSubmissionModal()}
+      ${renderAdminDeleteConfirmDialog()}
       ${renderFooter()}
     </main>
   `
@@ -419,8 +476,58 @@ export function attachAdminSubmissionsPage(): void {
     },
   })
 
+  const deleteDialog = document.querySelector<HTMLDialogElement>(
+    '[data-admin-delete-dialog]',
+  )
+  const deleteProjectName = document.querySelector<HTMLElement>(
+    '[data-admin-delete-project-name]',
+  )
+  const deleteCancelButton = document.querySelector<HTMLButtonElement>(
+    '[data-admin-delete-cancel]',
+  )
+  const deleteConfirmButton = document.querySelector<HTMLButtonElement>(
+    '[data-admin-delete-confirm]',
+  )
+
+  let pendingDeleteSubmissionId: string | null = null
+
+  deleteCancelButton?.addEventListener('click', () => {
+    pendingDeleteSubmissionId = null
+    deleteDialog?.close()
+  })
+
+  deleteDialog?.addEventListener('cancel', () => {
+    pendingDeleteSubmissionId = null
+  })
+
+  deleteConfirmButton?.addEventListener('click', () => {
+    void handleDeleteSubmissionConfirm(
+      ui,
+      loadedSubmissions,
+      deleteDialog,
+      () => pendingDeleteSubmissionId,
+      () => {
+        pendingDeleteSubmissionId = null
+      },
+    )
+  })
+
   tableWrap.addEventListener('click', (event) => {
-    void handleTableActionClick(event, ui, loadedSubmissions, openEditSubmissionModal)
+    void handleTableActionClick(
+      event,
+      ui,
+      loadedSubmissions,
+      openEditSubmissionModal,
+      (submission) => {
+        pendingDeleteSubmissionId = submission.id
+
+        if (deleteProjectName) {
+          deleteProjectName.textContent = submission.projectName
+        }
+
+        deleteDialog?.showModal()
+      },
+    )
   })
 
   if (getAdminSessionToken()) {
@@ -496,14 +603,132 @@ function handleUnauthorized(ui: AdminPageElements, message: string): void {
 let statusUpdateInFlight = false
 let featuredUpdateInFlight = false
 let verifiedUpdateInFlight = false
+let deleteUpdateInFlight = false
+
+function refreshAdminDashboardCounts(
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+): void {
+  const statusCounts = countLaunchSubmissionStatuses(
+    loadedSubmissions.map((submission) => submission.status),
+  )
+
+  ui.statsWrap.innerHTML = renderStatusStats(statusCounts)
+  ui.statsWrap.hidden = false
+  ui.count.hidden = false
+  ui.count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
+
+  if (loadedSubmissions.length === 0) {
+    ui.tableWrap.hidden = true
+    ui.empty.hidden = false
+    return
+  }
+
+  ui.empty.hidden = true
+  ui.tableWrap.hidden = false
+}
+
+async function handleDeleteSubmissionConfirm(
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+  deleteDialog: HTMLDialogElement | null,
+  getPendingDeleteId: () => string | null,
+  clearPendingDelete: () => void,
+): Promise<void> {
+  if (deleteUpdateInFlight) {
+    return
+  }
+
+  const submissionId = getPendingDeleteId()
+
+  if (!submissionId) {
+    return
+  }
+
+  deleteUpdateInFlight = true
+  ui.error.hidden = true
+  ui.error.textContent = ''
+
+  const confirmButton = document.querySelector<HTMLButtonElement>(
+    '[data-admin-delete-confirm]',
+  )
+  const cancelButton = document.querySelector<HTMLButtonElement>(
+    '[data-admin-delete-cancel]',
+  )
+
+  if (confirmButton) {
+    confirmButton.disabled = true
+  }
+
+  if (cancelButton) {
+    cancelButton.disabled = true
+  }
+
+  try {
+    const result = await deleteLaunchSubmission(submissionId)
+
+    if (!result.ok) {
+      if (result.unauthorized) {
+        deleteDialog?.close()
+        clearPendingDelete()
+        handleUnauthorized(ui, 'Your admin session expired. Please sign in again.')
+        return
+      }
+
+      ui.error.hidden = false
+      ui.error.textContent = result.message
+      return
+    }
+
+    const index = loadedSubmissions.findIndex((item) => item.id === submissionId)
+
+    if (index >= 0) {
+      loadedSubmissions.splice(index, 1)
+    }
+
+    ui.body
+      .querySelector(`[data-submission-row="${submissionId}"]`)
+      ?.remove()
+
+    refreshAdminDashboardCounts(ui, loadedSubmissions)
+    deleteDialog?.close()
+    clearPendingDelete()
+  } finally {
+    deleteUpdateInFlight = false
+
+    if (confirmButton) {
+      confirmButton.disabled = false
+    }
+
+    if (cancelButton) {
+      cancelButton.disabled = false
+    }
+  }
+}
 
 async function handleTableActionClick(
   event: Event,
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
   openEditSubmissionModal: (submission: LaunchSubmissionSummary) => void,
+  openDeleteDialog: (submission: LaunchSubmissionSummary) => void,
 ): Promise<void> {
   const target = event.target as HTMLElement
+  const deleteButton = target.closest<HTMLButtonElement>(
+    '[data-admin-delete-submission]',
+  )
+
+  if (deleteButton && !deleteButton.disabled) {
+    const submissionId = deleteButton.getAttribute('data-submission-id')
+    const submission = loadedSubmissions.find((item) => item.id === submissionId)
+
+    if (submission) {
+      openDeleteDialog(submission)
+    }
+
+    return
+  }
+
   const editButton = target.closest<HTMLButtonElement>(
     '[data-admin-edit-submission]',
   )
@@ -804,23 +1029,13 @@ async function loadSubmissions(
     return
   }
 
-  const statusCounts = countLaunchSubmissionStatuses(
-    result.submissions.map((submission) => submission.status),
-  )
-
-  statsWrap.innerHTML = renderStatusStats(statusCounts)
-  statsWrap.hidden = false
-
-  count.hidden = false
-  count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
-
-  if (result.count === 0) {
-    empty.hidden = false
-    return
-  }
-
   loadedSubmissions.length = 0
   loadedSubmissions.push(...result.submissions)
+
+  if (result.count === 0) {
+    refreshAdminDashboardCounts(ui, loadedSubmissions)
+    return
+  }
 
   const mintWarningIds = getSubmissionIdsWithMintWarning(result.submissions)
 
@@ -832,5 +1047,6 @@ async function loadSubmissions(
       ),
     )
     .join('')
-  tableWrap.hidden = false
+
+  refreshAdminDashboardCounts(ui, loadedSubmissions)
 }

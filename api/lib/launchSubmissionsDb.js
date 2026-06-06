@@ -1,5 +1,6 @@
 import {
   buildLaunchSubmissionsRestUrl,
+  deleteJsonWithHttps,
   getJsonWithHttps,
   logMissingSupabaseEnv,
   patchJsonWithHttps,
@@ -13,6 +14,7 @@ const UPDATE_LOG_PREFIX = '[update-launch-submission-status]'
 const EDIT_LOG_PREFIX = '[update-launch-submission-details]'
 const VERIFIED_LOG_PREFIX = '[update-launch-submission-verified]'
 const FEATURED_LOG_PREFIX = '[update-launch-submission-featured]'
+const DELETE_LOG_PREFIX = '[delete-launch-submission]'
 
 function isValidSubmissionId(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -542,6 +544,78 @@ export async function updateLaunchSubmissionFeatured(
       ok: false,
       status: 502,
       message: 'Could not update featured status. Please try again later.',
+    }
+  }
+}
+
+export async function deleteLaunchSubmission(env, submissionId) {
+  const trimmedId = typeof submissionId === 'string' ? submissionId.trim() : ''
+
+  if (!isValidSubmissionId(trimmedId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id is invalid.',
+    }
+  }
+
+  const config = getSupabaseConfig(env, DELETE_LOG_PREFIX)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Submission service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    id: `eq.${trimmedId}`,
+  })
+
+  const restUrl = `${config.baseUrl}?${query.toString()}`
+
+  try {
+    console.log(
+      `${DELETE_LOG_PREFIX} Supabase DELETE host: ${new URL(restUrl).host}`,
+    )
+
+    const upstream = await deleteJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+    )
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${DELETE_LOG_PREFIX} Supabase status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not delete submission. Please try again later.',
+      }
+    }
+
+    console.log(`${DELETE_LOG_PREFIX} deleted ${trimmedId}`)
+
+    return {
+      ok: true,
+      status: 200,
+      id: trimmedId,
+    }
+  } catch (error) {
+    console.error(
+      `${DELETE_LOG_PREFIX} Supabase request failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not delete submission. Please try again later.',
     }
   }
 }
