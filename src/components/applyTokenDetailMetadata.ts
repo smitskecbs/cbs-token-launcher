@@ -1,7 +1,7 @@
 import type { Launch } from '../types/launch'
 import type { ReadTokenMintResult } from '../solana/verifyMint'
 import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
-import { formatSupply } from '../utils/formatSupply'
+import { getCachedMintVerificationCachedAt } from '../services/mintVerificationCache'
 import {
   applyTokenLogo,
   getLaunchLogoFallback,
@@ -12,15 +12,9 @@ import {
   getDetailPageSymbol,
 } from '../utils/launchDetailDisplay'
 import { applyOfficialLinksFromMetadata } from './officialLinks'
-import { applyTokenCategory } from './tokenCategoryField'
-import { applyTokenTags } from './tokenTagsField'
-import { formatRawMetadataText } from './mintVerificationPanel'
+import { applyTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
 import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
-
-const LOADING = 'Loading…'
-const EMPTY = '—'
-const UNAVAILABLE = 'Not available'
 
 export function applyTokenDetailFromResult(
   launch: Launch,
@@ -59,10 +53,10 @@ export function applyTokenDetailFromResult(
     displayName,
   )
 
-  setText(page, '[data-token-decimals]', formatDecimals(result))
-  setText(page, '[data-token-supply]', formatSupplyValue(result))
-  setText(page, '[data-token-metadata-uri]', formatMetadataUri(result))
-  setText(page, '[data-token-metadata-raw]', formatRawMetadataDisplay(result))
+  applyTokenDetailMetadataPanel(launch, result, {
+    refreshedAtMs:
+      getCachedMintVerificationCachedAt(launch.mintAddress) ?? Date.now(),
+  })
 
   if (result.error) {
     showChainStatus(page, result.error, 'token-chain-status--error')
@@ -73,8 +67,6 @@ export function applyTokenDetailFromResult(
   }
 
   applyOfficialLinksFromMetadata(page, launch, result)
-  applyTokenCategory(page, result)
-  applyTokenTags(page, result)
   refreshLaunchAnalytics(launch)
   refreshLaunchRisk(launch)
 }
@@ -104,10 +96,7 @@ export function setTokenDetailLoading(launch: Launch): void {
     return
   }
 
-  setText(page, '[data-token-decimals]', LOADING)
-  setText(page, '[data-token-supply]', LOADING)
-  setText(page, '[data-token-metadata-uri]', LOADING)
-  setText(page, '[data-token-metadata-raw]', LOADING)
+  applyTokenDetailMetadataPanel(launch, null, { loading: true })
 
   const status = page.querySelector<HTMLElement>('[data-token-chain-status]')
 
@@ -116,48 +105,6 @@ export function setTokenDetailLoading(launch: Launch): void {
     status.textContent = 'Loading on-chain data…'
     status.className = 'token-chain-status'
   }
-}
-
-function formatDecimals(result: ReadTokenMintResult): string {
-  if (result.error || !result.exists) {
-    return UNAVAILABLE
-  }
-
-  return result.decimals !== null ? String(result.decimals) : UNAVAILABLE
-}
-
-function formatSupplyValue(result: ReadTokenMintResult): string {
-  if (result.error || !result.exists) {
-    return UNAVAILABLE
-  }
-
-  if (result.supply === null) {
-    return UNAVAILABLE
-  }
-
-  return formatSupply(result.supply, result.decimals ?? 0)
-}
-
-function formatMetadataUri(result: ReadTokenMintResult): string {
-  if (result.error || !result.exists) {
-    return UNAVAILABLE
-  }
-
-  if (!result.metadataFound) {
-    return 'Metadata not found on-chain'
-  }
-
-  return result.metadataUri ?? UNAVAILABLE
-}
-
-function formatRawMetadataDisplay(result: ReadTokenMintResult): string {
-  if (result.error || !result.exists) {
-    return UNAVAILABLE
-  }
-
-  const raw = formatRawMetadataText(result)
-
-  return raw === EMPTY ? 'No raw metadata available' : raw
 }
 
 function setText(

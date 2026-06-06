@@ -1,12 +1,10 @@
 import type { Launch } from '../types/launch'
-import { escapeHtml } from '../utils/html'
 import { renderLaunchAnalyticsPanel } from './launchAnalyticsPanel'
 import { renderLaunchRiskPanel } from './launchRiskPanel'
 import { renderMarketDataPanel } from './marketDataPanel'
 import { renderTechnicalRiskNotice } from './technicalRiskNotice'
-import { renderTokenCategoryField } from './tokenCategoryField'
-import { renderTokenTagsPanel } from './tokenTagsField'
 import { renderTokenDetailProjectInfo } from './tokenDetailProjectInfo'
+import { renderTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import {
   renderTokenDetailAccordion,
   tokenDetailMarketAccordionId,
@@ -33,39 +31,7 @@ function renderTechnicalSection(launch: Launch): string {
 }
 
 function renderMetadataSection(launch: Launch): string {
-  const mintAddress = escapeHtml(launch.mintAddress)
-
-  return `
-    <dl class="token-detail-details">
-      <div class="token-detail-row token-detail-row--full">
-        <dt>On-chain Mint</dt>
-        <dd>
-          <code class="mint-address">${mintAddress}</code>
-        </dd>
-      </div>
-      ${renderTokenCategoryField({ rowClass: 'token-detail-row' })}
-      ${renderTokenTagsPanel()}
-      <div class="token-detail-row token-detail-row--full">
-        <dt>Metadata URI</dt>
-        <dd class="verify-metadata-uri" data-token-metadata-uri>Not loaded yet</dd>
-      </div>
-      <div class="token-detail-row">
-        <dt>Supply</dt>
-        <dd data-token-supply>Not loaded yet</dd>
-      </div>
-      <div class="token-detail-row">
-        <dt>Decimals</dt>
-        <dd data-token-decimals>Not loaded yet</dd>
-      </div>
-      <div class="token-detail-row token-detail-row--full">
-        <dt>Raw Metadata</dt>
-        <dd
-          class="verify-metadata-raw token-detail-metadata-raw"
-          data-token-metadata-raw
-        >Not loaded yet</dd>
-      </div>
-    </dl>
-  `
+  return renderTokenDetailMetadataPanel(launch)
 }
 
 export function renderTokenDetailSections(launch: Launch): string {
@@ -84,7 +50,7 @@ export function renderTokenDetailSections(launch: Launch): string {
       )}
       ${renderTokenDetailAccordion(
         tokenDetailMetadataAccordionId(launch.id),
-        'On-chain Metadata',
+        'Metadata Status',
         renderMetadataSection(launch),
       )}
     </div>

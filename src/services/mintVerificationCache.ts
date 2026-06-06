@@ -57,6 +57,19 @@ export function getCachedMintVerification(
   return entry.result
 }
 
+/** Read cache timestamp for a fresh verification entry */
+export function getCachedMintVerificationCachedAt(
+  mintAddress: string,
+): number | null {
+  const entry = readEntry(mintAddress)
+
+  if (!entry || !isFresh(entry)) {
+    return null
+  }
+
+  return entry.cachedAt
+}
+
 export function setCachedMintVerification(
   mintAddress: string,
   result: ReadTokenMintResult,
