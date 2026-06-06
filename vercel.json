@@ -25,6 +25,9 @@
     },
     "api/launch-interest.js": {
       "maxDuration": 10
+    },
+    "api/launch-updates.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

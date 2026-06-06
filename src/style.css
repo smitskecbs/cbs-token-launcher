@@ -1036,6 +1036,58 @@ h3 {
   margin-top: 4px;
 }
 
+.token-detail-updates {
+  margin-top: 8px;
+  text-align: left;
+}
+
+.token-detail-updates-body {
+  margin-top: 8px;
+}
+
+.token-detail-updates-loading,
+.token-detail-updates-empty,
+.token-detail-updates-error {
+  margin: 0;
+  color: #555555;
+}
+
+.token-detail-updates-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.token-detail-update-item {
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.token-detail-update-date {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #666666;
+}
+
+.token-detail-update-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.token-detail-update-content {
+  margin: 0;
+  line-height: 1.55;
+  color: #444444;
+  white-space: pre-wrap;
+}
+
 .token-detail-status-badge {
   display: inline-block;
   margin-bottom: 10px;
@@ -3082,6 +3134,83 @@ h3 {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 4px;
+}
+
+.admin-builtin-updates {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.admin-builtin-updates__title {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.admin-builtin-updates__lead {
+  margin: 0 0 12px;
+  color: #555555;
+  font-size: 14px;
+}
+
+.admin-builtin-updates__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-updates-existing {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.admin-updates-existing__heading {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.admin-updates-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-updates-item {
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.admin-updates-item__meta time {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #666666;
+}
+
+.admin-updates-item__title {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.admin-updates-item__content {
+  margin: 0 0 10px;
+  line-height: 1.5;
+  color: #444444;
+  white-space: pre-wrap;
+}
+
+.admin-updates-empty {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
 }
 
 .admin-submissions-card {

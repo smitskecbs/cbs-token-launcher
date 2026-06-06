@@ -28,6 +28,11 @@ import {
   getLaunchInterestCounts,
   incrementLaunchInterest,
 } from './api/lib/launchInterest.js'
+import {
+  createLaunchUpdate,
+  deleteLaunchUpdate,
+  listLaunchUpdates,
+} from './api/lib/launchUpdatesDb.js'
 
 function sendJson(
   res: ServerResponse,
@@ -772,6 +777,122 @@ function launchInterestProxyPlugin(env: Record<string, string>): Plugin {
   }
 }
 
+function launchUpdatesProxyPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'dev-launch-updates-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/launch-updates', async (req, res, next) => {
+        if (!req.url?.startsWith('/api/launch-updates')) {
+          next()
+          return
+        }
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
+        if (req.method === 'GET') {
+          const requestUrl = new URL(req.url, 'http://localhost')
+          const submissionId =
+            requestUrl.searchParams.get('submissionId')?.trim() ?? ''
+          const launchId =
+            requestUrl.searchParams.get('launchId')?.trim() ?? ''
+          const result = await listLaunchUpdates(env, {
+            submissionId,
+            launchId,
+          })
+
+          res.statusCode = result.ok ? 200 : result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(
+            JSON.stringify(
+              result.ok
+                ? {
+                    ok: true,
+                    count: result.count,
+                    updates: result.updates,
+                  }
+                : { error: result.message },
+            ),
+          )
+          return
+        }
+
+        if (req.method === 'POST' || req.method === 'DELETE') {
+          const auth = checkAdminAuth(req, env)
+
+          if (!auth.ok) {
+            sendJson(res, auth.status, { error: auth.message })
+            return
+          }
+        }
+
+        if (req.method === 'POST') {
+          try {
+            const chunks: Buffer[] = []
+
+            await new Promise<void>((resolve, reject) => {
+              req.on('data', (chunk: Buffer) => chunks.push(chunk))
+              req.on('end', () => resolve())
+              req.on('error', reject)
+            })
+
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : null
+            const result = await createLaunchUpdate(env, body)
+
+            res.statusCode = result.ok ? 201 : result.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify(
+                result.ok
+                  ? { ok: true, update: result.update }
+                  : { error: result.message },
+              ),
+            )
+          } catch {
+            sendJson(res, 400, { error: 'Invalid request body.' })
+          }
+          return
+        }
+
+        if (req.method === 'DELETE') {
+          try {
+            const chunks: Buffer[] = []
+
+            await new Promise<void>((resolve, reject) => {
+              req.on('data', (chunk: Buffer) => chunks.push(chunk))
+              req.on('end', () => resolve())
+              req.on('error', reject)
+            })
+
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : null
+            const result = await deleteLaunchUpdate(env, body?.id)
+
+            res.statusCode = result.ok ? 200 : result.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify(
+                result.ok
+                  ? { ok: true, id: result.id }
+                  : { error: result.message },
+              ),
+            )
+          } catch {
+            sendJson(res, 400, { error: 'Invalid request body.' })
+          }
+          return
+        }
+
+        sendJson(res, 405, { error: 'Method not allowed' })
+      })
+    },
+  }
+}
+
 function rpcProxyPlugin(heliusMainnetRpc: string | undefined): Plugin {
   return {
     name: 'dev-rpc-proxy',
@@ -857,6 +978,7 @@ export default defineConfig(({ mode }) => {
       updateLaunchSubmissionFeaturedProxyPlugin(env),
       updateLaunchSubmissionVerifiedProxyPlugin(env),
       launchInterestProxyPlugin(env),
+      launchUpdatesProxyPlugin(env),
     ],
   }
 })

@@ -3,6 +3,15 @@ import {
   attachAdminEditSubmissionModal,
   renderAdminEditSubmissionModal,
 } from '../components/adminEditSubmissionModal'
+import {
+  attachAdminManageUpdatesModal,
+  renderAdminManageUpdatesModal,
+} from '../components/adminManageUpdatesModal'
+import {
+  getStaticLaunchUpdateTarget,
+  getSubmissionLaunchUpdateTarget,
+  type LaunchUpdateTarget,
+} from '../utils/launchUpdateTarget'
 import { loginAdmin } from '../services/adminLoginService'
 import {
   clearAdminSessionToken,
@@ -111,6 +120,16 @@ function renderStatusActions(
       Edit
     </button>
   `
+  const manageUpdatesButton = `
+    <button
+      type="button"
+      class="secondary-btn admin-submissions-action"
+      data-admin-manage-updates
+      data-submission-id="${escapeHtml(submission.id)}"
+    >
+      Manage Updates
+    </button>
+  `
 
   const statusButtons = STATUS_ACTIONS.filter(
     (action) => action.status !== submission.status,
@@ -154,7 +173,44 @@ function renderStatusActions(
     </button>
   `
 
-  return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${statusButtons}${deleteButton}</div>`
+  return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${manageUpdatesButton}${statusButtons}${deleteButton}</div>`
+}
+
+function renderBuiltinLaunchUpdatesPanel(): string {
+  return `
+    <section
+      class="admin-builtin-updates"
+      data-admin-builtin-updates
+      aria-labelledby="admin-builtin-updates-title"
+    >
+      <h2 class="admin-builtin-updates__title" id="admin-builtin-updates-title">
+        Built-in Launch Updates
+      </h2>
+      <p class="admin-builtin-updates__lead">
+        Post timeline updates for static catalog launches.
+      </p>
+      <div class="admin-builtin-updates__actions">
+        <button
+          type="button"
+          class="secondary-btn admin-submissions-action"
+          data-admin-manage-updates
+          data-launch-id="cbs-coin"
+          data-launch-label="CBS Coin"
+        >
+          Manage Updates — CBS Coin
+        </button>
+        <button
+          type="button"
+          class="secondary-btn admin-submissions-action"
+          data-admin-manage-updates
+          data-launch-id="mango"
+          data-launch-label="ManGo"
+        >
+          Manage Updates — ManGo
+        </button>
+      </div>
+    </section>
+  `
 }
 
 function renderSubmissionRow(
@@ -322,6 +378,8 @@ export function renderAdminSubmissionsPage(): string {
           Review submitted launches and update their review status.
         </p>
 
+        ${renderBuiltinLaunchUpdatesPanel()}
+
         <div
           class="admin-submissions-stats-wrap"
           data-admin-submissions-stats-wrap
@@ -383,6 +441,7 @@ export function renderAdminSubmissionsPage(): string {
       </section>
 
       ${renderAdminEditSubmissionModal()}
+      ${renderAdminManageUpdatesModal()}
       ${renderAdminDeleteConfirmDialog()}
       ${renderFooter()}
     </main>
@@ -480,6 +539,12 @@ export function attachAdminSubmissionsPage(): void {
     },
   })
 
+  const { openManageUpdatesModal } = attachAdminManageUpdatesModal({
+    onUnauthorized: (message) => {
+      handleUnauthorized(ui, message)
+    },
+  })
+
   const deleteDialog = document.querySelector<HTMLDialogElement>(
     '[data-admin-delete-dialog]',
   )
@@ -522,6 +587,7 @@ export function attachAdminSubmissionsPage(): void {
       ui,
       loadedSubmissions,
       openEditSubmissionModal,
+      openManageUpdatesModal,
       (submission) => {
         pendingDeleteSubmissionId = submission.id
 
@@ -532,6 +598,28 @@ export function attachAdminSubmissionsPage(): void {
         deleteDialog?.showModal()
       },
     )
+  })
+
+  const builtinUpdatesPanel = document.querySelector<HTMLElement>(
+    '[data-admin-builtin-updates]',
+  )
+
+  builtinUpdatesPanel?.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    const button = target.closest<HTMLButtonElement>('[data-admin-manage-updates]')
+
+    if (!button || button.disabled) {
+      return
+    }
+
+    const launchId = button.getAttribute('data-launch-id')
+    const launchLabel = button.getAttribute('data-launch-label')
+
+    if (launchId) {
+      openManageUpdatesModal(
+        getStaticLaunchUpdateTarget(launchId, launchLabel ?? launchId),
+      )
+    }
   })
 
   if (getAdminSessionToken()) {
@@ -715,6 +803,7 @@ async function handleTableActionClick(
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
   openEditSubmissionModal: (submission: LaunchSubmissionSummary) => void,
+  openManageUpdatesModal: (target: LaunchUpdateTarget) => void,
   openDeleteDialog: (submission: LaunchSubmissionSummary) => void,
 ): Promise<void> {
   const target = event.target as HTMLElement
@@ -743,6 +832,23 @@ async function handleTableActionClick(
 
     if (submission) {
       openEditSubmissionModal(submission)
+    }
+
+    return
+  }
+
+  const manageUpdatesButton = target.closest<HTMLButtonElement>(
+    '[data-admin-manage-updates]',
+  )
+
+  if (manageUpdatesButton && !manageUpdatesButton.disabled) {
+    const submissionId = manageUpdatesButton.getAttribute('data-submission-id')
+    const submission = loadedSubmissions.find((item) => item.id === submissionId)
+
+    if (submission) {
+      openManageUpdatesModal(
+        getSubmissionLaunchUpdateTarget(submission.id, submission.projectName),
+      )
     }
 
     return

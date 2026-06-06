@@ -4,6 +4,7 @@ import { renderLaunchRiskPanel } from './launchRiskPanel'
 import { renderMarketDataPanel } from './marketDataPanel'
 import { renderTechnicalRiskNotice } from './technicalRiskNotice'
 import { renderTokenDetailProjectInfo } from './tokenDetailProjectInfo'
+import { renderTokenDetailLaunchUpdates } from './tokenDetailLaunchUpdates'
 import { renderTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import {
   renderTokenDetailAccordion,
@@ -37,6 +38,7 @@ function renderMetadataSection(launch: Launch): string {
 export function renderTokenDetailSections(launch: Launch): string {
   return `
     ${renderTokenDetailProjectInfo(launch)}
+    ${renderTokenDetailLaunchUpdates(launch)}
     <div class="token-detail-accordions token-detail-accordions--secondary">
       ${renderTokenDetailAccordion(
         tokenDetailMarketAccordionId(launch.id),
