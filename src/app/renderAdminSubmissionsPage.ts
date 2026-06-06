@@ -402,7 +402,7 @@ export function renderAdminSubmissionsPage(): string {
           hidden
         ></div>
 
-        ${renderBuiltinLaunchesSection()}
+        <div data-admin-builtin-launches-host hidden></div>
 
         <p
           class="admin-submissions-count"
@@ -506,6 +506,9 @@ export function attachAdminSubmissionsPage(): void {
   const body = document.querySelector<HTMLElement>(
     '[data-admin-submissions-body]',
   )
+  let builtinLaunchesHost = document.querySelector<HTMLElement>(
+    '[data-admin-builtin-launches-host]',
+  )
 
   if (
     !loginPanel ||
@@ -525,6 +528,12 @@ export function attachAdminSubmissionsPage(): void {
     return
   }
 
+  if (!builtinLaunchesHost) {
+    builtinLaunchesHost = document.createElement('div')
+    builtinLaunchesHost.setAttribute('data-admin-builtin-launches-host', '')
+    statsWrap.insertAdjacentElement('afterend', builtinLaunchesHost)
+  }
+
   const ui: AdminPageElements = {
     loginPanel,
     dashboardPanel,
@@ -537,6 +546,7 @@ export function attachAdminSubmissionsPage(): void {
     empty,
     count,
     statsWrap,
+    builtinLaunchesHost,
     tableWrap,
     body,
   }
@@ -658,8 +668,31 @@ interface AdminPageElements {
   empty: HTMLElement
   count: HTMLElement
   statsWrap: HTMLElement
+  builtinLaunchesHost: HTMLElement
   tableWrap: HTMLElement
   body: HTMLElement
+}
+
+/** Imperative render — runs whenever dashboard stats refresh (including zero submissions). */
+function ensureBuiltinLaunchesSection(ui: AdminPageElements): void {
+  if (ui.statsWrap.nextElementSibling !== ui.builtinLaunchesHost) {
+    ui.statsWrap.insertAdjacentElement('afterend', ui.builtinLaunchesHost)
+  }
+
+  ui.builtinLaunchesHost.innerHTML = renderBuiltinLaunchesSection()
+  ui.builtinLaunchesHost.hidden = false
+
+  const section = ui.builtinLaunchesHost.querySelector<HTMLElement>(
+    '[data-admin-builtin-launches]',
+  )
+
+  if (section) {
+    section.hidden = false
+  }
+
+  if (ui.empty.previousElementSibling !== ui.builtinLaunchesHost) {
+    ui.builtinLaunchesHost.insertAdjacentElement('afterend', ui.empty)
+  }
 }
 
 function showLogin(ui: AdminPageElements): void {
@@ -723,16 +756,9 @@ function refreshAdminDashboardCounts(
 
   ui.statsWrap.innerHTML = renderStatusStats(statusCounts)
   ui.statsWrap.hidden = false
+  ensureBuiltinLaunchesSection(ui)
   ui.count.hidden = false
   ui.count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
-
-  const builtinLaunchesSection = ui.dashboardPanel.querySelector<HTMLElement>(
-    '[data-admin-builtin-launches]',
-  )
-
-  if (builtinLaunchesSection) {
-    builtinLaunchesSection.hidden = false
-  }
 
   if (loadedSubmissions.length === 0) {
     ui.tableWrap.hidden = true
@@ -1136,13 +1162,23 @@ async function loadSubmissions(
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
 ): Promise<void> {
-  const { loading, error, empty, count, statsWrap, tableWrap, body } = ui
+  const {
+    loading,
+    error,
+    empty,
+    count,
+    statsWrap,
+    builtinLaunchesHost,
+    tableWrap,
+    body,
+  } = ui
 
   loading.hidden = false
   error.hidden = true
   empty.hidden = true
   count.hidden = true
   statsWrap.hidden = true
+  builtinLaunchesHost.hidden = true
   tableWrap.hidden = true
   error.textContent = ''
   body.innerHTML = ''
