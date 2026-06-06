@@ -68,6 +68,8 @@ export interface Launch {
   submittedAt?: number
   /** Admin verification level (localStorage or built-in catalog) */
   verificationLevel?: LaunchVerificationLevel
+  /** Optional buy link — shown on detail page when launch is live */
+  buyUrl?: string
 }
 
 /**

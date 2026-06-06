@@ -11,6 +11,7 @@ export interface HomepageLaunchSubmission {
   x: string | null
   verified: boolean
   featured: boolean
+  buyUrl: string | null
   createdAt: string
 }
 

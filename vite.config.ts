@@ -16,6 +16,7 @@ import {
   updateLaunchSubmissionFeatured,
   updateLaunchSubmissionVerified,
 } from './api/lib/launchSubmissionsDb.js'
+import { getTokenMarketData } from './api/lib/tokenMarketData.js'
 import {
   insertSubmitLaunchRecord,
   validateAdminEditSubmissionPayload,
@@ -116,6 +117,49 @@ function adminLoginProxyPlugin(env: Record<string, string>): Plugin {
         } catch {
           sendJson(res, 400, { error: 'Invalid request body.' })
         }
+      })
+    },
+  }
+}
+
+function tokenMarketDataProxyPlugin(): Plugin {
+  return {
+    name: 'dev-token-market-data-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/token-market-data', async (req, res, next) => {
+        if (!req.url?.startsWith('/api/token-market-data')) {
+          next()
+          return
+        }
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
+        if (req.method !== 'GET') {
+          sendJson(res, 405, { error: 'Method not allowed' })
+          return
+        }
+
+        const requestUrl = new URL(req.url, 'http://localhost')
+        const mint = requestUrl.searchParams.get('mint')?.trim() ?? ''
+        const result = await getTokenMarketData(mint)
+
+        res.statusCode = result.ok ? 200 : result.status
+        res.setHeader('Content-Type', 'application/json')
+        res.end(
+          JSON.stringify(
+            result.ok
+              ? {
+                  ok: true,
+                  cached: result.cached === true,
+                  data: result.data,
+                }
+              : { error: result.message },
+          ),
+        )
       })
     },
   }
@@ -651,6 +695,7 @@ export default defineConfig(({ mode }) => {
     base: '/',
     plugins: [
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
+      tokenMarketDataProxyPlugin(),
       submitLaunchProxyPlugin(env),
       homepageLaunchesProxyPlugin(env),
       adminLoginProxyPlugin(env),

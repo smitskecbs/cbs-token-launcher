@@ -10,6 +10,7 @@ const MAX_LENGTH = {
   x: 200,
   description: 2000,
   contactEmail: 254,
+  buyUrl: 500,
 }
 
 export const SUPABASE_FETCH_TIMEOUT_MS = 8000
@@ -234,7 +235,25 @@ export function validateSubmitLaunchPayload(body) {
 }
 
 export function validateAdminEditSubmissionPayload(body) {
-  return validateSubmissionFieldValues(body)
+  const result = validateSubmissionFieldValues(body)
+
+  if (!result.ok) {
+    return result
+  }
+
+  const buyUrl = trimString(body?.buyUrl)
+
+  if (buyUrl && (!isValidOptionalUrl(buyUrl) || buyUrl.length > MAX_LENGTH.buyUrl)) {
+    return { ok: false, message: 'Buy URL is invalid.' }
+  }
+
+  return {
+    ok: true,
+    data: {
+      ...result.data,
+      buy_url: buyUrl || null,
+    },
+  }
 }
 
 export async function insertSubmitLaunchRecord(env, record) {

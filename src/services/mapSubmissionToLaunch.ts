@@ -50,6 +50,7 @@ export function mapSubmissionToLaunch(
     submittedAt: hasCreatedAt ? createdAtMs : undefined,
     logoFallback: logoSource.charAt(0).toUpperCase(),
     featured: submission.featured === true,
+    buyUrl: submission.buyUrl?.trim() || undefined,
     verificationLevel: submission.verified ? 'verified' : undefined,
     launchInfo: {
       launchStatus: isLive ? 'Live' : 'Coming Soon',

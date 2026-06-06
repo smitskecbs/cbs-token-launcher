@@ -869,6 +869,70 @@ h3 {
   color: #888888;
 }
 
+.token-detail-buy-section {
+  margin: 18px 0 8px;
+  text-align: center;
+}
+
+.token-detail-buy-btn {
+  display: inline-block;
+  min-width: 180px;
+}
+
+.token-detail-buy-note {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #666666;
+}
+
+.token-detail-trading {
+  text-align: left;
+}
+
+.token-detail-trading-loading,
+.token-detail-trading-note,
+.token-detail-trading-error {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #666666;
+}
+
+.token-detail-trading-status {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.token-detail-trading-status--available {
+  color: #15803d;
+}
+
+.token-detail-trading-stats {
+  margin-bottom: 14px;
+}
+
+.token-detail-trading-actions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .token-detail-trading-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .token-detail-trading-actions .primary-btn,
+  .token-detail-trading-actions .secondary-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .token-detail-actions {
   margin-top: 4px;
 }
@@ -2809,6 +2873,13 @@ h3 {
   margin: 0 0 8px;
   font-size: clamp(24px, 4vw, 30px);
   color: #111111;
+}
+
+.submit-launch-hint {
+  margin: -6px 0 4px;
+  font-size: 13px;
+  color: #888888;
+  line-height: 1.4;
 }
 
 .submit-launch-lead {

@@ -9,3 +9,11 @@ export const CBS_URLS = {
 export function getSolscanTokenUrl(mintAddress: string): string {
   return `https://solscan.io/token/${mintAddress}`
 }
+
+export function getDexscreenerPairUrl(pairAddress: string): string {
+  return `https://dexscreener.com/solana/${pairAddress.trim()}`
+}
+
+export function getJupiterSwapUrl(mintAddress: string): string {
+  return `https://jup.ag/swap/SOL-${mintAddress.trim()}`
+}

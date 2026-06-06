@@ -14,6 +14,7 @@ export interface LaunchSubmissionSummary {
   contactEmail: string | null
   verified: boolean
   featured: boolean
+  buyUrl: string | null
   createdAt: string
 }
 

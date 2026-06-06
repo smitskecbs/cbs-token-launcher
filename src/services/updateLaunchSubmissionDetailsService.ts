@@ -1,5 +1,5 @@
 import { getAdminAuthHeaders } from './adminSessionService'
-import type { SubmitLaunchFormValues } from '../utils/submitLaunchValidation'
+import type { AdminEditSubmissionFormValues } from '../utils/adminEditSubmissionValidation'
 
 export const UPDATE_LAUNCH_SUBMISSION_DETAILS_API_PATH =
   '/api/update-launch-submission-details'
@@ -18,7 +18,7 @@ function resolveUpdateLaunchSubmissionDetailsUrl(): string {
 
 export async function updateLaunchSubmissionDetails(
   id: string,
-  values: SubmitLaunchFormValues,
+  values: AdminEditSubmissionFormValues,
 ): Promise<UpdateLaunchSubmissionDetailsResult> {
   try {
     const response = await fetch(resolveUpdateLaunchSubmissionDetailsUrl(), {
@@ -39,6 +39,7 @@ export async function updateLaunchSubmissionDetails(
         x: values.x,
         description: values.description,
         contactEmail: values.contactEmail,
+        buyUrl: values.buyUrl,
       }),
     })
 

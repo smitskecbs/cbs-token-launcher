@@ -63,6 +63,7 @@ function mapSubmissionRow(row) {
     contactEmail: row.contact_email ?? null,
     verified: row.verified === true,
     featured: row.featured === true,
+    buyUrl: row.buy_url ?? null,
     createdAt: row.created_at,
   }
 }
@@ -81,6 +82,7 @@ function mapHomepageSubmissionRow(row) {
     x: row.x ?? null,
     verified: row.verified === true,
     featured: row.featured === true,
+    buyUrl: row.buy_url ?? null,
     createdAt: row.created_at,
   }
 }
@@ -160,7 +162,7 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,created_at',
+      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,buy_url,created_at',
     order: 'created_at.desc',
   })
 
@@ -185,7 +187,7 @@ export async function listLaunchSubmissions(env) {
 export async function listHomepageLaunches(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,featured,created_at',
+      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,featured,buy_url,created_at',
     status: 'in.(coming_soon,live)',
     order: 'created_at.desc',
   })

@@ -1,9 +1,9 @@
 import { updateLaunchSubmissionDetails } from '../services/updateLaunchSubmissionDetailsService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
-  validateSubmitLaunchForm,
-  type SubmitLaunchFormValues,
-} from '../utils/submitLaunchValidation'
+  validateAdminEditSubmissionForm,
+  type AdminEditSubmissionFormValues,
+} from '../utils/adminEditSubmissionValidation'
 
 export function renderAdminEditSubmissionModal(): string {
   return `
@@ -102,6 +102,21 @@ export function renderAdminEditSubmissionModal(): string {
               autocomplete="url"
             />
           </label>
+
+          <label class="submit-launch-field">
+            <span class="submit-launch-label">Buy URL</span>
+            <input
+              class="submit-launch-input"
+              type="url"
+              name="buyUrl"
+              data-admin-edit-buy-url
+              placeholder="https://example.com/buy"
+              autocomplete="off"
+            />
+          </label>
+          <p class="submit-launch-hint">
+            Optional. Shown as Buy Token on the detail page when this launch is Live.
+          </p>
 
           <label class="submit-launch-field">
             <span class="submit-launch-label">Telegram</span>
@@ -279,7 +294,7 @@ function wireAdminEditSubmissionModal(
     saveButton.disabled = disabled
   }
 
-  function readFormValues(): SubmitLaunchFormValues {
+  function readFormValues(): AdminEditSubmissionFormValues {
     return {
       projectName:
         form.querySelector<HTMLInputElement>(
@@ -298,6 +313,9 @@ function wireAdminEditSubmissionModal(
         )?.value ?? '',
       website:
         form.querySelector<HTMLInputElement>('[data-admin-edit-website]')
+          ?.value ?? '',
+      buyUrl:
+        form.querySelector<HTMLInputElement>('[data-admin-edit-buy-url]')
           ?.value ?? '',
       telegram:
         form.querySelector<HTMLInputElement>('[data-admin-edit-telegram]')
@@ -332,6 +350,9 @@ function wireAdminEditSubmissionModal(
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-website]',
     )!.value = submission.website ?? ''
+    form.querySelector<HTMLInputElement>(
+      '[data-admin-edit-buy-url]',
+    )!.value = submission.buyUrl ?? ''
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-telegram]',
     )!.value = submission.telegram ?? ''
@@ -375,7 +396,7 @@ function wireAdminEditSubmissionModal(
 
     hideError()
 
-    const validation = validateSubmitLaunchForm(readFormValues())
+    const validation = validateAdminEditSubmissionForm(readFormValues())
 
     if (!validation.valid || !validation.values) {
       showError(validation.error ?? 'Please check the form and try again.')

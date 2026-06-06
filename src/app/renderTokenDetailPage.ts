@@ -8,7 +8,17 @@ import { escapeHtml } from '../utils/html'
 import { renderFooter } from '../components/sections'
 import { renderTokenDetailBackNav } from '../components/tokenDetailBackNav'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
+import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
+import {
+  applyTokenDetailTradingData,
+  renderTokenDetailTradingSection,
+  setTokenDetailTradingError,
+  setTokenDetailTradingLoading,
+} from '../components/tokenDetailTradingSection'
+import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
+import { fetchTokenMarketData } from '../services/tokenMarketDataService'
+import { getCachedTokenMarketData } from '../services/tokenMarketDataCache'
 import {
   applyTokenDetailFromResult,
   setTokenDetailLoading,
@@ -60,6 +70,10 @@ function renderTokenDetailCard(launch: Launch): string {
       data-token-detail="${id}"
     >
       ${renderTokenDetailSections(launch)}
+
+      ${renderTokenDetailBuySection(launch)}
+
+      ${renderTokenDetailTradingSection(launch)}
 
       <div class="token-detail-actions actions">
         <a
@@ -132,7 +146,37 @@ async function loadTokenDetailData(
   await Promise.all([
     loadTokenDetailMetadata(launch, options),
     loadTokenDetailMarketStatus(launch, options),
+    loadTokenDetailTradingData(launch, options),
   ])
+}
+
+async function loadTokenDetailTradingData(
+  launch: Launch,
+  options: { forceRefresh?: boolean } = {},
+): Promise<void> {
+  if (!isLaunchLiveForBuy(launch)) {
+    return
+  }
+
+  if (!options.forceRefresh) {
+    const cached = getCachedTokenMarketData(launch.mintAddress)
+
+    if (cached) {
+      applyTokenDetailTradingData(launch, cached)
+      return
+    }
+  }
+
+  setTokenDetailTradingLoading(launch)
+
+  const result = await fetchTokenMarketData(launch.mintAddress, options)
+
+  if (!result.ok) {
+    setTokenDetailTradingError(launch, result.message)
+    return
+  }
+
+  applyTokenDetailTradingData(launch, result.data)
 }
 
 async function loadTokenDetailMarketStatus(
