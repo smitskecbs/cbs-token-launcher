@@ -49,6 +49,7 @@ export async function renderApp(): Promise<void> {
       />
 
       ${renderHeroSection()}
+      ${renderLaunchPipelineSection()}
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderTrendingLaunchesSection(homepage.trending)}
@@ -56,7 +57,6 @@ export async function renderApp(): Promise<void> {
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsEcosystemTokensSection(homepage.ecosystem)}
       ${renderCbsToolsSection(cbsTools)}
-      ${renderLaunchPipelineSection()}
       ${renderMangoDonationSection()}
       ${renderFooter()}
     </main>
