@@ -207,12 +207,33 @@ h3 {
   margin-bottom: 0;
 }
 
-.launch-details--compact p {
+.launch-details--compact [data-token-description] {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
+}
+
+.launch-metadata-summary {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #888888;
+}
+
+.launch-metadata-summary--complete {
+  color: #15803d;
+}
+
+.launch-metadata-summary--partial {
+  color: #b85a00;
+}
+
+.launch-metadata-summary--pending {
+  color: #888888;
+  font-style: italic;
 }
 
 .launch-overview-stats {

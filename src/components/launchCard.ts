@@ -33,7 +33,9 @@ import {
   renderLaunchAccordion,
 } from './launchCardAccordion'
 import { renderLaunchCardOverview } from './launchCardOverview'
+import { renderLaunchMetadataSummary } from './launchCardMetadataSummary'
 import { renderTechnicalRiskNotice } from './technicalRiskNotice'
+import { getCachedMintVerification } from '../services/mintVerificationCache'
 
 function renderLogo(launch: Launch): string {
   return renderTokenLogo(launch)
@@ -79,6 +81,7 @@ export function renderLaunchCard(
   const verificationPriority = getLaunchCardVerificationPriority(launch)
   const searchText = escapeHtml(buildLaunchSearchText(launch))
   const categorySlug = escapeHtml(getLaunchFilterCategorySlug(launch))
+  const cachedMintResult = getCachedMintVerification(launch.mintAddress)
 
   return `
     <article
@@ -111,6 +114,7 @@ export function renderLaunchCard(
 
         <div class="launch-details launch-details--compact">
           <p data-token-description>${description}</p>
+          ${renderLaunchMetadataSummary(launch, cachedMintResult)}
         </div>
 
         ${renderLaunchCardOverview(launch.id)}

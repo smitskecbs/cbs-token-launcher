@@ -14,6 +14,7 @@ import {
 } from '../services/mintVerificationService'
 import { loadMarketStatus } from '../services/marketStatusService'
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
+import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
 import {
   applyMarketStatus,
   setMarketStatusChecking,
@@ -210,6 +211,10 @@ function isLaunchCardDataFullyCached(launch: Launch): boolean {
 /** Restore cached metadata and market data without network calls */
 function restoreCachedLaunchCardData(launch: Launch): void {
   const cached = getCachedMintVerification(launch.mintAddress)
+
+  if (cached) {
+    applyLaunchCardMetadataSummary(launch, cached)
+  }
 
   if (cached?.exists) {
     applyLaunchCardFromResult(launch, cached)

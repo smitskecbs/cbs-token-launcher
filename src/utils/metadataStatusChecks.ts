@@ -146,6 +146,40 @@ export function buildMetadataStatusChecks(
   ]
 }
 
+export const METADATA_CHECK_COUNT = 5
+
+export type MetadataStatusSummary =
+  | { kind: 'pending' }
+  | { kind: 'score'; passed: number; total: number }
+
+export function getMetadataStatusSummary(
+  launch: Launch,
+  result: ReadTokenMintResult | null,
+): MetadataStatusSummary {
+  const checks = buildMetadataStatusChecks(launch, result, { loading: false })
+  const passed = checks.filter((check) => check.state === 'success').length
+
+  if (!result && passed === 0) {
+    return { kind: 'pending' }
+  }
+
+  return {
+    kind: 'score',
+    passed,
+    total: METADATA_CHECK_COUNT,
+  }
+}
+
+export function formatMetadataSummaryLabel(
+  summary: MetadataStatusSummary,
+): string {
+  if (summary.kind === 'pending') {
+    return 'Metadata pending'
+  }
+
+  return `Metadata: ${summary.passed}/${summary.total}`
+}
+
 export function formatMetadataRefreshTimestamp(
   cachedAtMs: number | null,
 ): string | null {

@@ -16,6 +16,7 @@ import {
 } from '../services/launchFilterService'
 import { getLaunchCatalog } from '../services/launchService'
 import { reapplyLaunchFilters } from './launchFiltersPanel'
+import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
 
 /** Session cache of logo URLs that already loaded successfully in this tab */
 const loadedTokenLogoUrls = new Set<string>()
@@ -57,6 +58,8 @@ export function applyLaunchCardFromResult(
   launch: Launch,
   result: ReadTokenMintResult,
 ): void {
+  applyLaunchCardMetadataSummary(launch, result)
+
   if (!result.exists) {
     refreshLaunchAnalytics(launch)
     refreshLaunchRisk(launch)
