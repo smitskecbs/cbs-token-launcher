@@ -1,5 +1,19 @@
 import { escapeHtml } from './html'
 
+export function isExternalLink(link: HTMLAnchorElement): boolean {
+  const href = link.getAttribute('href')?.trim() ?? ''
+
+  if (href.startsWith('https://') || href.startsWith('http://')) {
+    return true
+  }
+
+  if (link.target === '_blank') {
+    return true
+  }
+
+  return link.rel.split(/\s+/).includes('noopener')
+}
+
 export function isValidHttpsUrl(value: string | null | undefined): boolean {
   const trimmed = typeof value === 'string' ? value.trim() : ''
 

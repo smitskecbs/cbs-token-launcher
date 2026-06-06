@@ -31,7 +31,6 @@ function renderPoolActions(state: PoolTradingState): string {
       state.viewPoolUrl,
       'View Pool',
       'secondary-btn',
-      ' data-pool-view-link',
     )
 
     if (viewPool) {

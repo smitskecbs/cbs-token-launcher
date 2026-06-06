@@ -1,3 +1,5 @@
+import { isExternalLink } from '../utils/externalLink'
+
 export type AppRoute =
   | { name: 'home' }
   | { name: 'token'; tokenId: string }
@@ -62,9 +64,21 @@ export function initRouter(onRouteChange: RouteListener): void {
 
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement
-    const link = target.closest<HTMLAnchorElement>('a[data-router-link]')
+    const link = target.closest<HTMLAnchorElement>('a[href]')
 
-    if (!link || link.origin !== window.location.origin) {
+    if (!link) {
+      return
+    }
+
+    if (isExternalLink(link)) {
+      return
+    }
+
+    if (!link.hasAttribute('data-router-link')) {
+      return
+    }
+
+    if (link.origin !== window.location.origin) {
       return
     }
 

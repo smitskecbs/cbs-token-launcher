@@ -5,6 +5,7 @@ import {
 } from './applyLaunchCardMetadata'
 import { getLaunchById } from '../services/launchService'
 import { escapeHtml } from '../utils/html'
+import { isExternalLink } from '../utils/externalLink'
 
 const QUOTE_TOKEN_OPTIONS = ['SOL', 'USDC', 'BONK'] as const
 
@@ -143,6 +144,12 @@ export function attachCreatePoolModal(): void {
 
   document.querySelector('#app')?.addEventListener('click', (event) => {
     const target = event.target as HTMLElement
+    const anchor = target.closest<HTMLAnchorElement>('a[href]')
+
+    if (anchor && isExternalLink(anchor)) {
+      return
+    }
+
     const openButton = target.closest<HTMLButtonElement>(
       '[data-open-create-pool]',
     )

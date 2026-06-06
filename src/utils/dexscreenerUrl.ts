@@ -2,7 +2,7 @@ import {
   getDexscreenerPairUrl,
   getDexscreenerTokenUrl,
 } from '../config/urls'
-import { escapeHtml } from './html'
+import { renderExternalAnchorHtml } from './externalLink'
 
 function isValidDexscreenerHttpsUrl(value: string): boolean {
   try {
@@ -44,44 +44,10 @@ export function resolveDexscreenerUrl(options: {
   return null
 }
 
-export function logDexscreenerHref(href: string): void {
-  console.log(`[dexscreener-link] href = ${href}`)
-}
-
 export function renderDexscreenerAnchorHtml(
   url: string,
   label: string,
   className = 'market-dexscreener-link',
 ): string {
-  logDexscreenerHref(url)
-
-  return `<a class="${escapeHtml(className)}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" data-dexscreener-link>${escapeHtml(label)}</a>`
-}
-
-let dexscreenerClickLoggingAttached = false
-
-export function attachDexscreenerLinkClickLogging(): void {
-  if (dexscreenerClickLoggingAttached) {
-    return
-  }
-
-  dexscreenerClickLoggingAttached = true
-
-  document.addEventListener(
-    'click',
-    (event) => {
-      const link = (event.target as HTMLElement).closest<HTMLAnchorElement>(
-        'a[data-dexscreener-link]',
-      )
-
-      if (!link) {
-        return
-      }
-
-      console.log(
-        `[dexscreener-click] href = ${link.getAttribute('href') ?? ''}`,
-      )
-    },
-    true,
-  )
+  return renderExternalAnchorHtml(url, label, className)
 }

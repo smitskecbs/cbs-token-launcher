@@ -16,7 +16,6 @@ import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection
 import { renderTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
 import { applyTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
-import { attachDexscreenerLinkClickLogging } from '../utils/dexscreenerUrl'
 import {
   applyTokenDetailTradingData,
   renderTokenDetailTradingSection,
@@ -135,7 +134,6 @@ export function renderTokenDetailPage(tokenId: string): string {
 }
 
 export function attachTokenDetailHandlers(launch: Launch): void {
-  attachDexscreenerLinkClickLogging()
   attachTokenDetailProjectInfo(launch)
   attachTokenDetailLaunchUpdates(launch)
   attachLaunchInterestControl(launch)
