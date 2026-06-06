@@ -1,29 +1,34 @@
 import { escapeHtml } from '../utils/html'
 
-export const MANGO_DONATION_WALLET = 'REPLACE_WITH_MANGO_WALLET_ADDRESS'
+export const MANGO_DONATION_WALLET =
+  'ManGofryUWC5VWk7t4ATP32qJtGVBBNoVi2AQ9HyR9J'
 
 export function renderMangoDonationSection(): string {
+  const wallet = escapeHtml(MANGO_DONATION_WALLET)
+
   return `
     <section
-      class="mango-donation-section"
+      class="mango-donation-section page-section"
       aria-labelledby="mango-donation-title"
     >
       <div class="mango-donation-card">
         <h2 class="mango-donation-title" id="mango-donation-title">
-          Support ManGo liquidity
+          Support ManGo Development 🥭
         </h2>
         <p class="mango-donation-text">
-          Optional donations help fund future pool growth and ecosystem building.
+          Donations help fund liquidity, development and future ecosystem tools.
         </p>
-        <p class="mango-donation-note">
-          Donations are optional and not required to use the launcher.
-        </p>
+        <p class="mango-donation-wallet-label">Wallet address</p>
+        <code
+          class="mango-donation-wallet"
+          data-mango-donation-wallet
+        >${wallet}</code>
         <button
           type="button"
           class="secondary-btn mango-donation-copy-btn"
           data-mango-donation-copy
         >
-          Copy donation wallet
+          Copy Address
         </button>
         <p
           class="mango-donation-confirm"
@@ -31,7 +36,7 @@ export function renderMangoDonationSection(): string {
           hidden
           aria-live="polite"
         >
-          Wallet address copied.
+          Address copied.
         </p>
       </div>
     </section>
@@ -60,7 +65,7 @@ export function attachMangoDonationSection(): void {
 
       confirmTimeoutId = window.setTimeout(() => {
         confirm.hidden = true
-        confirm.textContent = 'Wallet address copied.'
+        confirm.textContent = 'Address copied.'
       }, 2400)
     })
   })
@@ -75,11 +80,12 @@ async function copyDonationWallet(
   try {
     await navigator.clipboard.writeText(wallet)
     confirm.hidden = false
-    confirm.textContent = 'Wallet address copied.'
+    confirm.textContent = 'Address copied.'
     onShown()
   } catch {
     confirm.hidden = false
-    confirm.textContent = `Copy failed. Wallet: ${escapeHtml(wallet)}`
+    confirm.textContent =
+      'Copy failed. Select the wallet address above and copy manually.'
     onShown()
   }
 }

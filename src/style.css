@@ -2308,20 +2308,40 @@ h3 {
 }
 
 .mango-donation-text {
-  margin: 0 0 6px;
+  margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.5;
   color: #666666;
 }
 
-.mango-donation-note {
-  margin: 0 0 14px;
-  font-size: 12px;
-  line-height: 1.45;
+.mango-donation-wallet-label {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #888888;
 }
 
+.mango-donation-wallet {
+  display: block;
+  margin: 0 auto 14px;
+  max-width: 100%;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  border-radius: 12px;
+  border: 1px solid rgba(216, 111, 0, 0.14);
+  background: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(11px, 2.8vw, 13px);
+  line-height: 1.45;
+  color: #444444;
+}
+
 .mango-donation-copy-btn {
+  width: 100%;
+  max-width: 220px;
   font-size: 13px;
   padding: 10px 16px;
 }
