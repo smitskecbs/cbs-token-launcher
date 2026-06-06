@@ -8,7 +8,7 @@ import { formatLiquidity, hasValidMarketLiquidity } from '../utils/formatLiquidi
 import { formatPrice, hasValidMarketPrice } from '../utils/formatPrice'
 import { escapeHtml } from '../utils/html'
 import {
-  logDexscreenerHref,
+  renderDexscreenerAnchorHtml,
   resolveDexscreenerUrl,
 } from '../utils/dexscreenerUrl'
 import { canPreparePoolCreation } from '../services/poolCreationEligibility'
@@ -225,17 +225,11 @@ function renderDexscreenerLinkHtml(result: MarketStatusResult): string {
   })
 
   if (dexscreenerUrl) {
-    logDexscreenerHref(dexscreenerUrl)
-    const url = escapeHtml(dexscreenerUrl)
-
-    return `
-      <a
-        class="market-dexscreener-link"
-        href="${url}"
-        target="_blank"
-        rel="noopener noreferrer"
-      >View on Dexscreener</a>
-    `
+    return renderDexscreenerAnchorHtml(
+      dexscreenerUrl,
+      'View on Dexscreener',
+      'market-dexscreener-link',
+    )
   }
 
   return `<span class="market-data-empty">${escapeHtml(MARKET_DATA_UNAVAILABLE)}</span>`

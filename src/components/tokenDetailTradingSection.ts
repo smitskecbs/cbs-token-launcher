@@ -2,9 +2,10 @@ import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
 import { getJupiterSwapUrl } from '../config/urls'
 import {
-  logDexscreenerHref,
+  renderDexscreenerAnchorHtml,
   resolveDexscreenerUrl,
 } from '../utils/dexscreenerUrl'
+import { escapeHtml } from '../utils/html'
 import { formatLiquidity } from '../utils/formatLiquidity'
 import { formatPrice } from '../utils/formatPrice'
 import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
@@ -91,24 +92,8 @@ export function renderTokenDetailTradingSection(launch: Launch): string {
             </div>
           </dl>
           <div class="token-detail-trading-actions actions">
-            <a
-              class="secondary-btn"
-              data-token-trading-dexscreener-link
-              hidden
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View on Dexscreener
-            </a>
-            <a
-              class="primary-btn"
-              data-token-trading-jupiter-link
-              hidden
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Buy on Jupiter
-            </a>
+            <div data-token-detail-trading-dexscreener-slot></div>
+            <div data-token-detail-trading-jupiter-slot></div>
           </div>
         </div>
         <p
@@ -259,29 +244,37 @@ export function applyTokenDetailTradingData(
   setText(root, '[data-token-trading-volume]', formatVolume(data.volume24hUsd))
 
   const dexscreenerUrl = resolveTradingDexscreenerUrl(launch, data)
-  const dexscreenerLink = root.querySelector<HTMLAnchorElement>(
-    '[data-token-trading-dexscreener-link]',
+  const dexscreenerSlot = root.querySelector<HTMLElement>(
+    '[data-token-detail-trading-dexscreener-slot]',
   )
 
-  if (dexscreenerLink) {
-    if (dexscreenerUrl) {
-      logDexscreenerHref(dexscreenerUrl)
-      dexscreenerLink.href = dexscreenerUrl
-      dexscreenerLink.hidden = false
-    } else {
-      dexscreenerLink.removeAttribute('href')
-      dexscreenerLink.hidden = true
-    }
+  if (dexscreenerSlot) {
+    dexscreenerSlot.innerHTML = dexscreenerUrl
+      ? renderDexscreenerAnchorHtml(
+          dexscreenerUrl,
+          'View on Dexscreener',
+          'secondary-btn',
+        )
+      : ''
   }
 
-  const jupiterLink = root.querySelector<HTMLAnchorElement>(
-    '[data-token-trading-jupiter-link]',
+  const jupiterSlot = root.querySelector<HTMLElement>(
+    '[data-token-detail-trading-jupiter-slot]',
   )
 
-  if (jupiterLink) {
+  if (jupiterSlot) {
     const jupiterUrl = getJupiterSwapUrl(launch.mintAddress)
-    jupiterLink.href = jupiterUrl
-    jupiterLink.hidden = false
+
+    jupiterSlot.innerHTML = `
+      <a
+        class="primary-btn"
+        href="${escapeHtml(jupiterUrl)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Buy on Jupiter
+      </a>
+    `
   }
 
   applyTokenDetailBuySection(launch, { poolExists: true })
