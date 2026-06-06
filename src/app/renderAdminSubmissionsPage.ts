@@ -12,7 +12,6 @@ import {
   getSubmissionLaunchUpdateTarget,
   type LaunchUpdateTarget,
 } from '../utils/launchUpdateTarget'
-import { launches } from '../data/launches'
 import { loginAdmin } from '../services/adminLoginService'
 import {
   clearAdminSessionToken,
@@ -177,41 +176,7 @@ function renderStatusActions(
   return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${manageUpdatesButton}${statusButtons}${deleteButton}</div>`
 }
 
-const BUILTIN_LAUNCH_LABELS: Record<string, string> = {
-  'cbs-coin': 'CBS Coin',
-  mango: 'ManGo',
-}
-
-function getBuiltinLaunchLabel(launchId: string, fallbackName?: string): string {
-  return (
-    fallbackName?.trim() ||
-    BUILTIN_LAUNCH_LABELS[launchId] ||
-    launchId
-  )
-}
-
 function renderBuiltinLaunchesSection(): string {
-  const rows = launches
-    .map((launch) => {
-      const label = getBuiltinLaunchLabel(launch.id, launch.name)
-
-      return `
-        <li class="admin-builtin-launches__item">
-          <span class="admin-builtin-launches__name">${escapeHtml(label)}</span>
-          <button
-            type="button"
-            class="secondary-btn admin-builtin-launches__manage-btn"
-            data-admin-manage-updates
-            data-launch-id="${escapeHtml(launch.id)}"
-            data-launch-label="${escapeHtml(label)}"
-          >
-            Manage Updates
-          </button>
-        </li>
-      `
-    })
-    .join('')
-
   return `
     <section
       class="admin-builtin-launches"
@@ -221,11 +186,33 @@ function renderBuiltinLaunchesSection(): string {
       <h2 class="admin-builtin-launches__title" id="admin-builtin-launches-title">
         Built-in Launches
       </h2>
-      <p class="admin-builtin-launches__lead">
-        Manage timeline updates for static catalog launches.
-      </p>
       <ul class="admin-builtin-launches__list">
-        ${rows}
+        <li class="admin-builtin-launches__item">
+          <span class="admin-builtin-launches__name">CBS Coin</span>
+          <span class="admin-builtin-launches__separator" aria-hidden="true">—</span>
+          <button
+            type="button"
+            class="secondary-btn admin-builtin-launches__manage-btn"
+            data-admin-manage-updates
+            data-launch-id="cbs-coin"
+            data-launch-label="CBS Coin"
+          >
+            Manage Updates
+          </button>
+        </li>
+        <li class="admin-builtin-launches__item">
+          <span class="admin-builtin-launches__name">ManGo</span>
+          <span class="admin-builtin-launches__separator" aria-hidden="true">—</span>
+          <button
+            type="button"
+            class="secondary-btn admin-builtin-launches__manage-btn"
+            data-admin-manage-updates
+            data-launch-id="mango"
+            data-launch-label="ManGo"
+          >
+            Manage Updates
+          </button>
+        </li>
       </ul>
     </section>
   `
@@ -402,7 +389,7 @@ export function renderAdminSubmissionsPage(): string {
           hidden
         ></div>
 
-        <div data-admin-builtin-launches-host hidden></div>
+        ${renderBuiltinLaunchesSection()}
 
         <p
           class="admin-submissions-count"
@@ -506,10 +493,6 @@ export function attachAdminSubmissionsPage(): void {
   const body = document.querySelector<HTMLElement>(
     '[data-admin-submissions-body]',
   )
-  let builtinLaunchesHost = document.querySelector<HTMLElement>(
-    '[data-admin-builtin-launches-host]',
-  )
-
   if (
     !loginPanel ||
     !dashboardPanel ||
@@ -528,12 +511,6 @@ export function attachAdminSubmissionsPage(): void {
     return
   }
 
-  if (!builtinLaunchesHost) {
-    builtinLaunchesHost = document.createElement('div')
-    builtinLaunchesHost.setAttribute('data-admin-builtin-launches-host', '')
-    statsWrap.insertAdjacentElement('afterend', builtinLaunchesHost)
-  }
-
   const ui: AdminPageElements = {
     loginPanel,
     dashboardPanel,
@@ -546,7 +523,6 @@ export function attachAdminSubmissionsPage(): void {
     empty,
     count,
     statsWrap,
-    builtinLaunchesHost,
     tableWrap,
     body,
   }
@@ -668,38 +644,8 @@ interface AdminPageElements {
   empty: HTMLElement
   count: HTMLElement
   statsWrap: HTMLElement
-  builtinLaunchesHost: HTMLElement
   tableWrap: HTMLElement
   body: HTMLElement
-}
-
-/** Imperative render — runs whenever dashboard stats refresh (including zero submissions). */
-function ensureBuiltinLaunchesSection(ui: AdminPageElements): void {
-  console.log('[builtin] ensureBuiltinLaunchesSection called')
-
-  if (ui.statsWrap.nextElementSibling !== ui.builtinLaunchesHost) {
-    ui.statsWrap.insertAdjacentElement('afterend', ui.builtinLaunchesHost)
-  }
-
-  ui.builtinLaunchesHost.innerHTML = `
-    <p class="admin-builtin-debug-marker" data-admin-builtin-debug>
-      BUILT-IN HOST DEBUG
-    </p>
-    ${renderBuiltinLaunchesSection()}
-  `
-  ui.builtinLaunchesHost.hidden = false
-
-  const section = ui.builtinLaunchesHost.querySelector<HTMLElement>(
-    '[data-admin-builtin-launches]',
-  )
-
-  if (section) {
-    section.hidden = false
-  }
-
-  if (ui.empty.previousElementSibling !== ui.builtinLaunchesHost) {
-    ui.builtinLaunchesHost.insertAdjacentElement('afterend', ui.empty)
-  }
 }
 
 function showLogin(ui: AdminPageElements): void {
@@ -757,16 +703,12 @@ function refreshAdminDashboardCounts(
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
 ): void {
-  console.log('[builtin] refreshAdminDashboardCounts called')
-
   const statusCounts = countLaunchSubmissionStatuses(
     loadedSubmissions.map((submission) => submission.status),
   )
 
   ui.statsWrap.innerHTML = renderStatusStats(statusCounts)
   ui.statsWrap.hidden = false
-  console.log('[builtin] calling ensureBuiltinLaunchesSection')
-  ensureBuiltinLaunchesSection(ui)
   ui.count.hidden = false
   ui.count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
 
@@ -1172,23 +1114,13 @@ async function loadSubmissions(
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
 ): Promise<void> {
-  const {
-    loading,
-    error,
-    empty,
-    count,
-    statsWrap,
-    builtinLaunchesHost,
-    tableWrap,
-    body,
-  } = ui
+  const { loading, error, empty, count, statsWrap, tableWrap, body } = ui
 
   loading.hidden = false
   error.hidden = true
   empty.hidden = true
   count.hidden = true
   statsWrap.hidden = true
-  builtinLaunchesHost.hidden = true
   tableWrap.hidden = true
   error.textContent = ''
   body.innerHTML = ''

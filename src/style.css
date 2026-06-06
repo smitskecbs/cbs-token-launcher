@@ -3136,19 +3136,6 @@ h3 {
   margin-top: 4px;
 }
 
-.admin-builtin-debug-marker {
-  margin: 0 0 12px;
-  padding: 10px 14px;
-  border: 2px dashed #d86f00;
-  border-radius: 10px;
-  background: #fff3cd;
-  color: #8a3b00;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-align: center;
-}
-
 .admin-builtin-launches {
   margin: 16px 0 20px;
   padding: 16px 18px;
@@ -3162,12 +3149,6 @@ h3 {
   margin: 0 0 6px;
   font-size: 18px;
   color: #8a3b00;
-}
-
-.admin-builtin-launches__lead {
-  margin: 0 0 12px;
-  color: #5c4a3a;
-  font-size: 14px;
 }
 
 .admin-builtin-launches__list {
@@ -3194,6 +3175,11 @@ h3 {
   font-size: 15px;
   font-weight: 700;
   color: #333333;
+}
+
+.admin-builtin-launches__separator {
+  color: #8a3b00;
+  font-weight: 700;
 }
 
 .admin-builtin-launches__manage-btn {
