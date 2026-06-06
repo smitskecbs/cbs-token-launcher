@@ -11,6 +11,7 @@ import { getSubmittedLaunchesAsLaunches } from './submittedLaunchesStorage'
 import { fetchHomepageLaunches } from './homepageLaunchesService'
 
 import { mapSubmissionToLaunch } from './mapSubmissionToLaunch'
+import { fetchLaunchInterestCounts } from './launchInterestService'
 
 import {
   getAllHomepageLaunches,
@@ -48,6 +49,29 @@ function mergeLaunchCatalog(
   return merged
 }
 
+async function enrichCatalogWithInterestCounts(
+  catalog: Launch[],
+): Promise<Launch[]> {
+  const mints = catalog
+    .map((launch) => launch.mintAddress.trim())
+    .filter(Boolean)
+  const result = await fetchLaunchInterestCounts(mints)
+
+  if (!result.ok) {
+    return catalog
+  }
+
+  return catalog.map((launch) => {
+    const mintAddress = launch.mintAddress.trim()
+    const remoteCount = result.counts[mintAddress] ?? 0
+
+    return {
+      ...launch,
+      interestCount: Math.max(launch.interestCount ?? 0, remoteCount),
+    }
+  })
+}
+
 export interface LoadLaunchCatalogOptions {
   refresh?: boolean
 }
@@ -64,12 +88,13 @@ export async function loadLaunchCatalog(
   const remoteResult = await fetchHomepageLaunches()
 
   if (!remoteResult.ok) {
-    cachedCatalog = staticCatalog
+    cachedCatalog = await enrichCatalogWithInterestCounts(staticCatalog)
     return cachedCatalog
   }
 
   const remoteLaunches = remoteResult.launches.map(mapSubmissionToLaunch)
-  cachedCatalog = mergeLaunchCatalog(staticCatalog, remoteLaunches)
+  const mergedCatalog = mergeLaunchCatalog(staticCatalog, remoteLaunches)
+  cachedCatalog = await enrichCatalogWithInterestCounts(mergedCatalog)
 
   return cachedCatalog
 }

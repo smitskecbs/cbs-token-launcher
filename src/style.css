@@ -264,6 +264,45 @@ h3 {
 .launch-discovery-card__actions {
   margin-top: auto;
   padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.launch-interest-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.launch-interest-control--card .launch-interest-btn {
+  width: 100%;
+  text-align: center;
+}
+
+.launch-interest-control--detail {
+  margin: 4px 0 12px;
+}
+
+.launch-interest-btn:disabled {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.launch-interest-feedback {
+  margin: 0;
+  font-size: 13px;
+  color: #f87171;
+}
+
+.admin-submissions-interest-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-submissions-interest-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 .launch-discovery-card__cta {

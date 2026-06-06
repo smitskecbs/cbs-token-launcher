@@ -7,6 +7,7 @@ import {
 } from '../services/mintVerificationService'
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
+import { attachLaunchInterestControl } from './launchInterestControl'
 
 /**
  * Wire card navigation and lightweight cached metadata for homepage discovery cards.
@@ -16,6 +17,7 @@ export function attachLaunchCardHandlers(
 ): void {
   for (const launch of catalog) {
     attachLaunchCardNavigation(launch)
+    attachLaunchInterestControl(launch)
     restoreCachedLaunchCardData(launch)
 
     if (

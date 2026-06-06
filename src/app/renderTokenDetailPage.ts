@@ -2,7 +2,10 @@ import bannerUrl from '../assets/launcher-banner.png'
 import type { Launch } from '../types/launch'
 import { getSolscanTokenUrl } from '../config/urls'
 import { getLaunchById } from '../services/launchService'
-import { attachTokenDetailProjectInfo } from '../components/tokenDetailProjectInfo'
+import {
+  attachTokenDetailProjectInfo,
+} from '../components/tokenDetailProjectInfo'
+import { attachLaunchInterestControl } from '../components/launchInterestControl'
 import { getDetailPageName } from '../utils/launchDetailDisplay'
 import { escapeHtml } from '../utils/html'
 import { renderFooter } from '../components/sections'
@@ -127,6 +130,7 @@ export function renderTokenDetailPage(tokenId: string): string {
 
 export function attachTokenDetailHandlers(launch: Launch): void {
   attachTokenDetailProjectInfo(launch)
+  attachLaunchInterestControl(launch)
 
   const refreshButton = document.querySelector<HTMLButtonElement>(
     `[data-refresh-token-detail="${launch.id}"]`,

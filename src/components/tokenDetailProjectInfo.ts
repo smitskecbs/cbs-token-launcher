@@ -15,6 +15,7 @@ import {
   getLaunchDetailStatusLabel,
   getLaunchListedDateDisplay,
 } from '../utils/launchDetailDisplay'
+import { renderLaunchInterestControl } from './launchInterestControl'
 function renderDetailLinksSection(launch: Launch): string {
   const links = catalogLinksToMetadataLinks(getLaunchOfficialLinks(launch))
 
@@ -64,6 +65,8 @@ export function renderTokenDetailProjectInfo(launch: Launch): string {
         <h2 class="token-detail-heading">About</h2>
         <p data-token-description>${description}</p>
       </div>
+
+      ${renderLaunchInterestControl(launch, { variant: 'detail' })}
 
       <dl class="token-detail-details token-detail-project-details">
         <div class="token-detail-row token-detail-row--full">

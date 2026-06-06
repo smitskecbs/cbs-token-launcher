@@ -184,6 +184,9 @@ function renderSubmissionRow(
       <td>
         <span class="${statusClass}">${escapeHtml(formatLaunchSubmissionStatus(submission.status))}</span>
       </td>
+      <td class="admin-submissions-interest-cell">
+        <span class="admin-submissions-interest-count">${submission.interestCount}</span>
+      </td>
       <td class="admin-submissions-readiness-cell">
         ${renderAdminSubmissionReadiness(readiness)}
       </td>
@@ -368,6 +371,7 @@ export function renderAdminSubmissionsPage(): string {
                 <th scope="col">Token Symbol</th>
                 <th scope="col">Mint Address</th>
                 <th scope="col">Status</th>
+                <th scope="col">Interest</th>
                 <th scope="col">Readiness</th>
                 <th scope="col">Created Date</th>
                 <th scope="col">Actions</th>

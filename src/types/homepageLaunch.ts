@@ -12,6 +12,7 @@ export interface HomepageLaunchSubmission {
   verified: boolean
   featured: boolean
   buyUrl: string | null
+  interestCount: number
   createdAt: string
 }
 

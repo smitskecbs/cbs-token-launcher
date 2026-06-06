@@ -22,6 +22,9 @@
     },
     "api/homepage-launches.js": {
       "maxDuration": 10
+    },
+    "api/launch-interest.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

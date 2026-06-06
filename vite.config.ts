@@ -24,6 +24,10 @@ import {
   validateSubmitLaunchPayload,
 } from './api/lib/submitLaunchCore.js'
 import { notifyAdminOfNewSubmission } from './api/lib/telegramNotify.js'
+import {
+  getLaunchInterestCounts,
+  incrementLaunchInterest,
+} from './api/lib/launchInterest.js'
 
 function sendJson(
   res: ServerResponse,
@@ -693,6 +697,81 @@ function submitLaunchProxyPlugin(env: Record<string, string>): Plugin {
   }
 }
 
+function launchInterestProxyPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'dev-launch-interest-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/launch-interest', async (req, res, next) => {
+        if (!req.url?.startsWith('/api/launch-interest')) {
+          next()
+          return
+        }
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
+        if (req.method === 'GET') {
+          const requestUrl = new URL(req.url, 'http://localhost')
+          const mintParam = requestUrl.searchParams.get('mints')?.trim() ?? ''
+          const mints = mintParam
+            ? mintParam.split(',').map((mint) => mint.trim()).filter(Boolean)
+            : []
+          const result = await getLaunchInterestCounts(env, mints)
+
+          res.statusCode = result.ok ? 200 : result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(
+            JSON.stringify(
+              result.ok
+                ? { ok: true, counts: result.counts }
+                : { error: result.message },
+            ),
+          )
+          return
+        }
+
+        if (req.method !== 'POST') {
+          sendJson(res, 405, { error: 'Method not allowed' })
+          return
+        }
+
+        try {
+          const chunks: Buffer[] = []
+
+          await new Promise<void>((resolve, reject) => {
+            req.on('data', (chunk: Buffer) => chunks.push(chunk))
+            req.on('end', () => resolve())
+            req.on('error', reject)
+          })
+
+          const raw = Buffer.concat(chunks).toString('utf8')
+          const body = raw ? JSON.parse(raw) : null
+          const result = await incrementLaunchInterest(env, body?.mintAddress)
+
+          res.statusCode = result.ok ? 200 : result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(
+            JSON.stringify(
+              result.ok
+                ? {
+                    ok: true,
+                    mintAddress: result.mintAddress,
+                    interestCount: result.interestCount,
+                  }
+                : { error: result.message },
+            ),
+          )
+        } catch {
+          sendJson(res, 400, { error: 'Invalid request body.' })
+        }
+      })
+    },
+  }
+}
+
 function rpcProxyPlugin(heliusMainnetRpc: string | undefined): Plugin {
   return {
     name: 'dev-rpc-proxy',
@@ -777,6 +856,7 @@ export default defineConfig(({ mode }) => {
       updateLaunchSubmissionDetailsProxyPlugin(env),
       updateLaunchSubmissionFeaturedProxyPlugin(env),
       updateLaunchSubmissionVerifiedProxyPlugin(env),
+      launchInterestProxyPlugin(env),
     ],
   }
 })

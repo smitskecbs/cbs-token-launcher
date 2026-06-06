@@ -51,6 +51,7 @@ export function mapSubmissionToLaunch(
     logoFallback: logoSource.charAt(0).toUpperCase(),
     featured: submission.featured === true,
     buyUrl: submission.buyUrl?.trim() || undefined,
+    interestCount: Math.max(0, submission.interestCount ?? 0),
     verificationLevel: submission.verified ? 'verified' : undefined,
     launchInfo: {
       launchStatus: isLive ? 'Live' : 'Coming Soon',

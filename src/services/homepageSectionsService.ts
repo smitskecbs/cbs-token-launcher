@@ -42,6 +42,13 @@ function resolveFeaturedLaunches(catalog: Launch[]): Launch[] {
   )
 }
 
+function sortLaunchesByInterest(launches: Launch[]): Launch[] {
+  return [...launches].sort(
+    (left, right) =>
+      (right.interestCount ?? 0) - (left.interestCount ?? 0),
+  )
+}
+
 function sortLaunchesByCreatedAt(launches: Launch[]): Launch[] {
   return [...launches].sort(
     (left, right) =>
@@ -66,8 +73,17 @@ export function resolveHomepageSections(
     launchSectionById.set(launch.id, 'featured')
   }
 
-  // Reserved for future analytics-driven trending rankings
-  const trending: Launch[] = []
+  const trending = sortLaunchesByInterest(
+    catalog.filter(
+      (launch) =>
+        !assigned.has(launch.id) && (launch.interestCount ?? 0) > 0,
+    ),
+  )
+
+  for (const launch of trending) {
+    assigned.add(launch.id)
+    launchSectionById.set(launch.id, 'trending')
+  }
 
   const newLaunches = sortLaunchesByCreatedAt(
     catalog.filter(
@@ -180,9 +196,8 @@ export function getAllHomepageLaunches(
   ]
 }
 
-/** Future hook — returns launches eligible for trending once analytics exist */
-export function getTrendingLaunchCandidates(
-  _catalog: Launch[],
-): Launch[] {
-  return []
+export function getTrendingLaunchCandidates(catalog: Launch[]): Launch[] {
+  return sortLaunchesByInterest(
+    catalog.filter((launch) => (launch.interestCount ?? 0) > 0),
+  )
 }

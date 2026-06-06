@@ -70,6 +70,8 @@ export interface Launch {
   verificationLevel?: LaunchVerificationLevel
   /** Optional buy link — shown on detail page when launch is live */
   buyUrl?: string
+  /** Community interest votes before or after launch */
+  interestCount?: number
 }
 
 /**
