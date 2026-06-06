@@ -11,6 +11,9 @@ const MAX_LENGTH = {
   description: 2000,
   contactEmail: 254,
   buyUrl: 500,
+  poolUrl: 500,
+  raydiumUrl: 500,
+  jupiterUrl: 500,
 }
 
 export const SUPABASE_FETCH_TIMEOUT_MS = 8000
@@ -242,9 +245,33 @@ export function validateAdminEditSubmissionPayload(body) {
   }
 
   const buyUrl = trimString(body?.buyUrl)
+  const poolUrl = trimString(body?.poolUrl)
+  const raydiumUrl = trimString(body?.raydiumUrl)
+  const jupiterUrl = trimString(body?.jupiterUrl)
 
   if (buyUrl && (!isValidOptionalUrl(buyUrl) || buyUrl.length > MAX_LENGTH.buyUrl)) {
     return { ok: false, message: 'Buy URL is invalid.' }
+  }
+
+  if (
+    poolUrl &&
+    (!isValidOptionalUrl(poolUrl) || poolUrl.length > MAX_LENGTH.poolUrl)
+  ) {
+    return { ok: false, message: 'Pool URL is invalid.' }
+  }
+
+  if (
+    raydiumUrl &&
+    (!isValidOptionalUrl(raydiumUrl) || raydiumUrl.length > MAX_LENGTH.raydiumUrl)
+  ) {
+    return { ok: false, message: 'Raydium URL is invalid.' }
+  }
+
+  if (
+    jupiterUrl &&
+    (!isValidOptionalUrl(jupiterUrl) || jupiterUrl.length > MAX_LENGTH.jupiterUrl)
+  ) {
+    return { ok: false, message: 'Jupiter URL is invalid.' }
   }
 
   return {
@@ -252,6 +279,9 @@ export function validateAdminEditSubmissionPayload(body) {
     data: {
       ...result.data,
       buy_url: buyUrl || null,
+      pool_url: poolUrl || null,
+      raydium_url: raydiumUrl || null,
+      jupiter_url: jupiterUrl || null,
     },
   }
 }

@@ -13,6 +13,7 @@ import { renderFooter } from '../components/sections'
 import { renderTokenDetailBackNav } from '../components/tokenDetailBackNav'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection'
+import { renderTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
 import {
   applyTokenDetailTradingData,
@@ -76,6 +77,8 @@ function renderTokenDetailCard(launch: Launch): string {
       ${renderTokenDetailSections(launch)}
 
       ${renderTokenDetailBuySection(launch)}
+
+      ${renderTokenDetailPoolSection(launch)}
 
       ${renderTokenDetailTradingSection(launch)}
 

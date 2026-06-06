@@ -40,6 +40,9 @@ export async function updateLaunchSubmissionDetails(
         description: values.description,
         contactEmail: values.contactEmail,
         buyUrl: values.buyUrl,
+        poolUrl: values.poolUrl,
+        raydiumUrl: values.raydiumUrl,
+        jupiterUrl: values.jupiterUrl,
       }),
     })
 

@@ -12,6 +12,9 @@ export interface HomepageLaunchSubmission {
   verified: boolean
   featured: boolean
   buyUrl: string | null
+  poolUrl: string | null
+  raydiumUrl: string | null
+  jupiterUrl: string | null
   interestCount: number
   createdAt: string
 }

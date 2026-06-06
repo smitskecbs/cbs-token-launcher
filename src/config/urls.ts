@@ -17,3 +17,13 @@ export function getDexscreenerPairUrl(pairAddress: string): string {
 export function getJupiterSwapUrl(mintAddress: string): string {
   return `https://jup.ag/swap/SOL-${mintAddress.trim()}`
 }
+
+export function getRaydiumPoolCreationUrl(): string {
+  return 'https://raydium.io/liquidity/create-pool/'
+}
+
+export function getRaydiumSwapUrl(mintAddress: string): string {
+  const mint = mintAddress.trim()
+
+  return `https://raydium.io/swap/?inputMint=sol&outputMint=${mint}`
+}

@@ -119,6 +119,51 @@ export function renderAdminEditSubmissionModal(): string {
           </p>
 
           <label class="submit-launch-field">
+            <span class="submit-launch-label">Pool URL</span>
+            <input
+              class="submit-launch-input"
+              type="url"
+              name="poolUrl"
+              data-admin-edit-pool-url
+              placeholder="https://raydium.io/liquidity/..."
+              autocomplete="off"
+            />
+          </label>
+          <p class="submit-launch-hint">
+            Optional. Marks the pool as active and enables View Pool on the detail page.
+          </p>
+
+          <label class="submit-launch-field">
+            <span class="submit-launch-label">Raydium URL</span>
+            <input
+              class="submit-launch-input"
+              type="url"
+              name="raydiumUrl"
+              data-admin-edit-raydium-url
+              placeholder="https://raydium.io/swap/..."
+              autocomplete="off"
+            />
+          </label>
+          <p class="submit-launch-hint">
+            Optional. Used for Trade on Raydium when a pool URL is set.
+          </p>
+
+          <label class="submit-launch-field">
+            <span class="submit-launch-label">Jupiter URL</span>
+            <input
+              class="submit-launch-input"
+              type="url"
+              name="jupiterUrl"
+              data-admin-edit-jupiter-url
+              placeholder="https://jup.ag/swap/..."
+              autocomplete="off"
+            />
+          </label>
+          <p class="submit-launch-hint">
+            Optional. Shown as Buy on Jupiter on the detail page.
+          </p>
+
+          <label class="submit-launch-field">
             <span class="submit-launch-label">Telegram</span>
             <input
               class="submit-launch-input"
@@ -317,6 +362,15 @@ function wireAdminEditSubmissionModal(
       buyUrl:
         form.querySelector<HTMLInputElement>('[data-admin-edit-buy-url]')
           ?.value ?? '',
+      poolUrl:
+        form.querySelector<HTMLInputElement>('[data-admin-edit-pool-url]')
+          ?.value ?? '',
+      raydiumUrl:
+        form.querySelector<HTMLInputElement>('[data-admin-edit-raydium-url]')
+          ?.value ?? '',
+      jupiterUrl:
+        form.querySelector<HTMLInputElement>('[data-admin-edit-jupiter-url]')
+          ?.value ?? '',
       telegram:
         form.querySelector<HTMLInputElement>('[data-admin-edit-telegram]')
           ?.value ?? '',
@@ -353,6 +407,15 @@ function wireAdminEditSubmissionModal(
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-buy-url]',
     )!.value = submission.buyUrl ?? ''
+    form.querySelector<HTMLInputElement>(
+      '[data-admin-edit-pool-url]',
+    )!.value = submission.poolUrl ?? ''
+    form.querySelector<HTMLInputElement>(
+      '[data-admin-edit-raydium-url]',
+    )!.value = submission.raydiumUrl ?? ''
+    form.querySelector<HTMLInputElement>(
+      '[data-admin-edit-jupiter-url]',
+    )!.value = submission.jupiterUrl ?? ''
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-telegram]',
     )!.value = submission.telegram ?? ''

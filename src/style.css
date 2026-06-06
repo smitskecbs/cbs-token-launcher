@@ -926,6 +926,41 @@ h3 {
   color: #666666;
 }
 
+.token-detail-pool {
+  text-align: left;
+}
+
+.token-detail-pool-details {
+  margin-bottom: 14px;
+}
+
+.token-detail-pool-status--active {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.token-detail-pool-status--inactive {
+  color: #666666;
+  font-weight: 700;
+}
+
+.token-detail-pool-actions {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .token-detail-pool-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .token-detail-pool-actions .primary-btn,
+  .token-detail-pool-actions .secondary-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .token-detail-trading {
   text-align: left;
 }

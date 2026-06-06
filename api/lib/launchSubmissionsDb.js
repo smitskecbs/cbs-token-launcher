@@ -66,6 +66,9 @@ function mapSubmissionRow(row) {
     verified: row.verified === true,
     featured: row.featured === true,
     buyUrl: row.buy_url ?? null,
+    poolUrl: row.pool_url ?? null,
+    raydiumUrl: row.raydium_url ?? null,
+    jupiterUrl: row.jupiter_url ?? null,
     interestCount: Number(row.interest_count) || 0,
     createdAt: row.created_at,
   }
@@ -86,6 +89,9 @@ function mapHomepageSubmissionRow(row) {
     verified: row.verified === true,
     featured: row.featured === true,
     buyUrl: row.buy_url ?? null,
+    poolUrl: row.pool_url ?? null,
+    raydiumUrl: row.raydium_url ?? null,
+    jupiterUrl: row.jupiter_url ?? null,
     interestCount: Number(row.interest_count) || 0,
     createdAt: row.created_at,
   }
@@ -166,7 +172,7 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,buy_url,interest_count,created_at',
+      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,buy_url,pool_url,raydium_url,jupiter_url,interest_count,created_at',
     order: 'created_at.desc',
   })
 
@@ -191,7 +197,7 @@ export async function listLaunchSubmissions(env) {
 export async function listHomepageLaunches(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,featured,buy_url,interest_count,created_at',
+      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,featured,buy_url,pool_url,raydium_url,jupiter_url,interest_count,created_at',
     status: 'in.(coming_soon,live)',
     order: 'created_at.desc',
   })

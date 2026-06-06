@@ -51,6 +51,9 @@ export function mapSubmissionToLaunch(
     logoFallback: logoSource.charAt(0).toUpperCase(),
     featured: submission.featured === true,
     buyUrl: submission.buyUrl?.trim() || undefined,
+    poolUrl: submission.poolUrl?.trim() || undefined,
+    raydiumUrl: submission.raydiumUrl?.trim() || undefined,
+    jupiterUrl: submission.jupiterUrl?.trim() || undefined,
     interestCount: Math.max(0, submission.interestCount ?? 0),
     verificationLevel: submission.verified ? 'verified' : undefined,
     launchInfo: {

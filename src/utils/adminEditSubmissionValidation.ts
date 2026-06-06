@@ -5,6 +5,9 @@ import {
 
 export interface AdminEditSubmissionFormValues extends SubmitLaunchFormValues {
   buyUrl: string
+  poolUrl: string
+  raydiumUrl: string
+  jupiterUrl: string
 }
 
 export interface AdminEditSubmissionValidationResult {
@@ -13,7 +16,7 @@ export interface AdminEditSubmissionValidationResult {
   values?: AdminEditSubmissionFormValues
 }
 
-const MAX_BUY_URL_LENGTH = 500
+const MAX_OPTIONAL_URL_LENGTH = 500
 
 function trimField(value: string): string {
   return value.trim()
@@ -42,13 +45,25 @@ export function validateAdminEditSubmissionForm(
   }
 
   const buyUrl = trimField(values.buyUrl)
+  const poolUrl = trimField(values.poolUrl)
+  const raydiumUrl = trimField(values.raydiumUrl)
+  const jupiterUrl = trimField(values.jupiterUrl)
 
-  if (buyUrl && !isValidOptionalUrl(buyUrl)) {
-    return { valid: false, error: 'Buy URL is invalid.' }
-  }
+  const urlFields = [
+    { label: 'Buy URL', value: buyUrl },
+    { label: 'Pool URL', value: poolUrl },
+    { label: 'Raydium URL', value: raydiumUrl },
+    { label: 'Jupiter URL', value: jupiterUrl },
+  ]
 
-  if (buyUrl.length > MAX_BUY_URL_LENGTH) {
-    return { valid: false, error: 'Buy URL is too long.' }
+  for (const field of urlFields) {
+    if (field.value && !isValidOptionalUrl(field.value)) {
+      return { valid: false, error: `${field.label} is invalid.` }
+    }
+
+    if (field.value.length > MAX_OPTIONAL_URL_LENGTH) {
+      return { valid: false, error: `${field.label} is too long.` }
+    }
   }
 
   return {
@@ -56,6 +71,9 @@ export function validateAdminEditSubmissionForm(
     values: {
       ...base.values,
       buyUrl,
+      poolUrl,
+      raydiumUrl,
+      jupiterUrl,
     },
   }
 }

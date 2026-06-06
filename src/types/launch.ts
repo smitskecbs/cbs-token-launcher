@@ -70,6 +70,12 @@ export interface Launch {
   verificationLevel?: LaunchVerificationLevel
   /** Optional buy link — shown on detail page when launch is live */
   buyUrl?: string
+  /** Optional liquidity pool page URL */
+  poolUrl?: string
+  /** Optional Raydium trade or pool URL */
+  raydiumUrl?: string
+  /** Optional Jupiter swap URL */
+  jupiterUrl?: string
   /** Community interest votes before or after launch */
   interestCount?: number
 }
