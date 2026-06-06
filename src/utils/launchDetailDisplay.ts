@@ -2,6 +2,57 @@ import type { Launch } from '../types/launch'
 
 export type LaunchDetailStatusLabel = 'Coming Soon' | 'Live' | 'Ended'
 
+export type DiscoveryCardStatusLabel =
+  | 'Preparing'
+  | 'Coming Soon'
+  | 'Live'
+  | 'Ended'
+
+export type DiscoveryCardStatusBadgeId =
+  | 'preparing'
+  | 'upcoming'
+  | 'live'
+  | 'ended'
+
+export function getDiscoveryCardStatusLabel(
+  launch: Launch,
+): DiscoveryCardStatusLabel {
+  if (launch.status === 'ended') {
+    return 'Ended'
+  }
+
+  if (launch.status === 'live' || launch.launchInfo?.launchStatus === 'Live') {
+    return 'Live'
+  }
+
+  const launchStatus = launch.launchInfo?.launchStatus?.trim()
+
+  if (launchStatus === 'Coming Soon') {
+    return 'Coming Soon'
+  }
+
+  if (launch.status === 'preparing') {
+    return 'Preparing'
+  }
+
+  return 'Coming Soon'
+}
+
+export function getDiscoveryCardStatusBadgeId(
+  label: DiscoveryCardStatusLabel,
+): DiscoveryCardStatusBadgeId {
+  switch (label) {
+    case 'Live':
+      return 'live'
+    case 'Preparing':
+      return 'preparing'
+    case 'Ended':
+      return 'ended'
+    default:
+      return 'upcoming'
+  }
+}
+
 export function getLaunchDetailStatusLabel(launch: Launch): LaunchDetailStatusLabel {
   const launchStatus = launch.launchInfo?.launchStatus?.trim()
 

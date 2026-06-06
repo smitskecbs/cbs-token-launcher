@@ -1,39 +1,15 @@
 import type { Launch } from '../types/launch'
 import { getTokenDetailPath, navigate } from '../router'
-import { getLaunchById } from '../services/launchService'
-import {
-  clearCachedMintVerification,
-  getCachedMintVerification,
-} from '../services/mintVerificationCache'
-import {
-  getCachedMarketStatus,
-} from '../services/marketStatusCache'
+import { getCachedMintVerification } from '../services/mintVerificationCache'
 import {
   loadMintVerification,
   shouldAutoLoadMetadata,
 } from '../services/mintVerificationService'
-import { loadMarketStatus } from '../services/marketStatusService'
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
-import {
-  applyMarketStatus,
-  setMarketStatusChecking,
-} from './applyMarketStatus'
-import {
-  showVerifyChecking,
-  showVerifyResult,
-  toggleVerifyPanelExpanded,
-  verifyPanelId,
-} from './mintVerificationPanel'
-import {
-  metadataAccordionId,
-  openLaunchAccordion,
-} from './launchCardAccordion'
-
-let launchCardAppClickHandlerAttached = false
 
 /**
- * Wire Verify Mint buttons, card navigation, and cached metadata on launch cards.
+ * Wire card navigation and lightweight cached metadata for homepage discovery cards.
  */
 export function attachLaunchCardHandlers(
   catalog: Launch[],
@@ -44,120 +20,11 @@ export function attachLaunchCardHandlers(
 
     if (
       shouldAutoLoadMetadata(launch) &&
-      !isLaunchCardDataFullyCached(launch)
+      !getCachedMintVerification(launch.mintAddress)
     ) {
-      void loadAutoLaunchCardData(launch)
+      void loadDiscoveryCardMetadata(launch)
     }
-
-    const button = document.querySelector<HTMLButtonElement>(
-      `[data-verify-mint="${launch.id}"]`,
-    )
-
-    if (!button) {
-      continue
-    }
-
-    button.addEventListener('click', () => {
-      void handleVerifyMint(launch, button)
-    })
   }
-
-  if (!launchCardAppClickHandlerAttached) {
-    document.querySelector('#app')?.addEventListener(
-      'click',
-      handleLaunchCardAppClick,
-    )
-    launchCardAppClickHandlerAttached = true
-  }
-}
-
-function handleLaunchCardAppClick(event: Event): void {
-  const target = event.target as HTMLElement
-  const infoButton = target.closest<HTMLButtonElement>(
-    '[data-technical-risk-info]',
-  )
-
-  if (infoButton) {
-    event.preventDefault()
-    event.stopPropagation()
-
-    const card = infoButton.closest<HTMLElement>('[data-token-card]')
-    const notice = card?.querySelector<HTMLElement>(
-      '[data-technical-risk-notice]',
-    )
-
-    if (notice) {
-      notice.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      notice.classList.add('technical-risk-notice--highlight')
-
-      window.setTimeout(() => {
-        notice.classList.remove('technical-risk-notice--highlight')
-      }, 1600)
-    }
-
-    return
-  }
-
-  const openAccordionButton = target.closest<HTMLButtonElement>(
-    '[data-open-accordion]',
-  )
-
-  if (openAccordionButton) {
-    event.preventDefault()
-    event.stopPropagation()
-
-    const accordionId = openAccordionButton.getAttribute('data-open-accordion')
-
-    if (accordionId) {
-      openLaunchAccordion(accordionId)
-    }
-
-    return
-  }
-
-  const expandButton = target.closest<HTMLButtonElement>(
-    '[data-verify-expand]',
-  )
-
-  if (expandButton) {
-    const panel = expandButton.closest<HTMLElement>('.verify-panel')
-
-    if (panel) {
-      toggleVerifyPanelExpanded(panel, expandButton)
-    }
-
-    return
-  }
-
-  const refreshButton = target.closest<HTMLButtonElement>(
-    '[data-refresh-verify]',
-  )
-
-  if (!refreshButton) {
-    return
-  }
-
-  const launchId = refreshButton.getAttribute('data-refresh-verify')
-
-  if (!launchId) {
-    return
-  }
-
-  const launch = getLaunchById(launchId)
-
-  if (!launch) {
-    return
-  }
-
-  const verifyButton = document.querySelector<HTMLButtonElement>(
-    `[data-verify-mint="${launchId}"]`,
-  )
-
-  if (!verifyButton) {
-    return
-  }
-
-  void handleVerifyMint(launch, verifyButton, { forceRefresh: true })
 }
 
 function attachLaunchCardNavigation(launch: Launch): void {
@@ -176,7 +43,7 @@ function attachLaunchCardNavigation(launch: Launch): void {
   card.addEventListener('click', (event) => {
     const target = event.target as HTMLElement
 
-    if (target.closest('a, button, summary, .launch-card-accordions, .launch-manage-menu')) {
+    if (target.closest('a, button')) {
       return
     }
 
@@ -193,137 +60,23 @@ function attachLaunchCardNavigation(launch: Launch): void {
   })
 }
 
-interface VerifyMintOptions {
-  forceRefresh?: boolean
-}
-
-/** True when auto-load layers have fresh localStorage entries (no network needed). */
-function isLaunchCardDataFullyCached(launch: Launch): boolean {
-  if (shouldAutoLoadMetadata(launch)) {
-    if (!getCachedMintVerification(launch.mintAddress)) {
-      return false
-    }
-  }
-
-  return getCachedMarketStatus(launch.mintAddress) !== null
-}
-
-/** Restore cached metadata and market data without network calls */
+/** Restore cached metadata for card header fields without network calls */
 function restoreCachedLaunchCardData(launch: Launch): void {
   const cached = getCachedMintVerification(launch.mintAddress)
 
-  if (cached) {
-    applyLaunchCardMetadataSummary(launch, cached)
-  }
-
-  if (cached?.exists) {
-    applyLaunchCardFromResult(launch, cached)
-
-    const panel = document.getElementById(verifyPanelId(launch.id))
-
-    if (panel) {
-      showVerifyResult(panel, cached, {
-        fromCache: true,
-        launchId: launch.id,
-      })
-    }
-  }
-
-  const cachedMarket = getCachedMarketStatus(launch.mintAddress)
-
-  if (cachedMarket) {
-    applyMarketStatus(launch, cachedMarket)
-  }
-}
-
-/** Auto-load metadata and market status in parallel (each layer uses its own cache) */
-async function loadAutoLaunchCardData(
-  launch: Launch,
-  options: VerifyMintOptions = {},
-): Promise<void> {
-  await Promise.all([
-    runMintVerification(launch, options),
-    runMarketStatusCheck(launch, options),
-  ])
-}
-
-function showVerificationResult(
-  launch: Launch,
-  panel: HTMLElement,
-  result: Awaited<ReturnType<typeof loadMintVerification>>,
-  fromCache: boolean,
-): void {
-  showVerifyResult(panel, result, {
-    fromCache,
-    launchId: launch.id,
-  })
-  applyLaunchCardFromResult(launch, result)
-  openLaunchAccordion(metadataAccordionId(launch.id))
-}
-
-async function runMintVerification(
-  launch: Launch,
-  options: VerifyMintOptions = {},
-): Promise<void> {
-  const panel = document.getElementById(verifyPanelId(launch.id))
-
-  if (!options.forceRefresh) {
-    const cached = getCachedMintVerification(launch.mintAddress)
-
-    if (cached) {
-      if (panel) {
-        showVerificationResult(launch, panel, cached, true)
-      } else {
-        applyLaunchCardFromResult(launch, cached)
-      }
-
-      return
-    }
-  } else {
-    clearCachedMintVerification(launch.mintAddress)
-  }
-
-  if (panel) {
-    showVerifyChecking(panel)
-  }
-
-  const result = await loadMintVerification(launch.mintAddress, options)
-
-  if (panel) {
-    showVerificationResult(launch, panel, result, false)
-  } else {
-    applyLaunchCardFromResult(launch, result)
-  }
-}
-
-async function runMarketStatusCheck(
-  launch: Launch,
-  options: VerifyMintOptions = {},
-): Promise<void> {
-  if (!options.forceRefresh && getCachedMarketStatus(launch.mintAddress)) {
-    applyMarketStatus(
-      launch,
-      getCachedMarketStatus(launch.mintAddress)!,
-    )
+  if (!cached) {
     return
   }
 
-  setMarketStatusChecking(launch)
+  applyLaunchCardMetadataSummary(launch, cached)
 
-  const result = await loadMarketStatus(launch.mintAddress, options)
-  applyMarketStatus(launch, result)
+  if (cached.exists) {
+    applyLaunchCardFromResult(launch, cached)
+  }
 }
 
-async function handleVerifyMint(
-  launch: Launch,
-  button: HTMLButtonElement,
-  options: VerifyMintOptions = {},
-): Promise<void> {
-  button.disabled = true
-
-  try {
-    await loadAutoLaunchCardData(launch, options)
-  } finally {
-    button.disabled = false
-  }
+/** Auto-load metadata only when catalog entries opt in (uses existing cache layer) */
+async function loadDiscoveryCardMetadata(launch: Launch): Promise<void> {
+  const result = await loadMintVerification(launch.mintAddress)
+  applyLaunchCardFromResult(launch, result)
 }

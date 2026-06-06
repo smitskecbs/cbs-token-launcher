@@ -199,6 +199,79 @@ h3 {
   text-align: center;
 }
 
+.launch-card--discovery {
+  padding: 16px 18px 18px;
+  text-align: left;
+}
+
+.launch-discovery-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.launch-discovery-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.launch-discovery-card__header .token-logo-wrap {
+  flex-shrink: 0;
+  margin: 0;
+  width: 52px;
+  height: 52px;
+}
+
+.launch-card--discovery .token-icon,
+.launch-card--discovery .token-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  font-size: 22px;
+}
+
+.launch-card--discovery .token-title-block {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.launch-card--discovery .token-title-block h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.launch-card--discovery .launch-verification-badge {
+  margin-top: 4px;
+}
+
+.launch-card--discovery .token-symbol {
+  margin-top: 2px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.launch-discovery-card__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.launch-discovery-card__actions {
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.launch-discovery-card__cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
 .launch-card-overview {
   margin-bottom: 4px;
 }
@@ -931,7 +1004,9 @@ h3 {
 
 .launch-card-list {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: stretch;
 }
 
 .launch-card.is-category-hidden,

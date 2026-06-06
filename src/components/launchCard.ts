@@ -6,16 +6,8 @@ import {
   getLaunchDisplaySymbol,
 } from './applyLaunchCardMetadata'
 import { escapeHtml } from '../utils/html'
-import { renderLaunchAnalyticsPanel } from './launchAnalyticsPanel'
-import { renderLaunchRiskPanel } from './launchRiskPanel'
-import { renderLaunchInfoPanel } from './launchInfoPanel'
-import { renderMarketDataPanel } from './marketDataPanel'
-import { renderLaunchCardActions } from './launchAdminActions'
 import { renderTokenLogo } from './tokenLogo'
-import { renderVerifyPanel } from './mintVerificationPanel'
 import {
-  renderLaunchBadges,
-  renderLaunchRankMeta,
   renderVerificationBadge,
   getLaunchCardVerificationPriority,
 } from './launchBadges'
@@ -24,46 +16,12 @@ import {
   buildLaunchSearchText,
   getLaunchFilterCategorySlug,
 } from '../services/launchFilterService'
-import {
-  launchAnalyticsAccordionId,
-  launchInfoAccordionId,
-  launchRiskAccordionId,
-  marketDataAccordionId,
-  metadataAccordionId,
-  renderLaunchAccordion,
-} from './launchCardAccordion'
-import { renderLaunchCardOverview } from './launchCardOverview'
 import { renderLaunchMetadataSummary } from './launchCardMetadataSummary'
-import { renderTechnicalRiskNotice } from './technicalRiskNotice'
 import { getCachedMintVerification } from '../services/mintVerificationCache'
+import { renderDiscoveryCardActions } from './launchDiscoveryCardActions'
+import { renderDiscoveryStatusBadge } from './launchDiscoveryStatusBadge'
 
-function renderLogo(launch: Launch): string {
-  return renderTokenLogo(launch)
-}
-
-function renderMetadataAccordionContent(launch: Launch): string {
-  const mintAddress = escapeHtml(launch.mintAddress)
-  const showMintPanel =
-    launch.status === 'preparing' ||
-    launch.status === 'live' ||
-    launch.status === 'ended'
-
-  return `
-    ${
-      showMintPanel
-        ? `
-      <div class="mint-panel mint-panel--embedded">
-        <span class="mint-label">Mint Address</span>
-        <code class="mint-address">${mintAddress}</code>
-      </div>
-    `
-        : ''
-    }
-    ${renderVerifyPanel(launch.id)}
-  `
-}
-
-/** Reusable launch card — metadata fields update after Verify Mint */
+/** Compact homepage discovery card — deep analysis lives on the token detail page */
 export function renderLaunchCard(
   launch: Launch,
   options: {
@@ -71,7 +29,6 @@ export function renderLaunchCard(
     homepageSection?: HomepageSectionId | null
   } = {},
 ): string {
-  const sectionRank = options.sectionRank
   const homepageSection = options.homepageSection ?? null
   const id = escapeHtml(launch.id)
   const name = escapeHtml(getLaunchDisplayName(launch))
@@ -85,7 +42,7 @@ export function renderLaunchCard(
 
   return `
     <article
-      class="launch-card launch-card--link"
+      class="launch-card launch-card--link launch-card--discovery"
       id="launch-${id}"
       data-token-card="${id}"
       data-launch-rank-score="${score ?? 0}"
@@ -99,57 +56,25 @@ export function renderLaunchCard(
       role="link"
       aria-label="View ${name} details"
     >
-      <div class="launch-card-overview">
-        ${renderLaunchBadges(launch, homepageSection)}
-
-        <div class="token-header">
-          ${renderLogo(launch)}
+      <div class="launch-discovery-card">
+        <div class="launch-discovery-card__header">
+          ${renderTokenLogo(launch)}
           <div class="token-title-block">
             <h3 data-token-name>${name}</h3>
             ${renderVerificationBadge(launch)}
-            ${renderLaunchRankMeta(sectionRank, score)}
             <p class="token-symbol" data-token-symbol>${symbol}</p>
           </div>
         </div>
+
+        ${renderDiscoveryStatusBadge(launch)}
 
         <div class="launch-details launch-details--compact">
           <p data-token-description>${description}</p>
           ${renderLaunchMetadataSummary(launch, cachedMintResult)}
         </div>
 
-        ${renderLaunchCardOverview(launch.id)}
+        ${renderDiscoveryCardActions(launch)}
       </div>
-
-      <div class="launch-card-accordions">
-        ${renderLaunchAccordion(
-          launchInfoAccordionId(launch.id),
-          'Launch Info',
-          renderLaunchInfoPanel(launch, { embedded: true }),
-        )}
-        ${renderLaunchAccordion(
-          marketDataAccordionId(launch.id),
-          'Market Data',
-          renderMarketDataPanel(launch),
-        )}
-        ${renderLaunchAccordion(
-          launchAnalyticsAccordionId(launch.id),
-          'Analytics',
-          renderLaunchAnalyticsPanel(launch.id, true),
-        )}
-        ${renderTechnicalRiskNotice(launch.id)}
-        ${renderLaunchAccordion(
-          launchRiskAccordionId(launch.id),
-          'Technical Checks',
-          renderLaunchRiskPanel(launch.id, true),
-        )}
-        ${renderLaunchAccordion(
-          metadataAccordionId(launch.id),
-          'Metadata / Mint Verification',
-          renderMetadataAccordionContent(launch),
-        )}
-      </div>
-
-      ${renderLaunchCardActions(launch)}
     </article>
   `
 }
