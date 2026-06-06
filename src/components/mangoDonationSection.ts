@@ -13,10 +13,10 @@ export function renderMangoDonationSection(): string {
     >
       <div class="mango-donation-card">
         <h2 class="mango-donation-title" id="mango-donation-title">
-          Support ManGo Development 🥭
+          Support CBS Ecosystem Development
         </h2>
         <p class="mango-donation-text">
-          Optional donations help fund liquidity, development and future CBS ecosystem tools.
+          Donations help fund development, infrastructure, liquidity, and future CBS ecosystem tools.
         </p>
         <ul class="mango-donation-points" aria-label="What support helps fund">
           <li>Liquidity</li>

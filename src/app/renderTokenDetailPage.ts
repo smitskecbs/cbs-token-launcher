@@ -6,6 +6,7 @@ import { attachTokenDetailProjectInfo } from '../components/tokenDetailProjectIn
 import { getDetailPageName } from '../utils/launchDetailDisplay'
 import { escapeHtml } from '../utils/html'
 import { renderFooter } from '../components/sections'
+import { renderTokenDetailBackNav } from '../components/tokenDetailBackNav'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
 import {
@@ -30,7 +31,7 @@ function renderNotFound(tokenId: string): string {
         alt="CBS Token Launcher"
       />
 
-      <a class="back-link" href="/" data-router-link>← Back to launcher</a>
+      ${renderTokenDetailBackNav()}
 
       <section class="token-detail-card launch-card">
         <h1>Token not found</h1>
@@ -101,7 +102,7 @@ export function renderTokenDetailPage(tokenId: string): string {
         alt="CBS Token Launcher"
       />
 
-      <a class="back-link" href="/" data-router-link>← Back to launcher</a>
+      ${renderTokenDetailBackNav()}
 
       ${renderTokenDetailCard(launch)}
 
