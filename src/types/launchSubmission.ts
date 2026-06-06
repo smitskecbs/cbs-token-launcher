@@ -13,6 +13,7 @@ export interface LaunchSubmissionSummary {
   description: string | null
   contactEmail: string | null
   verified: boolean
+  featured: boolean
   createdAt: string
 }
 

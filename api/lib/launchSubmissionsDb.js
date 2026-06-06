@@ -12,6 +12,7 @@ const HOMEPAGE_LOG_PREFIX = '[homepage-launches]'
 const UPDATE_LOG_PREFIX = '[update-launch-submission-status]'
 const EDIT_LOG_PREFIX = '[update-launch-submission-details]'
 const VERIFIED_LOG_PREFIX = '[update-launch-submission-verified]'
+const FEATURED_LOG_PREFIX = '[update-launch-submission-featured]'
 
 function isValidSubmissionId(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -61,6 +62,7 @@ function mapSubmissionRow(row) {
     description: row.description ?? null,
     contactEmail: row.contact_email ?? null,
     verified: row.verified === true,
+    featured: row.featured === true,
     createdAt: row.created_at,
   }
 }
@@ -78,6 +80,7 @@ function mapHomepageSubmissionRow(row) {
     telegram: row.telegram ?? null,
     x: row.x ?? null,
     verified: row.verified === true,
+    featured: row.featured === true,
     createdAt: row.created_at,
   }
 }
@@ -157,7 +160,7 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,created_at',
+      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,created_at',
     order: 'created_at.desc',
   })
 
@@ -182,7 +185,7 @@ export async function listLaunchSubmissions(env) {
 export async function listHomepageLaunches(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,created_at',
+      'id,project_name,token_symbol,mint_address,status,description,website,logo_url,telegram,x,verified,featured,created_at',
     status: 'in.(coming_soon,live)',
     order: 'created_at.desc',
   })
@@ -451,6 +454,92 @@ export async function updateLaunchSubmissionVerified(
       ok: false,
       status: 502,
       message: 'Could not update verified status. Please try again later.',
+    }
+  }
+}
+
+export async function updateLaunchSubmissionFeatured(
+  env,
+  submissionId,
+  featured,
+) {
+  const trimmedId = typeof submissionId === 'string' ? submissionId.trim() : ''
+
+  if (!isValidSubmissionId(trimmedId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id is invalid.',
+    }
+  }
+
+  if (typeof featured !== 'boolean') {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Featured value is invalid.',
+    }
+  }
+
+  const config = getSupabaseConfig(env, FEATURED_LOG_PREFIX)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Submission service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    id: `eq.${trimmedId}`,
+  })
+
+  const restUrl = `${config.baseUrl}?${query.toString()}`
+
+  try {
+    console.log(
+      `${FEATURED_LOG_PREFIX} Supabase PATCH host: ${new URL(restUrl).host}`,
+    )
+
+    const upstream = await patchJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+      { featured },
+    )
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${FEATURED_LOG_PREFIX} Supabase status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not update featured status. Please try again later.',
+      }
+    }
+
+    console.log(`${FEATURED_LOG_PREFIX} updated ${trimmedId} to ${featured}`)
+
+    return {
+      ok: true,
+      status: 200,
+      id: trimmedId,
+      featured,
+    }
+  } catch (error) {
+    console.error(
+      `${FEATURED_LOG_PREFIX} Supabase request failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not update featured status. Please try again later.',
     }
   }
 }

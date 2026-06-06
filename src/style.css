@@ -1207,6 +1207,18 @@ h3 {
   text-transform: none;
 }
 
+.token-detail-featured-badge {
+  margin: 6px 0 2px;
+}
+
+.token-detail-featured-badge[hidden] {
+  display: none;
+}
+
+.token-detail-featured-badge .launch-badge {
+  margin-bottom: 0;
+}
+
 .launch-verification-badge {
   margin: 6px 0 2px;
 }
@@ -3148,6 +3160,7 @@ h3 {
   white-space: nowrap;
 }
 
+.admin-submissions-featured-toggle--on,
 .admin-submissions-verified-toggle--on {
   color: #15803d;
   border-color: rgba(21, 128, 61, 0.35);

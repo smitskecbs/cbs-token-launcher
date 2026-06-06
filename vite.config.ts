@@ -13,6 +13,7 @@ import {
   listLaunchSubmissions,
   updateLaunchSubmissionDetails,
   updateLaunchSubmissionStatus,
+  updateLaunchSubmissionFeatured,
   updateLaunchSubmissionVerified,
 } from './api/lib/launchSubmissionsDb.js'
 import {
@@ -372,6 +373,77 @@ function updateLaunchSubmissionDetailsProxyPlugin(
   }
 }
 
+function updateLaunchSubmissionFeaturedProxyPlugin(
+  env: Record<string, string>,
+): Plugin {
+  return {
+    name: 'dev-update-launch-submission-featured-proxy',
+    configureServer(server) {
+      server.middlewares.use(
+        '/api/update-launch-submission-featured',
+        async (req, res, next) => {
+          if (!req.url?.startsWith('/api/update-launch-submission-featured')) {
+            next()
+            return
+          }
+
+          if (req.method === 'OPTIONS') {
+            res.statusCode = 204
+            res.end()
+            return
+          }
+
+          if (req.method !== 'PATCH') {
+            sendJson(res, 405, { error: 'Method not allowed' })
+            return
+          }
+
+          const auth = checkAdminAuth(req, env)
+
+          if (!auth.ok) {
+            sendJson(res, auth.status, { error: auth.message })
+            return
+          }
+
+          try {
+            const chunks: Buffer[] = []
+
+            await new Promise<void>((resolve, reject) => {
+              req.on('data', (chunk: Buffer) => chunks.push(chunk))
+              req.on('end', () => resolve())
+              req.on('error', reject)
+            })
+
+            const raw = Buffer.concat(chunks).toString('utf8')
+            const body = raw ? JSON.parse(raw) : null
+            const result = await updateLaunchSubmissionFeatured(
+              env,
+              body?.id,
+              body?.featured,
+            )
+
+            res.statusCode = result.ok ? 200 : result.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify(
+                result.ok
+                  ? {
+                      ok: true,
+                      id: result.id,
+                      featured: result.featured,
+                    }
+                  : { error: result.message },
+              ),
+            )
+          } catch {
+            sendJson(res, 400, { error: 'Invalid request body.' })
+          }
+        },
+      )
+    },
+  }
+}
+
 function updateLaunchSubmissionVerifiedProxyPlugin(
   env: Record<string, string>,
 ): Plugin {
@@ -585,6 +657,7 @@ export default defineConfig(({ mode }) => {
       listLaunchSubmissionsProxyPlugin(env),
       updateLaunchSubmissionStatusProxyPlugin(env),
       updateLaunchSubmissionDetailsProxyPlugin(env),
+      updateLaunchSubmissionFeaturedProxyPlugin(env),
       updateLaunchSubmissionVerifiedProxyPlugin(env),
     ],
   }

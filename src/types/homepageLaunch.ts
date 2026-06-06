@@ -10,6 +10,7 @@ export interface HomepageLaunchSubmission {
   telegram: string | null
   x: string | null
   verified: boolean
+  featured: boolean
   createdAt: string
 }
 

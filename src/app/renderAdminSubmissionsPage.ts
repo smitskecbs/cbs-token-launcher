@@ -11,6 +11,7 @@ import {
 } from '../services/adminSessionService'
 import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 import { updateLaunchSubmissionStatus } from '../services/updateLaunchSubmissionStatusService'
+import { updateLaunchSubmissionFeatured } from '../services/updateLaunchSubmissionFeaturedService'
 import { updateLaunchSubmissionVerified } from '../services/updateLaunchSubmissionVerifiedService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
@@ -48,6 +49,26 @@ function formatSubmissionDate(iso: string): string {
   })
 }
 
+function renderFeaturedToggle(submission: LaunchSubmissionSummary): string {
+  const isFeatured = submission.featured === true
+  const activeClass = isFeatured
+    ? ' admin-submissions-featured-toggle--on'
+    : ''
+
+  return `
+    <button
+      type="button"
+      class="secondary-btn admin-submissions-action admin-submissions-featured-toggle${activeClass}"
+      data-admin-featured-toggle
+      data-submission-id="${escapeHtml(submission.id)}"
+      data-featured="${isFeatured ? 'true' : 'false'}"
+      aria-pressed="${isFeatured ? 'true' : 'false'}"
+    >
+      ${isFeatured ? 'Featured: On' : 'Featured: Off'}
+    </button>
+  `
+}
+
 function renderVerifiedToggle(submission: LaunchSubmissionSummary): string {
   const isVerified = submission.verified === true
   const activeClass = isVerified
@@ -69,6 +90,7 @@ function renderVerifiedToggle(submission: LaunchSubmissionSummary): string {
 }
 
 function renderStatusActions(submission: LaunchSubmissionSummary): string {
+  const featuredToggle = renderFeaturedToggle(submission)
   const verifiedToggle = renderVerifiedToggle(submission)
   const editButton = `
     <button
@@ -98,7 +120,7 @@ function renderStatusActions(submission: LaunchSubmissionSummary): string {
     )
     .join('')
 
-  return `<div class="admin-submissions-actions">${verifiedToggle}${editButton}${statusButtons}</div>`
+  return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${statusButtons}</div>`
 }
 
 function renderSubmissionRow(
@@ -448,6 +470,7 @@ function handleUnauthorized(ui: AdminPageElements, message: string): void {
 }
 
 let statusUpdateInFlight = false
+let featuredUpdateInFlight = false
 let verifiedUpdateInFlight = false
 
 async function handleTableActionClick(
@@ -472,6 +495,15 @@ async function handleTableActionClick(
     return
   }
 
+  const featuredButton = target.closest<HTMLButtonElement>(
+    '[data-admin-featured-toggle]',
+  )
+
+  if (featuredButton && !featuredButton.disabled) {
+    await handleFeaturedToggleClick(event, ui, loadedSubmissions)
+    return
+  }
+
   const verifiedButton = target.closest<HTMLButtonElement>(
     '[data-admin-verified-toggle]',
   )
@@ -482,6 +514,92 @@ async function handleTableActionClick(
   }
 
   await handleStatusActionClick(event, ui, loadedSubmissions)
+}
+
+function applyFeaturedToggleState(
+  button: HTMLButtonElement,
+  featured: boolean,
+): void {
+  button.setAttribute('data-featured', featured ? 'true' : 'false')
+  button.setAttribute('aria-pressed', featured ? 'true' : 'false')
+  button.textContent = featured ? 'Featured: On' : 'Featured: Off'
+  button.classList.toggle('admin-submissions-featured-toggle--on', featured)
+}
+
+async function handleFeaturedToggleClick(
+  event: Event,
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+): Promise<void> {
+  if (featuredUpdateInFlight) {
+    return
+  }
+
+  const target = event.target as HTMLElement
+  const button = target.closest<HTMLButtonElement>('[data-admin-featured-toggle]')
+
+  if (!button || button.disabled) {
+    return
+  }
+
+  const submissionId = button.getAttribute('data-submission-id')
+
+  if (!submissionId) {
+    return
+  }
+
+  const currentFeatured = button.getAttribute('data-featured') === 'true'
+  const nextFeatured = !currentFeatured
+
+  featuredUpdateInFlight = true
+  ui.error.hidden = true
+  ui.error.textContent = ''
+
+  const rowButtons = ui.body.querySelectorAll<HTMLButtonElement>(
+    `[data-submission-row="${submissionId}"] button`,
+  )
+
+  for (const rowButton of rowButtons) {
+    rowButton.disabled = true
+  }
+
+  try {
+    const result = await updateLaunchSubmissionFeatured(
+      submissionId,
+      nextFeatured,
+    )
+
+    if (!result.ok) {
+      if (result.unauthorized) {
+        handleUnauthorized(ui, 'Your admin session expired. Please sign in again.')
+        return
+      }
+
+      ui.error.hidden = false
+      ui.error.textContent = result.message
+      return
+    }
+
+    const submission = loadedSubmissions.find((item) => item.id === submissionId)
+
+    if (submission) {
+      submission.featured = result.featured
+    }
+
+    const featuredButtons = ui.body.querySelectorAll<HTMLButtonElement>(
+      `[data-submission-row="${submissionId}"] [data-admin-featured-toggle]`,
+    )
+
+    for (const featuredButton of featuredButtons) {
+      applyFeaturedToggleState(featuredButton, result.featured)
+    }
+  } finally {
+    featuredUpdateInFlight = false
+
+    for (const rowButton of rowButtons) {
+      rowButton.disabled = false
+    }
+  }
 }
 
 async function handleVerifiedToggleClick(

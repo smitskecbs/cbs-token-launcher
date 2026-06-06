@@ -28,6 +28,20 @@ export function renderLaunchBadges(
   `
 }
 
+export function renderFeaturedBadge(launch: Launch): string {
+  if (launch.featured !== true) {
+    return `
+      <div class="token-detail-featured-badge" data-token-detail-featured hidden></div>
+    `
+  }
+
+  return `
+    <div class="token-detail-featured-badge" data-token-detail-featured>
+      <span class="launch-badge launch-badge--featured">Featured</span>
+    </div>
+  `
+}
+
 export function renderVerificationBadge(launch: Launch): string {
   const badge = getVerificationBadge(launch)
 

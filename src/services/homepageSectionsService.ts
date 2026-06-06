@@ -26,6 +26,22 @@ export function isFeaturedLaunch(launch: Launch): boolean {
   return launch.featured === true
 }
 
+const DEFAULT_FEATURED_FALLBACK_IDS = new Set(['cbs-coin', 'mango'])
+
+function resolveFeaturedLaunches(catalog: Launch[]): Launch[] {
+  const featured = sortLaunchesByRank(
+    catalog.filter((launch) => isFeaturedLaunch(launch)),
+  )
+
+  if (featured.length > 0) {
+    return featured
+  }
+
+  return sortLaunchesByRank(
+    catalog.filter((launch) => DEFAULT_FEATURED_FALLBACK_IDS.has(launch.id)),
+  )
+}
+
 function sortLaunchesByCreatedAt(launches: Launch[]): Launch[] {
   return [...launches].sort(
     (left, right) =>
@@ -43,9 +59,7 @@ export function resolveHomepageSections(
   const assigned = new Set<string>()
   const launchSectionById = new Map<string, HomepageSectionId>()
 
-  const featured = sortLaunchesByRank(
-    catalog.filter((launch) => isFeaturedLaunch(launch)),
-  )
+  const featured = resolveFeaturedLaunches(catalog)
 
   for (const launch of featured) {
     assigned.add(launch.id)

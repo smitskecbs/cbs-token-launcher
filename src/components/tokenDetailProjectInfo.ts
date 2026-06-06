@@ -4,7 +4,7 @@ import {
   getLaunchOfficialLinks,
   renderDetailLinksContent,
 } from './officialLinks'
-import { renderVerificationBadge } from './launchBadges'
+import { renderFeaturedBadge, renderVerificationBadge } from './launchBadges'
 import { renderTokenLogo } from './tokenLogo'
 import { escapeHtml } from '../utils/html'
 import {
@@ -53,6 +53,7 @@ export function renderTokenDetailProjectInfo(launch: Launch): string {
             ${escapeHtml(statusLabel)}
           </span>
           <h1 data-token-name>${name}</h1>
+          ${renderFeaturedBadge(launch)}
           ${renderVerificationBadge(launch)}
           <p class="token-symbol" data-token-symbol>${symbol}</p>
           ${listedDateMarkup}
