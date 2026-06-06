@@ -15,9 +15,14 @@ import { updateLaunchSubmissionFeatured } from '../services/updateLaunchSubmissi
 import { updateLaunchSubmissionVerified } from '../services/updateLaunchSubmissionVerifiedService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
+  renderAdminSubmissionReadiness,
+  getMoveToLiveWarningMessage,
+} from '../components/adminSubmissionReadiness'
+import {
   DUPLICATE_MINT_WARNING_MESSAGE,
   getSubmissionIdsWithMintWarning,
 } from '../utils/adminSubmissionMintWarnings'
+import { evaluateLiveReadiness } from '../utils/adminSubmissionLiveReadiness'
 import { escapeHtml } from '../utils/html'
 import {
   countLaunchSubmissionStatuses,
@@ -89,7 +94,10 @@ function renderVerifiedToggle(submission: LaunchSubmissionSummary): string {
   `
 }
 
-function renderStatusActions(submission: LaunchSubmissionSummary): string {
+function renderStatusActions(
+  submission: LaunchSubmissionSummary,
+  readiness: ReturnType<typeof evaluateLiveReadiness>,
+): string {
   const featuredToggle = renderFeaturedToggle(submission)
   const verifiedToggle = renderVerifiedToggle(submission)
   const editButton = `
@@ -106,18 +114,27 @@ function renderStatusActions(submission: LaunchSubmissionSummary): string {
   const statusButtons = STATUS_ACTIONS.filter(
     (action) => action.status !== submission.status,
   )
-    .map(
-      (action) => `
+    .map((action) => {
+      const isMoveToLive = action.status === 'live'
+      const notReadyAttr =
+        isMoveToLive && !readiness.isReady ? ' data-not-ready-for-live="true"' : ''
+      const notReadyTitle =
+        isMoveToLive && !readiness.isReady
+          ? ' title="Not ready for Live — review readiness checklist"'
+          : ''
+
+      return `
         <button
           type="button"
-          class="secondary-btn admin-submissions-action"
+          class="secondary-btn admin-submissions-action${isMoveToLive && !readiness.isReady ? ' admin-submissions-action--warn' : ''}"
           data-admin-status-action="${action.status}"
           data-submission-id="${escapeHtml(submission.id)}"
+          ${notReadyAttr}${notReadyTitle}
         >
           ${escapeHtml(action.label)}
         </button>
-      `,
-    )
+      `
+    })
     .join('')
 
   return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${statusButtons}</div>`
@@ -127,6 +144,9 @@ function renderSubmissionRow(
   submission: LaunchSubmissionSummary,
   showMintWarning: boolean,
 ): string {
+  const readiness = evaluateLiveReadiness(submission, {
+    hasMintWarning: showMintWarning,
+  })
   const statusClass = getLaunchSubmissionStatusClass(submission.status)
   const mintWarning = showMintWarning
     ? `
@@ -147,8 +167,11 @@ function renderSubmissionRow(
       <td>
         <span class="${statusClass}">${escapeHtml(formatLaunchSubmissionStatus(submission.status))}</span>
       </td>
+      <td class="admin-submissions-readiness-cell">
+        ${renderAdminSubmissionReadiness(readiness)}
+      </td>
       <td>${escapeHtml(formatSubmissionDate(submission.createdAt))}</td>
-      <td>${renderStatusActions(submission)}</td>
+      <td>${renderStatusActions(submission, readiness)}</td>
     </tr>
   `
 }
@@ -289,6 +312,7 @@ export function renderAdminSubmissionsPage(): string {
                 <th scope="col">Token Symbol</th>
                 <th scope="col">Mint Address</th>
                 <th scope="col">Status</th>
+                <th scope="col">Readiness</th>
                 <th scope="col">Created Date</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -689,6 +713,25 @@ async function handleStatusActionClick(
 
   if (!submissionId || !nextStatus) {
     return
+  }
+
+  if (nextStatus === 'live') {
+    const submission = loadedSubmissions.find((item) => item.id === submissionId)
+
+    if (submission) {
+      const mintWarningIds = getSubmissionIdsWithMintWarning(loadedSubmissions)
+      const readiness = evaluateLiveReadiness(submission, {
+        hasMintWarning: mintWarningIds.has(submissionId),
+      })
+
+      if (!readiness.isReady) {
+        const proceed = window.confirm(getMoveToLiveWarningMessage(readiness))
+
+        if (!proceed) {
+          return
+        }
+      }
+    }
   }
 
   statusUpdateInFlight = true

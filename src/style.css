@@ -3218,6 +3218,97 @@ h3 {
   color: #b42318;
 }
 
+.admin-submissions-readiness-cell {
+  min-width: 148px;
+  vertical-align: top;
+}
+
+.admin-readiness {
+  border: 1px solid rgba(216, 111, 0, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  overflow: hidden;
+}
+
+.admin-readiness-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.admin-readiness-summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-readiness-summary--ready {
+  color: #15803d;
+}
+
+.admin-readiness-summary--needs {
+  color: #b85a00;
+}
+
+.admin-readiness-score {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888888;
+}
+
+.admin-readiness-checklist {
+  margin: 0;
+  padding: 8px 10px 10px;
+  list-style: none;
+  border-top: 1px solid rgba(216, 111, 0, 0.12);
+}
+
+.admin-readiness-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.admin-readiness-check:last-child {
+  margin-bottom: 0;
+}
+
+.admin-readiness-check-icon {
+  flex-shrink: 0;
+  width: 16px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.admin-readiness-check--pass {
+  color: #15803d;
+}
+
+.admin-readiness-check--pass .admin-readiness-check-icon {
+  color: #15803d;
+}
+
+.admin-readiness-check--warn {
+  color: #b85a00;
+}
+
+.admin-readiness-check--warn .admin-readiness-check-icon {
+  color: #d86f00;
+}
+
+.admin-submissions-action--warn {
+  border-color: rgba(216, 111, 0, 0.42);
+  color: #b85a00;
+}
+
 .admin-submissions-actions {
   display: flex;
   flex-direction: column;
