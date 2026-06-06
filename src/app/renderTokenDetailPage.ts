@@ -15,7 +15,10 @@ import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection'
 import { renderTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
-import { applyTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
+import {
+  applyTokenDetailPoolSection,
+} from '../components/tokenDetailPoolSection'
+import { attachCbsCoinPoolExternalLinkDebug } from '../components/tokenDetailPoolExternalDebug'
 import {
   applyTokenDetailTradingData,
   renderTokenDetailTradingSection,
@@ -145,6 +148,12 @@ export function attachTokenDetailHandlers(launch: Launch): void {
   refreshButton?.addEventListener('click', () => {
     void loadTokenDetailData(launch, { forceRefresh: true })
   })
+
+  if (launch.id === 'cbs-coin') {
+    queueMicrotask(() => {
+      attachCbsCoinPoolExternalLinkDebug(launch)
+    })
+  }
 
   void loadTokenDetailData(launch)
 }

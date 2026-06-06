@@ -969,6 +969,43 @@ h3 {
   margin-top: 6px;
 }
 
+.token-detail-pool-live-debug {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed rgba(37, 99, 235, 0.35);
+  border-radius: 10px;
+  background: rgba(239, 246, 255, 0.95);
+  font-size: 12px;
+  line-height: 1.45;
+  color: #334155;
+  word-break: break-all;
+}
+
+.token-detail-pool-live-debug p {
+  margin: 0;
+}
+
+.token-detail-pool-live-debug p + p {
+  margin-top: 4px;
+}
+
+.token-detail-pool-live-debug__title {
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.token-detail-pool-live-debug__html {
+  margin: 8px 0 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 @media (min-width: 480px) {
   .token-detail-pool-actions {
     grid-template-columns: 1fr 1fr;

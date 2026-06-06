@@ -8,6 +8,7 @@ import {
   resolvePoolTradingState,
   type PoolTradingState,
 } from '../utils/resolvePoolTradingState'
+import { attachCbsCoinPoolExternalLinkDebug } from './tokenDetailPoolExternalDebug'
 
 function renderPoolActions(state: PoolTradingState): string {
   const actions: string[] = []
@@ -89,23 +90,7 @@ function renderPoolActions(state: PoolTradingState): string {
   return actions.join('')
 }
 
-function renderPoolUrlDebug(launch: Launch, state: PoolTradingState): string {
-  if (launch.id !== 'cbs-coin') {
-    return ''
-  }
-
-  const viewPoolDebug = state.viewPoolUrl ?? 'hidden'
-  const dexscreenerDebug = state.dexscreenerUrl ?? 'hidden'
-
-  return `
-    <div class="token-detail-pool-debug" data-token-detail-pool-debug>
-      <p>View Pool href: ${escapeHtml(viewPoolDebug)}</p>
-      <p>Dexscreener href: ${escapeHtml(dexscreenerDebug)}</p>
-    </div>
-  `
-}
-
-function renderPoolSectionBody(launch: Launch, state: PoolTradingState): string {
+function renderPoolSectionBody(state: PoolTradingState): string {
   const poolStatusClass = state.hasPool
     ? 'token-detail-pool-status--active'
     : 'token-detail-pool-status--inactive'
@@ -132,8 +117,17 @@ function renderPoolSectionBody(launch: Launch, state: PoolTradingState): string 
         `
         : ''
     }
-    ${renderPoolUrlDebug(launch, state)}
   `
+}
+
+function queueCbsCoinPoolExternalLinkDebug(launch: Launch): void {
+  if (launch.id !== 'cbs-coin') {
+    return
+  }
+
+  queueMicrotask(() => {
+    attachCbsCoinPoolExternalLinkDebug(launch)
+  })
 }
 
 export function renderTokenDetailPoolSection(launch: Launch): string {
@@ -150,7 +144,7 @@ export function renderTokenDetailPoolSection(launch: Launch): string {
     >
       <h2 class="token-detail-heading">Pool &amp; Trading</h2>
       <div data-token-detail-pool-body>
-        ${renderPoolSectionBody(launch, state)}
+        ${renderPoolSectionBody(state)}
       </div>
     </section>
   `
@@ -172,5 +166,6 @@ export function applyTokenDetailPoolSection(
     marketData ?? getCachedTokenMarketData(launch.mintAddress) ?? null
   const state = resolvePoolTradingState(launch, resolvedMarketData)
 
-  body.innerHTML = renderPoolSectionBody(launch, state)
+  body.innerHTML = renderPoolSectionBody(state)
+  queueCbsCoinPoolExternalLinkDebug(launch)
 }
