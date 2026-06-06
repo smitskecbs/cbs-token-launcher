@@ -13,6 +13,13 @@ import { escapeHtml } from '../utils/html'
 
 const FILTER_HIDDEN_CLASS = 'is-filter-hidden'
 const SECTION_EMPTY_CLASS = 'is-section-filter-empty'
+const LAUNCH_FILTER_SECTIONS = new Set([
+  'featured',
+  'trending',
+  'new',
+  'upcoming',
+  'ecosystem',
+])
 
 let filterState: LaunchFilterState = { ...DEFAULT_LAUNCH_FILTER_STATE }
 
@@ -243,6 +250,13 @@ function applyLaunchFilters(
   for (const section of document.querySelectorAll<HTMLElement>(
     '[data-launch-section]',
   )) {
+    const sectionId = section.getAttribute('data-launch-section') ?? ''
+
+    if (!LAUNCH_FILTER_SECTIONS.has(sectionId)) {
+      section.classList.remove(SECTION_EMPTY_CLASS)
+      continue
+    }
+
     const visibleCards = section.querySelectorAll<HTMLElement>(
       `[data-token-card]:not(.${FILTER_HIDDEN_CLASS})`,
     )
