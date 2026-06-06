@@ -1,3 +1,4 @@
+import { getAdminAuthHeaders } from './adminSessionService'
 import type { LaunchSubmissionStatus } from '../utils/launchSubmissionStatus'
 
 export const UPDATE_LAUNCH_SUBMISSION_STATUS_API_PATH =
@@ -5,7 +6,7 @@ export const UPDATE_LAUNCH_SUBMISSION_STATUS_API_PATH =
 
 export type UpdateLaunchSubmissionStatusResult =
   | { ok: true; id: string; status: LaunchSubmissionStatus }
-  | { ok: false; message: string }
+  | { ok: false; message: string; unauthorized?: boolean }
 
 function resolveUpdateLaunchSubmissionStatusUrl(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
@@ -25,6 +26,7 @@ export async function updateLaunchSubmissionStatus(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...getAdminAuthHeaders(),
       },
       body: JSON.stringify({ id, status }),
     })
@@ -43,7 +45,11 @@ export async function updateLaunchSubmissionStatus(
         // Use generic message when response body is not JSON
       }
 
-      return { ok: false, message }
+      return {
+        ok: false,
+        message,
+        unauthorized: response.status === 401,
+      }
     }
 
     const data = (await response.json()) as {

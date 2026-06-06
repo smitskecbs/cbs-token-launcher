@@ -2188,6 +2188,54 @@ h3 {
   box-shadow: 0 2px 8px rgba(216, 111, 0, 0.14);
 }
 
+.mango-donation-section {
+  width: 100%;
+  max-width: 720px;
+}
+
+.mango-donation-card {
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(216, 111, 0, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 250, 245, 0.92);
+  box-shadow: 0 6px 22px rgba(216, 111, 0, 0.05);
+  text-align: center;
+}
+
+.mango-donation-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #b85a00;
+  letter-spacing: -0.01em;
+}
+
+.mango-donation-text {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666666;
+}
+
+.mango-donation-note {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #888888;
+}
+
+.mango-donation-copy-btn {
+  font-size: 13px;
+  padding: 10px 16px;
+}
+
+.mango-donation-confirm {
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #15803d;
+}
+
 .site-footer {
   width: 100%;
   max-width: 720px;
@@ -2458,6 +2506,13 @@ h3 {
   width: 100%;
   max-width: 720px;
   text-align: left;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .admin-submissions-lead {

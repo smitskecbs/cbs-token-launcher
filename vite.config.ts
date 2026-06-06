@@ -1,4 +1,13 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import {
+  ADMIN_SESSION_TTL_MS,
+  createAdminSessionToken,
+  getAdminPassword,
+  getBearerTokenFromHeaders,
+  verifyAdminPassword,
+  verifyAdminSessionToken,
+} from './api/lib/adminSession.js'
 import {
   listHomepageLaunches,
   listLaunchSubmissions,
@@ -8,6 +17,105 @@ import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
 } from './api/lib/submitLaunchCore.js'
+
+function sendJson(
+  res: ServerResponse,
+  status: number,
+  body: Record<string, unknown>,
+): void {
+  res.statusCode = status
+  res.setHeader('Content-Type', 'application/json')
+  res.end(JSON.stringify(body))
+}
+
+function checkAdminAuth(
+  req: IncomingMessage,
+  env: Record<string, string>,
+): { ok: true } | { ok: false; status: number; message: string } {
+  const adminPassword = getAdminPassword(env)
+
+  if (!adminPassword) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Admin authentication is not configured.',
+    }
+  }
+
+  const token = getBearerTokenFromHeaders(req.headers)
+
+  if (!token || !verifyAdminSessionToken(token, adminPassword)) {
+    return {
+      ok: false,
+      status: 401,
+      message: 'Admin authentication required.',
+    }
+  }
+
+  return { ok: true }
+}
+
+function adminLoginProxyPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'dev-admin-login-proxy',
+    configureServer(server) {
+      server.middlewares.use('/api/admin-login', async (req, res, next) => {
+        if (!req.url?.startsWith('/api/admin-login')) {
+          next()
+          return
+        }
+
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 204
+          res.end()
+          return
+        }
+
+        if (req.method !== 'POST') {
+          sendJson(res, 405, { error: 'Method not allowed' })
+          return
+        }
+
+        const adminPassword = getAdminPassword(env)
+
+        if (!adminPassword) {
+          sendJson(res, 500, { error: 'Admin authentication is not configured.' })
+          return
+        }
+
+        try {
+          const chunks: Buffer[] = []
+
+          await new Promise<void>((resolve, reject) => {
+            req.on('data', (chunk: Buffer) => chunks.push(chunk))
+            req.on('end', () => resolve())
+            req.on('error', reject)
+          })
+
+          const raw = Buffer.concat(chunks).toString('utf8')
+          const body = raw ? JSON.parse(raw) : null
+          const password =
+            typeof body?.password === 'string' ? body.password : ''
+
+          if (!verifyAdminPassword(password, adminPassword)) {
+            sendJson(res, 401, { error: 'Invalid admin password.' })
+            return
+          }
+
+          const token = createAdminSessionToken(adminPassword)
+
+          sendJson(res, 200, {
+            ok: true,
+            token,
+            expiresInMs: ADMIN_SESSION_TTL_MS,
+          })
+        } catch {
+          sendJson(res, 400, { error: 'Invalid request body.' })
+        }
+      })
+    },
+  }
+}
 
 function homepageLaunchesProxyPlugin(env: Record<string, string>): Plugin {
   return {
@@ -71,9 +179,14 @@ function listLaunchSubmissionsProxyPlugin(env: Record<string, string>): Plugin {
           }
 
           if (req.method !== 'GET') {
-            res.statusCode = 405
-            res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify({ error: 'Method not allowed' }))
+            sendJson(res, 405, { error: 'Method not allowed' })
+            return
+          }
+
+          const auth = checkAdminAuth(req, env)
+
+          if (!auth.ok) {
+            sendJson(res, auth.status, { error: auth.message })
             return
           }
 
@@ -119,9 +232,14 @@ function updateLaunchSubmissionStatusProxyPlugin(
           }
 
           if (req.method !== 'PATCH') {
-            res.statusCode = 405
-            res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify({ error: 'Method not allowed' }))
+            sendJson(res, 405, { error: 'Method not allowed' })
+            return
+          }
+
+          const auth = checkAdminAuth(req, env)
+
+          if (!auth.ok) {
+            sendJson(res, auth.status, { error: auth.message })
             return
           }
 
@@ -304,6 +422,7 @@ export default defineConfig(({ mode }) => {
       rpcProxyPlugin(env.HELIUS_MAINNET_RPC?.trim()),
       submitLaunchProxyPlugin(env),
       homepageLaunchesProxyPlugin(env),
+      adminLoginProxyPlugin(env),
       listLaunchSubmissionsProxyPlugin(env),
       updateLaunchSubmissionStatusProxyPlugin(env),
     ],

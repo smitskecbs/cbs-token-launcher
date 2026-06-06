@@ -1,4 +1,10 @@
 import bannerUrl from '../assets/launcher-banner.png'
+import { loginAdmin } from '../services/adminLoginService'
+import {
+  clearAdminSessionToken,
+  getAdminSessionToken,
+  setAdminSessionToken,
+} from '../services/adminSessionService'
 import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 import { updateLaunchSubmissionStatus } from '../services/updateLaunchSubmissionStatusService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
@@ -108,8 +114,52 @@ export function renderAdminSubmissionsPage(): string {
       <a class="back-link" href="/" data-router-link>← Back to launcher</a>
 
       <section
+        class="admin-submissions-card launch-card admin-login-card"
+        data-admin-login-panel
+        aria-labelledby="admin-login-title"
+      >
+        <h1 id="admin-login-title">Admin Login</h1>
+        <p class="hero-text admin-submissions-lead">
+          Enter the admin password to review launch submissions.
+        </p>
+
+        <form class="admin-login-form" data-admin-login-form novalidate>
+          <label class="submit-launch-field">
+            <span class="submit-launch-label">Admin Password</span>
+            <input
+              class="submit-launch-input"
+              type="password"
+              name="password"
+              data-admin-login-password
+              autocomplete="current-password"
+              required
+            />
+          </label>
+
+          <p
+            class="admin-submissions-state admin-submissions-state--error"
+            data-admin-login-error
+            hidden
+            aria-live="polite"
+          ></p>
+
+          <div class="submit-launch-actions">
+            <button
+              type="submit"
+              class="primary-btn"
+              data-admin-login-submit
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section
         class="admin-submissions-card launch-card"
+        data-admin-dashboard-panel
         aria-labelledby="admin-submissions-title"
+        hidden
       >
         <h1 id="admin-submissions-title">Launch Submissions</h1>
         <p class="hero-text admin-submissions-lead">
@@ -180,6 +230,24 @@ export function renderAdminSubmissionsPage(): string {
 }
 
 export function attachAdminSubmissionsPage(): void {
+  const loginPanel = document.querySelector<HTMLElement>(
+    '[data-admin-login-panel]',
+  )
+  const dashboardPanel = document.querySelector<HTMLElement>(
+    '[data-admin-dashboard-panel]',
+  )
+  const loginForm = document.querySelector<HTMLFormElement>(
+    '[data-admin-login-form]',
+  )
+  const loginPassword = document.querySelector<HTMLInputElement>(
+    '[data-admin-login-password]',
+  )
+  const loginSubmit = document.querySelector<HTMLButtonElement>(
+    '[data-admin-login-submit]',
+  )
+  const loginError = document.querySelector<HTMLElement>(
+    '[data-admin-login-error]',
+  )
   const loading = document.querySelector<HTMLElement>(
     '[data-admin-submissions-loading]',
   )
@@ -203,6 +271,12 @@ export function attachAdminSubmissionsPage(): void {
   )
 
   if (
+    !loginPanel ||
+    !dashboardPanel ||
+    !loginForm ||
+    !loginPassword ||
+    !loginSubmit ||
+    !loginError ||
     !loading ||
     !error ||
     !empty ||
@@ -214,7 +288,13 @@ export function attachAdminSubmissionsPage(): void {
     return
   }
 
-  const ui: AdminSubmissionsElements = {
+  const ui: AdminPageElements = {
+    loginPanel,
+    dashboardPanel,
+    loginForm,
+    loginPassword,
+    loginSubmit,
+    loginError,
     loading,
     error,
     empty,
@@ -224,14 +304,30 @@ export function attachAdminSubmissionsPage(): void {
     body,
   }
 
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault()
+    void handleAdminLogin(ui)
+  })
+
   tableWrap.addEventListener('click', (event) => {
     void handleStatusActionClick(event, ui)
   })
 
-  void loadSubmissions(ui)
+  if (getAdminSessionToken()) {
+    showDashboard(ui)
+    void loadSubmissions(ui)
+  } else {
+    showLogin(ui)
+  }
 }
 
-interface AdminSubmissionsElements {
+interface AdminPageElements {
+  loginPanel: HTMLElement
+  dashboardPanel: HTMLElement
+  loginForm: HTMLFormElement
+  loginPassword: HTMLInputElement
+  loginSubmit: HTMLButtonElement
+  loginError: HTMLElement
   loading: HTMLElement
   error: HTMLElement
   empty: HTMLElement
@@ -241,11 +337,54 @@ interface AdminSubmissionsElements {
   body: HTMLElement
 }
 
+function showLogin(ui: AdminPageElements): void {
+  ui.loginPanel.hidden = false
+  ui.dashboardPanel.hidden = true
+  ui.loginError.hidden = true
+  ui.loginError.textContent = ''
+  ui.loginSubmit.disabled = false
+}
+
+function showDashboard(ui: AdminPageElements): void {
+  ui.loginPanel.hidden = true
+  ui.dashboardPanel.hidden = false
+}
+
+async function handleAdminLogin(ui: AdminPageElements): Promise<void> {
+  ui.loginError.hidden = true
+  ui.loginError.textContent = ''
+  ui.loginSubmit.disabled = true
+
+  try {
+    const result = await loginAdmin(ui.loginPassword.value)
+
+    if (!result.ok) {
+      ui.loginError.hidden = false
+      ui.loginError.textContent = result.message
+      return
+    }
+
+    setAdminSessionToken(result.token)
+    ui.loginPassword.value = ''
+    showDashboard(ui)
+    await loadSubmissions(ui)
+  } finally {
+    ui.loginSubmit.disabled = false
+  }
+}
+
+function handleUnauthorized(ui: AdminPageElements, message: string): void {
+  clearAdminSessionToken()
+  showLogin(ui)
+  ui.loginError.hidden = false
+  ui.loginError.textContent = message
+}
+
 let statusUpdateInFlight = false
 
 async function handleStatusActionClick(
   event: Event,
-  ui: AdminSubmissionsElements,
+  ui: AdminPageElements,
 ): Promise<void> {
   if (statusUpdateInFlight) {
     return
@@ -286,6 +425,11 @@ async function handleStatusActionClick(
     )
 
     if (!result.ok) {
+      if (result.unauthorized) {
+        handleUnauthorized(ui, 'Your admin session expired. Please sign in again.')
+        return
+      }
+
       ui.error.hidden = false
       ui.error.textContent = result.message
       return
@@ -301,7 +445,7 @@ async function handleStatusActionClick(
   }
 }
 
-async function loadSubmissions(ui: AdminSubmissionsElements): Promise<void> {
+async function loadSubmissions(ui: AdminPageElements): Promise<void> {
   const { loading, error, empty, count, statsWrap, tableWrap, body } = ui
 
   loading.hidden = false
@@ -319,6 +463,11 @@ async function loadSubmissions(ui: AdminSubmissionsElements): Promise<void> {
   loading.hidden = true
 
   if (!result.ok) {
+    if (result.unauthorized) {
+      handleUnauthorized(ui, 'Admin sign-in required to view submissions.')
+      return
+    }
+
     error.hidden = false
     error.textContent = result.message
     return

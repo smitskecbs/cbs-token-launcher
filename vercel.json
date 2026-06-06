@@ -5,6 +5,9 @@
     "api/submit-launch.js": {
       "maxDuration": 10
     },
+    "api/admin-login.js": {
+      "maxDuration": 10
+    },
     "api/list-launch-submissions.js": {
       "maxDuration": 10
     },

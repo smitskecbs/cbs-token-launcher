@@ -1,3 +1,4 @@
+import { getAdminAuthHeaders } from './adminSessionService'
 import type { ListLaunchSubmissionsResponse } from '../types/launchSubmission'
 
 export const LIST_LAUNCH_SUBMISSIONS_API_PATH =
@@ -5,7 +6,7 @@ export const LIST_LAUNCH_SUBMISSIONS_API_PATH =
 
 export type ListLaunchSubmissionsResult =
   | { ok: true; count: number; submissions: ListLaunchSubmissionsResponse['submissions'] }
-  | { ok: false; message: string }
+  | { ok: false; message: string; unauthorized?: boolean }
 
 function resolveListLaunchSubmissionsUrl(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
@@ -21,6 +22,7 @@ export async function fetchLaunchSubmissions(): Promise<ListLaunchSubmissionsRes
       method: 'GET',
       headers: {
         Accept: 'application/json',
+        ...getAdminAuthHeaders(),
       },
     })
 
@@ -38,7 +40,11 @@ export async function fetchLaunchSubmissions(): Promise<ListLaunchSubmissionsRes
         // Use generic message when response body is not JSON
       }
 
-      return { ok: false, message }
+      return {
+        ok: false,
+        message,
+        unauthorized: response.status === 401,
+      }
     }
 
     const data = (await response.json()) as ListLaunchSubmissionsResponse

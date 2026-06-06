@@ -14,6 +14,10 @@ import {
   resolveHomepageSections,
 } from '../services/homepageSectionsService'
 import {
+  attachMangoDonationSection,
+  renderMangoDonationSection,
+} from '../components/mangoDonationSection'
+import {
   renderCbsEcosystemTokensSection,
   renderCbsToolsSection,
   renderFeaturedLaunchesSection,
@@ -51,11 +55,13 @@ export async function renderApp(): Promise<void> {
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsEcosystemTokensSection(homepage.ecosystem)}
       ${renderCbsToolsSection(cbsTools)}
+      ${renderMangoDonationSection()}
       ${renderFooter()}
     </main>
     ${renderAppModals()}
   `
 
+  attachMangoDonationSection()
   attachLaunchCardHandlers(renderedLaunches)
   attachLaunchFilters(renderedLaunches, {
     initialCount: renderedLaunches.length,

@@ -2,6 +2,7 @@
  * Vercel serverless endpoint — read-only launch submission list.
  * SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in Vercel env (never VITE_*).
  */
+import { requireAdminAuth } from './lib/adminSession.js'
 import { listLaunchSubmissions } from './lib/launchSubmissionsDb.js'
 
 console.log('[list-launch-submissions] handler loaded')
@@ -16,6 +17,10 @@ export default async function handler(req, res) {
 
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
+  if (!requireAdminAuth(req, res)) {
     return
   }
 
