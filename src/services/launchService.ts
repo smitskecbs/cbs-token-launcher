@@ -132,7 +132,7 @@ export function getNewLaunches(
   return resolveHomepageSections(catalog).newLaunches
 }
 
-/** Trending Launches — placeholder until analytics are wired */
+/** Trending Launches — community interest votes, highest first */
 export function getTrendingLaunches(
   catalog: Launch[] = getLaunchCatalog(),
 ): Launch[] {

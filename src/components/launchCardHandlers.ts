@@ -8,6 +8,7 @@ import {
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
 import { attachLaunchInterestControl } from './launchInterestControl'
+import { getLaunchCardInstanceIds } from './launchCard'
 
 /**
  * Wire card navigation and lightweight cached metadata for homepage discovery cards.
@@ -15,7 +16,14 @@ import { attachLaunchInterestControl } from './launchInterestControl'
 export function attachLaunchCardHandlers(
   catalog: Launch[],
 ): void {
+  const seenLaunchIds = new Set<string>()
+
   for (const launch of catalog) {
+    if (seenLaunchIds.has(launch.id)) {
+      continue
+    }
+
+    seenLaunchIds.add(launch.id)
     attachLaunchCardNavigation(launch)
     attachLaunchInterestControl(launch)
     restoreCachedLaunchCardData(launch)
@@ -30,11 +38,9 @@ export function attachLaunchCardHandlers(
 }
 
 function attachLaunchCardNavigation(launch: Launch): void {
-  const card = document.querySelector<HTMLElement>(
-    `[data-token-card="${launch.id}"]`,
-  )
+  const cards = getLaunchCardElements(launch.id)
 
-  if (!card) {
+  if (cards.length === 0) {
     return
   }
 
@@ -42,24 +48,34 @@ function attachLaunchCardNavigation(launch: Launch): void {
     navigate(getTokenDetailPath(launch.id))
   }
 
-  card.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement
+  for (const card of cards) {
+    card.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement
 
-    if (target.closest('a, button')) {
-      return
-    }
+      if (target.closest('a, button')) {
+        return
+      }
 
-    openDetail()
-  })
+      openDetail()
+    })
 
-  card.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' && event.key !== ' ') {
-      return
-    }
+    card.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return
+      }
 
-    event.preventDefault()
-    openDetail()
-  })
+      event.preventDefault()
+      openDetail()
+    })
+  }
+}
+
+function getLaunchCardElements(launchId: string): HTMLElement[] {
+  return getLaunchCardInstanceIds(launchId)
+    .map((instanceId) =>
+      document.querySelector<HTMLElement>(`[data-token-card="${instanceId}"]`),
+    )
+    .filter((card): card is HTMLElement => card != null)
 }
 
 /** Restore cached metadata for card header fields without network calls */

@@ -22,15 +22,25 @@ import { renderDiscoveryCardActions } from './launchDiscoveryCardActions'
 import { renderDiscoveryStatusBadge } from './launchDiscoveryStatusBadge'
 
 /** Compact homepage discovery card — deep analysis lives on the token detail page */
+export function getTrendingLaunchCardInstanceId(launchId: string): string {
+  return `${launchId}--trending`
+}
+
+export function getLaunchCardInstanceIds(launchId: string): string[] {
+  return [launchId, getTrendingLaunchCardInstanceId(launchId)]
+}
+
 export function renderLaunchCard(
   launch: Launch,
   options: {
     sectionRank?: number
     homepageSection?: HomepageSectionId | null
+    cardInstanceId?: string
   } = {},
 ): string {
   const homepageSection = options.homepageSection ?? null
-  const id = escapeHtml(launch.id)
+  const cardInstanceId = options.cardInstanceId ?? launch.id
+  const id = escapeHtml(cardInstanceId)
   const name = escapeHtml(getLaunchDisplayName(launch))
   const symbol = escapeHtml(getLaunchDisplaySymbol(launch))
   const description = escapeHtml(getLaunchDisplayDescription(launch))
@@ -94,6 +104,10 @@ export function renderLaunchCardList(
           renderLaunchCard(launch, {
             sectionRank: index + 1,
             homepageSection,
+            cardInstanceId:
+              homepageSection === 'trending'
+                ? getTrendingLaunchCardInstanceId(launch.id)
+                : launch.id,
           }),
         )
         .join('')}

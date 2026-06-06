@@ -73,14 +73,13 @@ export function resolveHomepageSections(
     launchSectionById.set(launch.id, 'featured')
   }
 
-  const trending = sortLaunchesByInterest(
-    catalog.filter(
-      (launch) =>
-        !assigned.has(launch.id) && (launch.interestCount ?? 0) > 0,
-    ),
-  )
+  const trending = getTrendingLaunchCandidates(catalog)
 
   for (const launch of trending) {
+    if (assigned.has(launch.id)) {
+      continue
+    }
+
     assigned.add(launch.id)
     launchSectionById.set(launch.id, 'trending')
   }

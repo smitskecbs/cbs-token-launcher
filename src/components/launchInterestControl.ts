@@ -49,29 +49,27 @@ export function renderLaunchInterestControl(
 }
 
 export function attachLaunchInterestControl(launch: Launch): void {
-  const root = document.querySelector<HTMLElement>(
+  const roots = document.querySelectorAll<HTMLElement>(
     `[data-launch-interest-control][data-launch-id="${launch.id}"]`,
   )
 
-  if (!root) {
-    return
+  for (const root of roots) {
+    const button = root.querySelector<HTMLButtonElement>(
+      '[data-launch-interest-btn]',
+    )
+    const feedback = root.querySelector<HTMLElement>(
+      '[data-launch-interest-feedback]',
+    )
+
+    if (!button || button.disabled) {
+      continue
+    }
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation()
+      void handleLaunchInterestVote(launch, button, feedback, roots)
+    })
   }
-
-  const button = root.querySelector<HTMLButtonElement>(
-    '[data-launch-interest-btn]',
-  )
-  const feedback = root.querySelector<HTMLElement>(
-    '[data-launch-interest-feedback]',
-  )
-
-  if (!button || button.disabled) {
-    return
-  }
-
-  button.addEventListener('click', (event) => {
-    event.stopPropagation()
-    void handleLaunchInterestVote(launch, button, feedback)
-  })
 }
 
 function updateLaunchInterestButton(
@@ -92,17 +90,34 @@ async function handleLaunchInterestVote(
   launch: Launch,
   button: HTMLButtonElement,
   feedback: HTMLElement | null,
+  allControls: NodeListOf<HTMLElement>,
 ): Promise<void> {
   if (button.disabled) {
     return
   }
 
-  button.disabled = true
+  for (const control of allControls) {
+    const controlButton = control.querySelector<HTMLButtonElement>(
+      '[data-launch-interest-btn]',
+    )
+
+    if (controlButton) {
+      controlButton.disabled = true
+    }
+  }
 
   const result = await postLaunchInterest(launch.mintAddress)
 
   if (!result.ok) {
-    button.disabled = false
+    for (const control of allControls) {
+      const controlButton = control.querySelector<HTMLButtonElement>(
+        '[data-launch-interest-btn]',
+      )
+
+      if (controlButton && !hasVotedForLaunchInterest(launch.mintAddress)) {
+        controlButton.disabled = false
+      }
+    }
 
     if (feedback) {
       feedback.hidden = false
@@ -114,10 +129,22 @@ async function handleLaunchInterestVote(
 
   launch.interestCount = result.interestCount
   markLaunchInterestVoted(result.mintAddress)
-  updateLaunchInterestButton(button, result.interestCount, true)
 
-  if (feedback) {
-    feedback.hidden = true
-    feedback.textContent = ''
+  for (const control of allControls) {
+    const controlButton = control.querySelector<HTMLButtonElement>(
+      '[data-launch-interest-btn]',
+    )
+    const controlFeedback = control.querySelector<HTMLElement>(
+      '[data-launch-interest-feedback]',
+    )
+
+    if (controlButton) {
+      updateLaunchInterestButton(controlButton, result.interestCount, true)
+    }
+
+    if (controlFeedback) {
+      controlFeedback.hidden = true
+      controlFeedback.textContent = ''
+    }
   }
 }
