@@ -1,4 +1,4 @@
-export const LAUNCH_INTEREST_API_PATH = '/api/launch-interest'
+export const LAUNCH_INTEREST_API_PATH = '/api/public/launch-interest'
 
 export type PostLaunchInterestResult =
   | { ok: true; mintAddress: string; interestCount: number }

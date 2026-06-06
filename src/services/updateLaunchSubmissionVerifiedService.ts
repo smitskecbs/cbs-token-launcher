@@ -1,7 +1,7 @@
 import { getAdminAuthHeaders } from './adminSessionService'
 
 export const UPDATE_LAUNCH_SUBMISSION_VERIFIED_API_PATH =
-  '/api/update-launch-submission-verified'
+  '/api/admin/update-launch-submission-verified'
 
 export type UpdateLaunchSubmissionVerifiedResult =
   | { ok: true; id: string; verified: boolean }

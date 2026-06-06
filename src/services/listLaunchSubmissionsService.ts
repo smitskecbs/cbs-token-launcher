@@ -2,7 +2,7 @@ import { getAdminAuthHeaders } from './adminSessionService'
 import type { ListLaunchSubmissionsResponse } from '../types/launchSubmission'
 
 export const LIST_LAUNCH_SUBMISSIONS_API_PATH =
-  '/api/list-launch-submissions'
+  '/api/admin/list-launch-submissions'
 
 export type ListLaunchSubmissionsResult =
   | { ok: true; count: number; submissions: ListLaunchSubmissionsResponse['submissions'] }

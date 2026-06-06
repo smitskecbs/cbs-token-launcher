@@ -5,7 +5,7 @@ import {
   setCachedTokenMarketData,
 } from './tokenMarketDataCache'
 
-export const TOKEN_MARKET_DATA_API_PATH = '/api/token-market-data'
+export const TOKEN_MARKET_DATA_API_PATH = '/api/public/token-market-data'
 
 export type FetchTokenMarketDataResult =
   | { ok: true; data: TokenMarketData; cached: boolean }

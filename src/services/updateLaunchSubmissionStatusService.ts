@@ -2,7 +2,7 @@ import { getAdminAuthHeaders } from './adminSessionService'
 import type { LaunchSubmissionStatus } from '../utils/launchSubmissionStatus'
 
 export const UPDATE_LAUNCH_SUBMISSION_STATUS_API_PATH =
-  '/api/update-launch-submission-status'
+  '/api/admin/update-launch-submission-status'
 
 export type UpdateLaunchSubmissionStatusResult =
   | { ok: true; id: string; status: LaunchSubmissionStatus }

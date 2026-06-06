@@ -2,7 +2,8 @@ import type { LaunchUpdate } from '../types/launchUpdate'
 import type { LaunchUpdateTarget } from '../utils/launchUpdateTarget'
 import { getAdminAuthHeaders } from './adminSessionService'
 
-export const LAUNCH_UPDATES_API_PATH = '/api/launch-updates'
+export const PUBLIC_LAUNCH_UPDATES_API_PATH = '/api/public/launch-updates'
+export const ADMIN_LAUNCH_UPDATES_API_PATH = '/api/admin/launch-updates'
 
 export type FetchLaunchUpdatesResult =
   | { ok: true; updates: LaunchUpdate[] }
@@ -16,11 +17,12 @@ export type DeleteLaunchUpdateResult =
   | { ok: true; id: string }
   | { ok: false; message: string; unauthorized?: boolean }
 
-function resolveLaunchUpdatesUrl(searchParams?: URLSearchParams): string {
+function resolveLaunchUpdatesUrl(
+  basePath: string,
+  searchParams?: URLSearchParams,
+): string {
   const query = searchParams?.toString()
-  const path = query
-    ? `${LAUNCH_UPDATES_API_PATH}?${query}`
-    : LAUNCH_UPDATES_API_PATH
+  const path = query ? `${basePath}?${query}` : basePath
 
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}${path}`
@@ -51,12 +53,15 @@ export async function fetchLaunchUpdates(
   }
 
   try {
-    const response = await fetch(resolveLaunchUpdatesUrl(params), {
+    const response = await fetch(
+      resolveLaunchUpdatesUrl(PUBLIC_LAUNCH_UPDATES_API_PATH, params),
+      {
       method: 'GET',
       headers: {
         Accept: 'application/json',
       },
-    })
+      },
+    )
 
     if (!response.ok) {
       return {
@@ -86,7 +91,9 @@ export async function createLaunchUpdate(
   values: { title: string; content: string },
 ): Promise<CreateLaunchUpdateResult> {
   try {
-    const response = await fetch(resolveLaunchUpdatesUrl(), {
+    const response = await fetch(
+      resolveLaunchUpdatesUrl(ADMIN_LAUNCH_UPDATES_API_PATH),
+      {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -99,7 +106,8 @@ export async function createLaunchUpdate(
         title: values.title,
         content: values.content,
       }),
-    })
+      },
+    )
 
     if (!response.ok) {
       let message = 'Could not save launch update right now.'
@@ -139,7 +147,9 @@ export async function deleteLaunchUpdate(
   updateId: string,
 ): Promise<DeleteLaunchUpdateResult> {
   try {
-    const response = await fetch(resolveLaunchUpdatesUrl(), {
+    const response = await fetch(
+      resolveLaunchUpdatesUrl(ADMIN_LAUNCH_UPDATES_API_PATH),
+      {
       method: 'DELETE',
       headers: {
         Accept: 'application/json',
@@ -147,7 +157,8 @@ export async function deleteLaunchUpdate(
         ...getAdminAuthHeaders(),
       },
       body: JSON.stringify({ id: updateId }),
-    })
+      },
+    )
 
     if (!response.ok) {
       let message = 'Could not delete launch update right now.'

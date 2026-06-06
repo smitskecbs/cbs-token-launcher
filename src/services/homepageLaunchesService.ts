@@ -1,6 +1,6 @@
 import type { HomepageLaunchesResponse } from '../types/homepageLaunch'
 
-export const HOMEPAGE_LAUNCHES_API_PATH = '/api/homepage-launches'
+export const HOMEPAGE_LAUNCHES_API_PATH = '/api/public/homepage-launches'
 
 export type FetchHomepageLaunchesResult =
   | { ok: true; count: number; launches: HomepageLaunchesResponse['launches'] }

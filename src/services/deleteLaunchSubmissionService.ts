@@ -1,7 +1,7 @@
 import { getAdminAuthHeaders } from './adminSessionService'
 
 export const DELETE_LAUNCH_SUBMISSION_API_PATH =
-  '/api/delete-launch-submission'
+  '/api/admin/delete-launch-submission'
 
 export type DeleteLaunchSubmissionResult =
   | { ok: true; id: string }

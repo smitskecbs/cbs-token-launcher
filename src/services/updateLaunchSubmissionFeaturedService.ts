@@ -1,7 +1,7 @@
 import { getAdminAuthHeaders } from './adminSessionService'
 
 export const UPDATE_LAUNCH_SUBMISSION_FEATURED_API_PATH =
-  '/api/update-launch-submission-featured'
+  '/api/admin/update-launch-submission-featured'
 
 export type UpdateLaunchSubmissionFeaturedResult =
   | { ok: true; id: string; featured: boolean }

@@ -5,32 +5,25 @@
     "api/submit-launch.js": {
       "maxDuration": 10
     },
-    "api/admin-login.js": {
+    "api/rpc.js": {
       "maxDuration": 10
     },
-    "api/list-launch-submissions.js": {
+    "api/admin.js": {
       "maxDuration": 10
     },
-    "api/update-launch-submission-status.js": {
-      "maxDuration": 10
-    },
-    "api/update-launch-submission-details.js": {
-      "maxDuration": 10
-    },
-    "api/update-launch-submission-verified.js": {
-      "maxDuration": 10
-    },
-    "api/homepage-launches.js": {
-      "maxDuration": 10
-    },
-    "api/launch-interest.js": {
-      "maxDuration": 10
-    },
-    "api/launch-updates.js": {
+    "api/public.js": {
       "maxDuration": 10
     }
   },
   "rewrites": [
+    {
+      "source": "/api/admin/:action",
+      "destination": "/api/admin?action=:action"
+    },
+    {
+      "source": "/api/public/:action",
+      "destination": "/api/public?action=:action"
+    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"

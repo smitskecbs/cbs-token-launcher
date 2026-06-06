@@ -1,4 +1,4 @@
-export const ADMIN_LOGIN_API_PATH = '/api/admin-login'
+export const ADMIN_LOGIN_API_PATH = '/api/admin/login'
 
 export type AdminLoginResult =
   | { ok: true; token: string; expiresInMs: number }

@@ -2,7 +2,7 @@ import { getAdminAuthHeaders } from './adminSessionService'
 import type { AdminEditSubmissionFormValues } from '../utils/adminEditSubmissionValidation'
 
 export const UPDATE_LAUNCH_SUBMISSION_DETAILS_API_PATH =
-  '/api/update-launch-submission-details'
+  '/api/admin/update-launch-submission-details'
 
 export type UpdateLaunchSubmissionDetailsResult =
   | { ok: true; id: string }
