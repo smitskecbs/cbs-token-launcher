@@ -12,6 +12,7 @@ import {
   getSubmissionLaunchUpdateTarget,
   type LaunchUpdateTarget,
 } from '../utils/launchUpdateTarget'
+import { launches } from '../data/launches'
 import { loginAdmin } from '../services/adminLoginService'
 import {
   clearAdminSessionToken,
@@ -176,39 +177,56 @@ function renderStatusActions(
   return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${manageUpdatesButton}${statusButtons}${deleteButton}</div>`
 }
 
-function renderBuiltinLaunchUpdatesPanel(): string {
+const BUILTIN_LAUNCH_LABELS: Record<string, string> = {
+  'cbs-coin': 'CBS Coin',
+  mango: 'ManGo',
+}
+
+function getBuiltinLaunchLabel(launchId: string, fallbackName?: string): string {
+  return (
+    fallbackName?.trim() ||
+    BUILTIN_LAUNCH_LABELS[launchId] ||
+    launchId
+  )
+}
+
+function renderBuiltinLaunchesSection(): string {
+  const rows = launches
+    .map((launch) => {
+      const label = getBuiltinLaunchLabel(launch.id, launch.name)
+
+      return `
+        <li class="admin-builtin-launches__item">
+          <span class="admin-builtin-launches__name">${escapeHtml(label)}</span>
+          <button
+            type="button"
+            class="secondary-btn admin-builtin-launches__manage-btn"
+            data-admin-manage-updates
+            data-launch-id="${escapeHtml(launch.id)}"
+            data-launch-label="${escapeHtml(label)}"
+          >
+            Manage Updates
+          </button>
+        </li>
+      `
+    })
+    .join('')
+
   return `
     <section
-      class="admin-builtin-updates"
-      data-admin-builtin-updates
-      aria-labelledby="admin-builtin-updates-title"
+      class="admin-builtin-launches"
+      data-admin-builtin-launches
+      aria-labelledby="admin-builtin-launches-title"
     >
-      <h2 class="admin-builtin-updates__title" id="admin-builtin-updates-title">
-        Built-in Launch Updates
+      <h2 class="admin-builtin-launches__title" id="admin-builtin-launches-title">
+        Built-in Launches
       </h2>
-      <p class="admin-builtin-updates__lead">
-        Post timeline updates for static catalog launches.
+      <p class="admin-builtin-launches__lead">
+        Manage timeline updates for static catalog launches.
       </p>
-      <div class="admin-builtin-updates__actions">
-        <button
-          type="button"
-          class="secondary-btn admin-submissions-action"
-          data-admin-manage-updates
-          data-launch-id="cbs-coin"
-          data-launch-label="CBS Coin"
-        >
-          Manage Updates — CBS Coin
-        </button>
-        <button
-          type="button"
-          class="secondary-btn admin-submissions-action"
-          data-admin-manage-updates
-          data-launch-id="mango"
-          data-launch-label="ManGo"
-        >
-          Manage Updates — ManGo
-        </button>
-      </div>
+      <ul class="admin-builtin-launches__list">
+        ${rows}
+      </ul>
     </section>
   `
 }
@@ -378,13 +396,13 @@ export function renderAdminSubmissionsPage(): string {
           Review submitted launches and update their review status.
         </p>
 
-        ${renderBuiltinLaunchUpdatesPanel()}
-
         <div
           class="admin-submissions-stats-wrap"
           data-admin-submissions-stats-wrap
           hidden
         ></div>
+
+        ${renderBuiltinLaunchesSection()}
 
         <p
           class="admin-submissions-count"
@@ -600,15 +618,13 @@ export function attachAdminSubmissionsPage(): void {
     )
   })
 
-  const builtinUpdatesPanel = document.querySelector<HTMLElement>(
-    '[data-admin-builtin-updates]',
-  )
-
-  builtinUpdatesPanel?.addEventListener('click', (event) => {
+  ui.dashboardPanel.addEventListener('click', (event) => {
     const target = event.target as HTMLElement
-    const button = target.closest<HTMLButtonElement>('[data-admin-manage-updates]')
+    const button = target.closest<HTMLButtonElement>(
+      '[data-admin-manage-updates][data-launch-id]',
+    )
 
-    if (!button || button.disabled) {
+    if (!button || button.disabled || button.hasAttribute('data-submission-id')) {
       return
     }
 
@@ -709,6 +725,14 @@ function refreshAdminDashboardCounts(
   ui.statsWrap.hidden = false
   ui.count.hidden = false
   ui.count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
+
+  const builtinLaunchesSection = ui.dashboardPanel.querySelector<HTMLElement>(
+    '[data-admin-builtin-launches]',
+  )
+
+  if (builtinLaunchesSection) {
+    builtinLaunchesSection.hidden = false
+  }
 
   if (loadedSubmissions.length === 0) {
     ui.tableWrap.hidden = true
