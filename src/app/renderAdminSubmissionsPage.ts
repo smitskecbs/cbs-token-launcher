@@ -12,6 +12,10 @@ import {
 import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 import { updateLaunchSubmissionStatus } from '../services/updateLaunchSubmissionStatusService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
+import {
+  DUPLICATE_MINT_WARNING_MESSAGE,
+  getSubmissionIdsWithMintWarning,
+} from '../utils/adminSubmissionMintWarnings'
 import { escapeHtml } from '../utils/html'
 import {
   countLaunchSubmissionStatuses,
@@ -75,15 +79,26 @@ function renderStatusActions(submission: LaunchSubmissionSummary): string {
   return `<div class="admin-submissions-actions">${editButton}${statusButtons}</div>`
 }
 
-function renderSubmissionRow(submission: LaunchSubmissionSummary): string {
+function renderSubmissionRow(
+  submission: LaunchSubmissionSummary,
+  showMintWarning: boolean,
+): string {
   const statusClass = getLaunchSubmissionStatusClass(submission.status)
+  const mintWarning = showMintWarning
+    ? `
+        <p class="admin-submissions-mint-warning">
+          ${escapeHtml(DUPLICATE_MINT_WARNING_MESSAGE)}
+        </p>
+      `
+    : ''
 
   return `
     <tr data-submission-row="${escapeHtml(submission.id)}">
       <td>${escapeHtml(submission.projectName)}</td>
       <td>${escapeHtml(submission.tokenSymbol)}</td>
-      <td>
+      <td class="admin-submissions-mint-cell">
         <code class="admin-submissions-mint">${escapeHtml(submission.mintAddress)}</code>
+        ${mintWarning}
       </td>
       <td>
         <span class="${statusClass}">${escapeHtml(formatLaunchSubmissionStatus(submission.status))}</span>
@@ -550,8 +565,15 @@ async function loadSubmissions(
   loadedSubmissions.length = 0
   loadedSubmissions.push(...result.submissions)
 
+  const mintWarningIds = getSubmissionIdsWithMintWarning(result.submissions)
+
   body.innerHTML = result.submissions
-    .map((submission) => renderSubmissionRow(submission))
+    .map((submission) =>
+      renderSubmissionRow(
+        submission,
+        mintWarningIds.has(submission.id),
+      ),
+    )
     .join('')
   tableWrap.hidden = false
 }
