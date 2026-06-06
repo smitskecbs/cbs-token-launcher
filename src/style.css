@@ -1234,6 +1234,77 @@ h3 {
   align-items: stretch;
 }
 
+.launch-your-project-section {
+  width: 100%;
+}
+
+.launch-your-project-subtitle {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #555555;
+  text-align: left;
+}
+
+.launch-your-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.launch-your-project-card {
+  padding: 18px 18px 16px;
+  text-align: left;
+}
+
+.launch-your-project-card__title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.35;
+  color: #1a1a1a;
+}
+
+.launch-your-project-card__description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666666;
+}
+
+.launch-your-project-cta {
+  display: grid;
+  gap: 12px;
+  padding: 20px 20px 22px;
+  border: 1px solid rgba(216, 111, 0, 0.2);
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 179, 71, 0.08),
+    #ffffff
+  );
+  box-shadow: 0 10px 40px rgba(216, 111, 0, 0.08);
+  text-align: center;
+}
+
+.launch-your-project-cta__heading {
+  margin: 0;
+  font-size: clamp(20px, 4vw, 24px);
+  color: #1a1a1a;
+}
+
+.launch-your-project-cta__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #555555;
+}
+
+.launch-your-project-cta__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
 .launcher-statistics-section {
   width: 100%;
 }

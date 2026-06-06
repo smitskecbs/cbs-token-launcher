@@ -22,6 +22,7 @@ import {
   attachLauncherStatisticsSection,
   renderLauncherStatisticsSection,
 } from '../components/launcherStatisticsSection'
+import { renderLaunchYourProjectSection } from '../components/launchYourProjectSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import {
   renderCbsEcosystemTokensSection,
@@ -60,6 +61,7 @@ export async function renderApp(): Promise<void> {
 
       ${renderHeroSection()}
       ${renderLauncherStatisticsSection(catalog)}
+      ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
