@@ -1,57 +1,17 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
 import {
-  getDexscreenerPairUrl,
+  getDexscreenerTokenUrl,
   getRaydiumAddLiquidityUrl,
   getRaydiumSwapUrl,
 } from '../config/urls'
 import { isValidHttpsUrl } from './externalLink'
-import { resolveDexscreenerUrl } from './dexscreenerUrl'
 import {
   getLaunchJupiterTradeUrl,
   getLaunchPoolUrl,
   getLaunchRaydiumPoolCreationLink,
   getLaunchRaydiumTradeUrl,
 } from './launchTradingLinks'
-
-function isValidDexscreenerHttpsUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
-
-    return (
-      url.protocol === 'https:' &&
-      url.hostname === 'dexscreener.com' &&
-      url.pathname.length > 1
-    )
-  } catch {
-    return false
-  }
-}
-
-export function resolveViewPoolUrl(
-  launch: Launch,
-  marketData?: TokenMarketData | null,
-): string | null {
-  const adminPoolUrl = getLaunchPoolUrl(launch)
-
-  if (adminPoolUrl && isValidHttpsUrl(adminPoolUrl)) {
-    return adminPoolUrl
-  }
-
-  const pairAddress = marketData?.pairAddress?.trim()
-
-  if (pairAddress) {
-    return getDexscreenerPairUrl(pairAddress)
-  }
-
-  const pairUrl = marketData?.pairUrl?.trim()
-
-  if (pairUrl && isValidDexscreenerHttpsUrl(pairUrl)) {
-    return pairUrl
-  }
-
-  return null
-}
 
 export interface PoolTradingState {
   hasPool: boolean
@@ -69,16 +29,10 @@ export function resolvePoolTradingState(
   marketData?: TokenMarketData | null,
 ): PoolTradingState {
   const marketPoolExists = marketData?.poolExists === true
-  const viewPoolUrl = resolveViewPoolUrl(launch, marketData)
-  const hasPool = Boolean(viewPoolUrl) || marketPoolExists
-
-  const dexscreenerUrl = marketData
-    ? resolveDexscreenerUrl({
-        pairUrl: marketData.pairUrl,
-        pairAddress: marketData.pairAddress,
-        mintAddress: launch.mintAddress,
-      })
-    : null
+  const adminPoolUrl = getLaunchPoolUrl(launch)
+  const hasAdminPoolUrl = Boolean(adminPoolUrl && isValidHttpsUrl(adminPoolUrl))
+  const hasPool = marketPoolExists || hasAdminPoolUrl
+  const mintDexscreenerUrl = getDexscreenerTokenUrl(launch.mintAddress)
 
   let raydiumTradeUrl: string | null = null
   let raydiumAddLiquidityUrl: string | null = null
@@ -90,8 +44,6 @@ export function resolvePoolTradingState(
         ? configuredTradeUrl
         : getRaydiumSwapUrl(launch.mintAddress)
 
-    const adminPoolUrl = getLaunchPoolUrl(launch)
-
     if (adminPoolUrl?.includes('raydium.io') && isValidHttpsUrl(adminPoolUrl)) {
       raydiumAddLiquidityUrl = adminPoolUrl
     } else {
@@ -102,8 +54,8 @@ export function resolvePoolTradingState(
   return {
     hasPool,
     poolStatusLabel: hasPool ? 'Pool Active' : 'No pool created yet',
-    viewPoolUrl: hasPool ? viewPoolUrl : null,
-    dexscreenerUrl: hasPool ? dexscreenerUrl : null,
+    viewPoolUrl: hasPool ? mintDexscreenerUrl : null,
+    dexscreenerUrl: hasPool ? mintDexscreenerUrl : null,
     raydiumTradeUrl,
     raydiumAddLiquidityUrl,
     jupiterUrl: hasPool ? getLaunchJupiterTradeUrl(launch) : null,

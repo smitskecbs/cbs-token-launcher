@@ -218,11 +218,7 @@ function renderMainPairText(result: MarketStatusResult): string {
 }
 
 function renderDexscreenerLinkHtml(result: MarketStatusResult): string {
-  const dexscreenerUrl = resolveDexscreenerUrl({
-    pairUrl: result.pairUrl,
-    pairAddress: result.pairAddress,
-    mintAddress: result.mintAddress,
-  })
+  const dexscreenerUrl = resolveDexscreenerUrl(result.mintAddress)
 
   if (dexscreenerUrl) {
     return renderDexscreenerAnchorHtml(

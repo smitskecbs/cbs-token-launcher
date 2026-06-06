@@ -39,7 +39,6 @@ export function renderExternalAnchorHtml(
   const trimmed = url.trim()
 
   if (!isValidHttpsUrl(trimmed)) {
-    console.warn(`[external-link] skipped invalid href for ${label}: ${url}`)
     return ''
   }
 

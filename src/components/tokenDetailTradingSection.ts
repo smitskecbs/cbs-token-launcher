@@ -34,15 +34,8 @@ function formatPairAddress(pairAddress: string | null): string {
   return `${pairAddress.slice(0, 6)}…${pairAddress.slice(-6)}`
 }
 
-function resolveTradingDexscreenerUrl(
-  launch: Launch,
-  data: TokenMarketData,
-): string | null {
-  return resolveDexscreenerUrl({
-    pairUrl: data.pairUrl,
-    pairAddress: data.pairAddress,
-    mintAddress: launch.mintAddress,
-  })
+function resolveTradingDexscreenerUrl(launch: Launch): string | null {
+  return resolveDexscreenerUrl(launch.mintAddress)
 }
 
 export function renderTokenDetailTradingSection(launch: Launch): string {
@@ -243,7 +236,7 @@ export function applyTokenDetailTradingData(
   )
   setText(root, '[data-token-trading-volume]', formatVolume(data.volume24hUsd))
 
-  const dexscreenerUrl = resolveTradingDexscreenerUrl(launch, data)
+  const dexscreenerUrl = resolveTradingDexscreenerUrl(launch)
   const dexscreenerSlot = root.querySelector<HTMLElement>(
     '[data-token-detail-trading-dexscreener-slot]',
   )

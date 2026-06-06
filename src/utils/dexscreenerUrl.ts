@@ -1,47 +1,14 @@
-import {
-  getDexscreenerPairUrl,
-  getDexscreenerTokenUrl,
-} from '../config/urls'
+import { getDexscreenerTokenUrl } from '../config/urls'
 import { renderExternalAnchorHtml } from './externalLink'
 
-function isValidDexscreenerHttpsUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
+export function resolveDexscreenerUrl(mintAddress: string): string | null {
+  const trimmed = mintAddress.trim()
 
-    return (
-      url.protocol === 'https:' &&
-      url.hostname === 'dexscreener.com' &&
-      url.pathname.length > 1
-    )
-  } catch {
-    return false
-  }
-}
-
-export function resolveDexscreenerUrl(options: {
-  pairUrl?: string | null
-  pairAddress?: string | null
-  mintAddress: string
-}): string | null {
-  const pairAddress = options.pairAddress?.trim()
-
-  if (pairAddress) {
-    return getDexscreenerPairUrl(pairAddress)
+  if (!trimmed) {
+    return null
   }
 
-  const pairUrl = options.pairUrl?.trim()
-
-  if (pairUrl && isValidDexscreenerHttpsUrl(pairUrl)) {
-    return pairUrl
-  }
-
-  const mintAddress = options.mintAddress?.trim()
-
-  if (mintAddress) {
-    return getDexscreenerTokenUrl(mintAddress)
-  }
-
-  return null
+  return getDexscreenerTokenUrl(trimmed)
 }
 
 export function renderDexscreenerAnchorHtml(

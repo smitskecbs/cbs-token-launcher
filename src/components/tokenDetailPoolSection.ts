@@ -1,14 +1,12 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
 import { getCachedTokenMarketData } from '../services/tokenMarketDataCache'
-import { renderDexscreenerAnchorHtml } from '../utils/dexscreenerUrl'
 import { renderExternalAnchorHtml } from '../utils/externalLink'
 import { escapeHtml } from '../utils/html'
 import {
   resolvePoolTradingState,
   type PoolTradingState,
 } from '../utils/resolvePoolTradingState'
-import { attachCbsCoinPoolExternalLinkDebug } from './tokenDetailPoolExternalDebug'
 
 function renderPoolActions(state: PoolTradingState): string {
   const actions: string[] = []
@@ -76,7 +74,7 @@ function renderPoolActions(state: PoolTradingState): string {
   }
 
   if (state.dexscreenerUrl) {
-    const dexscreener = renderDexscreenerAnchorHtml(
+    const dexscreener = renderExternalAnchorHtml(
       state.dexscreenerUrl,
       'Dexscreener',
       'secondary-btn',
@@ -120,16 +118,6 @@ function renderPoolSectionBody(state: PoolTradingState): string {
   `
 }
 
-function queueCbsCoinPoolExternalLinkDebug(launch: Launch): void {
-  if (launch.id !== 'cbs-coin') {
-    return
-  }
-
-  queueMicrotask(() => {
-    attachCbsCoinPoolExternalLinkDebug(launch)
-  })
-}
-
 export function renderTokenDetailPoolSection(launch: Launch): string {
   const cachedMarketData = getCachedTokenMarketData(launch.mintAddress)
   const state = resolvePoolTradingState(launch, cachedMarketData)
@@ -167,5 +155,4 @@ export function applyTokenDetailPoolSection(
   const state = resolvePoolTradingState(launch, resolvedMarketData)
 
   body.innerHTML = renderPoolSectionBody(state)
-  queueCbsCoinPoolExternalLinkDebug(launch)
 }
