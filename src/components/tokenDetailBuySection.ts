@@ -34,10 +34,65 @@ export function renderTokenDetailBuySection(launch: Launch): string {
   }
 
   return `
-    <div class="token-detail-buy-section" data-token-detail-buy>
-      <p class="token-detail-buy-note">
+    <div
+      class="token-detail-buy-section token-detail-buy-section--pending"
+      data-token-detail-buy
+      hidden
+    >
+      <p
+        class="token-detail-buy-note"
+        data-token-detail-buy-unavailable
+        hidden
+      >
         Buy link not available yet.
       </p>
     </div>
   `
+}
+
+export function applyTokenDetailBuySection(
+  launch: Launch,
+  options: { poolExists: boolean | null },
+): void {
+  if (!isLaunchLiveForBuy(launch) || getLaunchBuyUrl(launch)) {
+    return
+  }
+
+  const section = document.querySelector<HTMLElement>(
+    `[data-token-detail="${launch.id}"] [data-token-detail-buy]`,
+  )
+
+  if (!section) {
+    return
+  }
+
+  const unavailable = section.querySelector<HTMLElement>(
+    '[data-token-detail-buy-unavailable]',
+  )
+
+  if (options.poolExists === true) {
+    section.hidden = true
+
+    if (unavailable) {
+      unavailable.hidden = true
+    }
+
+    return
+  }
+
+  if (options.poolExists === false) {
+    section.hidden = false
+
+    if (unavailable) {
+      unavailable.hidden = false
+    }
+
+    return
+  }
+
+  section.hidden = true
+
+  if (unavailable) {
+    unavailable.hidden = true
+  }
 }

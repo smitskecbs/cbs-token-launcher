@@ -7,6 +7,7 @@ import {
 import { formatLiquidity } from '../utils/formatLiquidity'
 import { formatPrice } from '../utils/formatPrice'
 import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
+import { applyTokenDetailBuySection } from './tokenDetailBuySection'
 
 const EMPTY_VALUE = '—'
 
@@ -177,6 +178,8 @@ export function setTokenDetailTradingLoading(launch: Launch): void {
     error.hidden = true
     error.textContent = ''
   }
+
+  applyTokenDetailBuySection(launch, { poolExists: null })
 }
 
 export function applyTokenDetailTradingData(
@@ -222,6 +225,7 @@ export function applyTokenDetailTradingData(
       unavailable.hidden = false
     }
 
+    applyTokenDetailBuySection(launch, { poolExists: false })
     return
   }
 
@@ -273,6 +277,8 @@ export function applyTokenDetailTradingData(
   if (jupiterLink) {
     jupiterLink.href = getJupiterSwapUrl(launch.mintAddress)
   }
+
+  applyTokenDetailBuySection(launch, { poolExists: true })
 }
 
 export function setTokenDetailTradingError(
@@ -316,4 +322,6 @@ export function setTokenDetailTradingError(
     error.hidden = false
     error.textContent = message
   }
+
+  applyTokenDetailBuySection(launch, { poolExists: null })
 }
