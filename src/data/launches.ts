@@ -47,6 +47,7 @@ export const launches: Launch[] = [
     description:
       'ManGo is the first public example token created with CBS tools, but it is a separate meme project outside CBS Coin.',
     logoFallback: 'M',
+    verificationLevel: 'verified',
     launchInfo: {
       launchStatus: 'Coming Soon',
       tradingStatus: 'Trading not live yet',

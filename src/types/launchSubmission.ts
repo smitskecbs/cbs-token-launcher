@@ -12,6 +12,7 @@ export interface LaunchSubmissionSummary {
   x: string | null
   description: string | null
   contactEmail: string | null
+  verified: boolean
   createdAt: string
 }
 

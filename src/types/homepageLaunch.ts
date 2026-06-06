@@ -9,6 +9,7 @@ export interface HomepageLaunchSubmission {
   logoUrl: string | null
   telegram: string | null
   x: string | null
+  verified: boolean
   createdAt: string
 }
 

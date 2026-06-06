@@ -53,17 +53,14 @@ export function getLaunchVerificationLevel(
   return normalizeVerificationLevel(launch.verificationLevel)
 }
 
-export function getVerificationBadge(
-  launch: Launch,
-  chainVerified = false,
-): LaunchBadge | null {
+export function getVerificationBadge(launch: Launch): LaunchBadge | null {
   const level = getLaunchVerificationLevel(launch)
 
   if (level === 'cbs-verified') {
     return { id: 'cbs-verified', label: '⭐ CBS VERIFIED' }
   }
 
-  if (level === 'verified' || chainVerified) {
+  if (level === 'verified') {
     return { id: 'verified', label: '✓ VERIFIED' }
   }
 
@@ -81,12 +78,6 @@ export function getVerificationSortPriority(launch: Launch): number {
     return 1
   }
 
-  const mintResult = getCachedMintVerification(launch.mintAddress)
-
-  if (isLaunchVerified(mintResult)) {
-    return 1
-  }
-
   return 0
 }
 
@@ -100,13 +91,11 @@ export function getLaunchRankScore(launch: Launch): number | null {
 export function getLaunchBadges(
   launch: Launch,
   options: {
-    chainVerified?: boolean
     homepageSection?: HomepageSectionId | null
   } = {},
 ): LaunchBadge[] {
   const badges: LaunchBadge[] = []
   const homepageSection = options.homepageSection ?? null
-  const chainVerified = options.chainVerified ?? false
 
   if (
     launch.featured === true ||
@@ -123,7 +112,7 @@ export function getLaunchBadges(
     badges.push({ id: 'new', label: 'New' })
   }
 
-  const verificationBadge = getVerificationBadge(launch, chainVerified)
+  const verificationBadge = getVerificationBadge(launch)
 
   if (verificationBadge?.id === 'verified') {
     badges.push({ id: 'verified', label: 'Verified' })

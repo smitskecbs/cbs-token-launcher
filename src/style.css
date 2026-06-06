@@ -2909,6 +2909,12 @@ h3 {
   white-space: nowrap;
 }
 
+.admin-submissions-verified-toggle--on {
+  color: #15803d;
+  border-color: rgba(21, 128, 61, 0.35);
+  background: rgba(21, 128, 61, 0.1);
+}
+
 .admin-submissions-status--pending {
   background: rgba(255, 179, 71, 0.16);
   color: #d86f00;

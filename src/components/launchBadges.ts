@@ -1,12 +1,10 @@
 import type { Launch } from '../types/launch'
 import type { HomepageSectionId } from '../types/homepage'
-import { getCachedMintVerification } from '../services/mintVerificationCache'
 import {
   formatLaunchRankScore,
   getLaunchBadges,
   getVerificationBadge,
   getVerificationSortPriority,
-  isLaunchVerified,
   type LaunchBadge,
 } from '../services/launchRankingService'
 import { escapeHtml } from '../utils/html'
@@ -15,11 +13,8 @@ export function renderLaunchBadges(
   launch: Launch,
   homepageSection?: HomepageSectionId | null,
 ): string {
-  const mintResult = getCachedMintVerification(launch.mintAddress)
-  const chainVerified = isLaunchVerified(mintResult)
   const badges = getLaunchBadges(launch, {
     homepageSection,
-    chainVerified,
   })
 
   if (badges.length === 0) {
@@ -34,9 +29,7 @@ export function renderLaunchBadges(
 }
 
 export function renderVerificationBadge(launch: Launch): string {
-  const mintResult = getCachedMintVerification(launch.mintAddress)
-  const chainVerified = isLaunchVerified(mintResult)
-  const badge = getVerificationBadge(launch, chainVerified)
+  const badge = getVerificationBadge(launch)
 
   if (!badge) {
     return `

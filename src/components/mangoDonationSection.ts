@@ -16,8 +16,13 @@ export function renderMangoDonationSection(): string {
           Support ManGo Development 🥭
         </h2>
         <p class="mango-donation-text">
-          Donations help fund liquidity, development and future ecosystem tools.
+          Optional donations help fund liquidity, development and future CBS ecosystem tools.
         </p>
+        <ul class="mango-donation-points" aria-label="What support helps fund">
+          <li>Liquidity</li>
+          <li>Development</li>
+          <li>Launch tools</li>
+        </ul>
         <p class="mango-donation-wallet-label">Wallet address</p>
         <code
           class="mango-donation-wallet"
@@ -37,6 +42,9 @@ export function renderMangoDonationSection(): string {
           aria-live="polite"
         >
           Address copied.
+        </p>
+        <p class="mango-donation-disclaimer">
+          No promises. No pressure. Only support if you believe in the build.
         </p>
       </div>
     </section>

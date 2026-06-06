@@ -11,6 +11,7 @@ import {
 } from '../services/adminSessionService'
 import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 import { updateLaunchSubmissionStatus } from '../services/updateLaunchSubmissionStatusService'
+import { updateLaunchSubmissionVerified } from '../services/updateLaunchSubmissionVerifiedService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
   DUPLICATE_MINT_WARNING_MESSAGE,
@@ -47,7 +48,28 @@ function formatSubmissionDate(iso: string): string {
   })
 }
 
+function renderVerifiedToggle(submission: LaunchSubmissionSummary): string {
+  const isVerified = submission.verified === true
+  const activeClass = isVerified
+    ? ' admin-submissions-verified-toggle--on'
+    : ''
+
+  return `
+    <button
+      type="button"
+      class="secondary-btn admin-submissions-action admin-submissions-verified-toggle${activeClass}"
+      data-admin-verified-toggle
+      data-submission-id="${escapeHtml(submission.id)}"
+      data-verified="${isVerified ? 'true' : 'false'}"
+      aria-pressed="${isVerified ? 'true' : 'false'}"
+    >
+      ${isVerified ? 'Verified: On' : 'Verified: Off'}
+    </button>
+  `
+}
+
 function renderStatusActions(submission: LaunchSubmissionSummary): string {
+  const verifiedToggle = renderVerifiedToggle(submission)
   const editButton = `
     <button
       type="button"
@@ -76,7 +98,7 @@ function renderStatusActions(submission: LaunchSubmissionSummary): string {
     )
     .join('')
 
-  return `<div class="admin-submissions-actions">${editButton}${statusButtons}</div>`
+  return `<div class="admin-submissions-actions">${verifiedToggle}${editButton}${statusButtons}</div>`
 }
 
 function renderSubmissionRow(
@@ -426,6 +448,7 @@ function handleUnauthorized(ui: AdminPageElements, message: string): void {
 }
 
 let statusUpdateInFlight = false
+let verifiedUpdateInFlight = false
 
 async function handleTableActionClick(
   event: Event,
@@ -449,7 +472,80 @@ async function handleTableActionClick(
     return
   }
 
+  const verifiedButton = target.closest<HTMLButtonElement>(
+    '[data-admin-verified-toggle]',
+  )
+
+  if (verifiedButton && !verifiedButton.disabled) {
+    await handleVerifiedToggleClick(event, ui, loadedSubmissions)
+    return
+  }
+
   await handleStatusActionClick(event, ui, loadedSubmissions)
+}
+
+async function handleVerifiedToggleClick(
+  event: Event,
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+): Promise<void> {
+  if (verifiedUpdateInFlight) {
+    return
+  }
+
+  const target = event.target as HTMLElement
+  const button = target.closest<HTMLButtonElement>('[data-admin-verified-toggle]')
+
+  if (!button || button.disabled) {
+    return
+  }
+
+  const submissionId = button.getAttribute('data-submission-id')
+
+  if (!submissionId) {
+    return
+  }
+
+  const currentVerified = button.getAttribute('data-verified') === 'true'
+  const nextVerified = !currentVerified
+
+  verifiedUpdateInFlight = true
+  ui.error.hidden = true
+  ui.error.textContent = ''
+
+  const rowButtons = ui.body.querySelectorAll<HTMLButtonElement>(
+    `[data-submission-row="${submissionId}"] button`,
+  )
+
+  for (const rowButton of rowButtons) {
+    rowButton.disabled = true
+  }
+
+  try {
+    const result = await updateLaunchSubmissionVerified(
+      submissionId,
+      nextVerified,
+    )
+
+    if (!result.ok) {
+      if (result.unauthorized) {
+        handleUnauthorized(ui, 'Your admin session expired. Please sign in again.')
+        return
+      }
+
+      ui.error.hidden = false
+      ui.error.textContent = result.message
+      return
+    }
+
+    await loadSubmissions(ui, loadedSubmissions)
+  } finally {
+    verifiedUpdateInFlight = false
+
+    for (const rowButton of rowButtons) {
+      rowButton.disabled = false
+    }
+  }
 }
 
 async function handleStatusActionClick(

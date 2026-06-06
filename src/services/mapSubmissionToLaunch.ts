@@ -49,6 +49,7 @@ export function mapSubmissionToLaunch(
     createdAt: hasCreatedAt ? createdAtMs : undefined,
     submittedAt: hasCreatedAt ? createdAtMs : undefined,
     logoFallback: logoSource.charAt(0).toUpperCase(),
+    verificationLevel: submission.verified ? 'verified' : undefined,
     launchInfo: {
       launchStatus: isLive ? 'Live' : 'Coming Soon',
       tradingStatus: isLive ? 'Live' : 'Trading not live yet',
