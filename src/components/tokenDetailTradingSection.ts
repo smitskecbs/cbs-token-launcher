@@ -1,13 +1,12 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
-import {
-  getDexscreenerPairUrl,
-  getJupiterSwapUrl,
-} from '../config/urls'
+import { getJupiterSwapUrl } from '../config/urls'
+import { resolveDexscreenerUrl } from '../utils/dexscreenerUrl'
 import { formatLiquidity } from '../utils/formatLiquidity'
 import { formatPrice } from '../utils/formatPrice'
 import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
 import { applyTokenDetailBuySection } from './tokenDetailBuySection'
+import { applyTokenDetailPoolSection } from './tokenDetailPoolSection'
 
 const EMPTY_VALUE = '—'
 
@@ -31,16 +30,16 @@ function formatPairAddress(pairAddress: string | null): string {
   return `${pairAddress.slice(0, 6)}…${pairAddress.slice(-6)}`
 }
 
-function resolveDexscreenerUrl(data: TokenMarketData): string | null {
-  if (data.pairUrl) {
-    return data.pairUrl
-  }
-
-  if (data.pairAddress) {
-    return getDexscreenerPairUrl(data.pairAddress)
-  }
-
-  return null
+function resolveTradingDexscreenerUrl(
+  launch: Launch,
+  data: TokenMarketData,
+): string | null {
+  return resolveDexscreenerUrl({
+    pairUrl: data.pairUrl,
+    pairAddress: data.pairAddress,
+    mintAddress: launch.mintAddress,
+    allowTokenFallback: data.poolExists,
+  })
 }
 
 export function renderTokenDetailTradingSection(launch: Launch): string {
@@ -93,7 +92,7 @@ export function renderTokenDetailTradingSection(launch: Launch): string {
             <a
               class="secondary-btn"
               data-token-trading-dexscreener-link
-              href="#"
+              hidden
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -102,7 +101,7 @@ export function renderTokenDetailTradingSection(launch: Launch): string {
             <a
               class="primary-btn"
               data-token-trading-jupiter-link
-              href="#"
+              hidden
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -226,6 +225,7 @@ export function applyTokenDetailTradingData(
     }
 
     applyTokenDetailBuySection(launch, { poolExists: false })
+    applyTokenDetailPoolSection(launch, data)
     return
   }
 
@@ -256,7 +256,7 @@ export function applyTokenDetailTradingData(
   )
   setText(root, '[data-token-trading-volume]', formatVolume(data.volume24hUsd))
 
-  const dexscreenerUrl = resolveDexscreenerUrl(data)
+  const dexscreenerUrl = resolveTradingDexscreenerUrl(launch, data)
   const dexscreenerLink = root.querySelector<HTMLAnchorElement>(
     '[data-token-trading-dexscreener-link]',
   )
@@ -266,6 +266,7 @@ export function applyTokenDetailTradingData(
       dexscreenerLink.href = dexscreenerUrl
       dexscreenerLink.hidden = false
     } else {
+      dexscreenerLink.removeAttribute('href')
       dexscreenerLink.hidden = true
     }
   }
@@ -275,10 +276,13 @@ export function applyTokenDetailTradingData(
   )
 
   if (jupiterLink) {
-    jupiterLink.href = getJupiterSwapUrl(launch.mintAddress)
+    const jupiterUrl = getJupiterSwapUrl(launch.mintAddress)
+    jupiterLink.href = jupiterUrl
+    jupiterLink.hidden = false
   }
 
   applyTokenDetailBuySection(launch, { poolExists: true })
+  applyTokenDetailPoolSection(launch, data)
 }
 
 export function setTokenDetailTradingError(

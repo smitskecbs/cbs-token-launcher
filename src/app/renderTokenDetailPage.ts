@@ -15,6 +15,7 @@ import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection'
 import { renderTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import { renderTokenDetailSections } from '../components/tokenDetailSections'
+import { applyTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import {
   applyTokenDetailTradingData,
   renderTokenDetailTradingSection,
@@ -163,29 +164,41 @@ async function loadTokenDetailTradingData(
   launch: Launch,
   options: { forceRefresh?: boolean } = {},
 ): Promise<void> {
-  if (!isLaunchLiveForBuy(launch)) {
-    return
-  }
+  const isLive = isLaunchLiveForBuy(launch)
 
   if (!options.forceRefresh) {
     const cached = getCachedTokenMarketData(launch.mintAddress)
 
     if (cached) {
-      applyTokenDetailTradingData(launch, cached)
+      applyTokenDetailPoolSection(launch, cached)
+
+      if (isLive) {
+        applyTokenDetailTradingData(launch, cached)
+      }
+
       return
     }
   }
 
-  setTokenDetailTradingLoading(launch)
+  if (isLive) {
+    setTokenDetailTradingLoading(launch)
+  }
 
   const result = await fetchTokenMarketData(launch.mintAddress, options)
 
   if (!result.ok) {
-    setTokenDetailTradingError(launch, result.message)
+    if (isLive) {
+      setTokenDetailTradingError(launch, result.message)
+    }
+
     return
   }
 
-  applyTokenDetailTradingData(launch, result.data)
+  applyTokenDetailPoolSection(launch, result.data)
+
+  if (isLive) {
+    applyTokenDetailTradingData(launch, result.data)
+  }
 }
 
 async function loadTokenDetailMarketStatus(
