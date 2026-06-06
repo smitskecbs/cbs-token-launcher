@@ -36,7 +36,6 @@ export function resolvePoolTradingState(
         pairUrl: marketData.pairUrl,
         pairAddress: marketData.pairAddress,
         mintAddress: launch.mintAddress,
-        allowTokenFallback: marketPoolExists,
       })
     : null
 

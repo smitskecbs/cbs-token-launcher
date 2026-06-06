@@ -1,7 +1,10 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
 import { getJupiterSwapUrl } from '../config/urls'
-import { resolveDexscreenerUrl } from '../utils/dexscreenerUrl'
+import {
+  logDexscreenerHref,
+  resolveDexscreenerUrl,
+} from '../utils/dexscreenerUrl'
 import { formatLiquidity } from '../utils/formatLiquidity'
 import { formatPrice } from '../utils/formatPrice'
 import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
@@ -38,7 +41,6 @@ function resolveTradingDexscreenerUrl(
     pairUrl: data.pairUrl,
     pairAddress: data.pairAddress,
     mintAddress: launch.mintAddress,
-    allowTokenFallback: data.poolExists,
   })
 }
 
@@ -263,6 +265,7 @@ export function applyTokenDetailTradingData(
 
   if (dexscreenerLink) {
     if (dexscreenerUrl) {
+      logDexscreenerHref(dexscreenerUrl)
       dexscreenerLink.href = dexscreenerUrl
       dexscreenerLink.hidden = false
     } else {

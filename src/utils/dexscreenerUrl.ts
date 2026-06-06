@@ -3,59 +3,46 @@ import {
   getDexscreenerTokenUrl,
 } from '../config/urls'
 
-const INVALID_HREFS = new Set(['', '#', 'about:blank'])
-
-export function normalizeExternalUrl(
-  value: string | null | undefined,
-): string | null {
-  const trimmed = typeof value === 'string' ? value.trim() : ''
-
-  if (!trimmed || INVALID_HREFS.has(trimmed.toLowerCase())) {
-    return null
-  }
-
-  if (trimmed.startsWith('//')) {
-    return `https:${trimmed}`
-  }
-
-  if (trimmed.startsWith('/')) {
-    return `https://dexscreener.com${trimmed}`
-  }
-
+function isValidDexscreenerHttpsUrl(value: string): boolean {
   try {
-    const url = new URL(trimmed)
+    const url = new URL(value)
 
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      return url.toString()
-    }
+    return (
+      url.protocol === 'https:' &&
+      url.hostname === 'dexscreener.com' &&
+      url.pathname.length > 1
+    )
   } catch {
-    return null
+    return false
   }
-
-  return null
 }
 
 export function resolveDexscreenerUrl(options: {
   pairUrl?: string | null
   pairAddress?: string | null
   mintAddress: string
-  allowTokenFallback?: boolean
 }): string | null {
-  const fromPairUrl = normalizeExternalUrl(options.pairUrl)
-
-  if (fromPairUrl) {
-    return fromPairUrl
-  }
-
   const pairAddress = options.pairAddress?.trim()
 
   if (pairAddress) {
     return getDexscreenerPairUrl(pairAddress)
   }
 
-  if (options.allowTokenFallback) {
-    return getDexscreenerTokenUrl(options.mintAddress)
+  const pairUrl = options.pairUrl?.trim()
+
+  if (pairUrl && isValidDexscreenerHttpsUrl(pairUrl)) {
+    return pairUrl
+  }
+
+  const mintAddress = options.mintAddress?.trim()
+
+  if (mintAddress) {
+    return getDexscreenerTokenUrl(mintAddress)
   }
 
   return null
+}
+
+export function logDexscreenerHref(href: string): void {
+  console.log(`[dexscreener-link] href = ${href}`)
 }

@@ -14,6 +14,7 @@ export interface MarketStatusResult {
   liquidityUsd: number | null
   priceUsd: number | null
   pairUrl: string | null
+  pairAddress: string | null
   dexId: string | null
   priceSource: MarketDataSource | null
   liquiditySource: MarketDataSource | null

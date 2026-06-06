@@ -7,7 +7,10 @@ import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
 import { formatLiquidity, hasValidMarketLiquidity } from '../utils/formatLiquidity'
 import { formatPrice, hasValidMarketPrice } from '../utils/formatPrice'
 import { escapeHtml } from '../utils/html'
-import { resolveDexscreenerUrl } from '../utils/dexscreenerUrl'
+import {
+  logDexscreenerHref,
+  resolveDexscreenerUrl,
+} from '../utils/dexscreenerUrl'
 import { canPreparePoolCreation } from '../services/poolCreationEligibility'
 import { updateCreatePoolActionVisibility } from './createPoolModal'
 
@@ -217,12 +220,12 @@ function renderMainPairText(result: MarketStatusResult): string {
 function renderDexscreenerLinkHtml(result: MarketStatusResult): string {
   const dexscreenerUrl = resolveDexscreenerUrl({
     pairUrl: result.pairUrl,
-    pairAddress: null,
+    pairAddress: result.pairAddress,
     mintAddress: result.mintAddress,
-    allowTokenFallback: result.tradable,
   })
 
   if (dexscreenerUrl) {
+    logDexscreenerHref(dexscreenerUrl)
     const url = escapeHtml(dexscreenerUrl)
 
     return `

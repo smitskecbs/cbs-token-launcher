@@ -21,6 +21,7 @@ interface DexscreenerTokenRef {
 interface DexscreenerPair {
   chainId?: string
   dexId?: string
+  pairAddress?: string
   url?: string
   priceUsd?: string
   baseToken?: DexscreenerTokenRef
@@ -76,6 +77,7 @@ export async function fetchDexscreenerMarketData(
             : null,
         priceUsd,
         pairUrl: bestPair.url ?? null,
+        pairAddress: bestPair.pairAddress?.trim() || null,
         dexId,
         priceSource: priceUsd !== null ? 'dexscreener' : null,
         liquiditySource:
@@ -114,6 +116,7 @@ export async function fetchMarketStatusFromDexscreener(
     liquidityUsd: null,
     priceUsd: null,
     pairUrl: null,
+    pairAddress: null,
     dexId: null,
     priceSource: null,
     liquiditySource: null,
