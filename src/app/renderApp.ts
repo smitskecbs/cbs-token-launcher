@@ -53,14 +53,14 @@ export async function renderApp(): Promise<void> {
 
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
-      ${renderHeroSection()}
-      ${renderLaunchFiltersPanel()}
-      ${renderLauncherStatisticsSection(catalog)}
       <img
         class="site-banner"
         src="${bannerUrl}"
         alt="CBS Token Launcher"
       />
+      ${renderHeroSection()}
+      ${renderLaunchFiltersPanel()}
+      ${renderLauncherStatisticsSection(catalog)}
       ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
