@@ -13,7 +13,7 @@ import {
   getDetailPageSymbol,
   getLaunchDetailStatusClass,
   getLaunchDetailStatusLabel,
-  getLaunchListedDateLabel,
+  getLaunchListedDateDisplay,
 } from '../utils/launchDetailDisplay'
 function renderDetailLinksSection(launch: Launch): string {
   const links = catalogLinksToMetadataLinks(getLaunchOfficialLinks(launch))
@@ -33,9 +33,9 @@ export function renderTokenDetailProjectInfo(launch: Launch): string {
   const mintAddress = escapeHtml(launch.mintAddress)
   const statusLabel = getLaunchDetailStatusLabel(launch)
   const statusClass = getLaunchDetailStatusClass(statusLabel)
-  const listedDate = getLaunchListedDateLabel(launch)
-  const listedDateMarkup = listedDate
-    ? `<p class="token-detail-listed-date">Listed ${escapeHtml(listedDate)}</p>`
+  const listedDateDisplay = getLaunchListedDateDisplay(launch)
+  const listedDateMarkup = listedDateDisplay
+    ? `<p class="token-detail-listed-date">${escapeHtml(listedDateDisplay)}</p>`
     : ''
 
   return `

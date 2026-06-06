@@ -44,6 +44,10 @@ export function getDetailPageDescription(launch: Launch): string {
   )
 }
 
+export function isCatalogSubmissionLaunch(launch: Launch): boolean {
+  return launch.id.startsWith('submission-') || launch.locallyManaged === true
+}
+
 export function getLaunchListedDateLabel(launch: Launch): string | null {
   const timestamp = launch.submittedAt ?? launch.createdAt
 
@@ -60,4 +64,24 @@ export function getLaunchListedDateLabel(launch: Launch): string | null {
   return parsed.toLocaleDateString('en-US', {
     dateStyle: 'medium',
   })
+}
+
+/** Detail-page listed line — hides static placeholder dates for Coming Soon launches */
+export function getLaunchListedDateDisplay(launch: Launch): string | null {
+  const status = getLaunchDetailStatusLabel(launch)
+  const formattedDate = getLaunchListedDateLabel(launch)
+
+  if (status === 'Coming Soon') {
+    if (isCatalogSubmissionLaunch(launch) && formattedDate) {
+      return `Listed ${formattedDate}`
+    }
+
+    return 'Listed: Coming Soon'
+  }
+
+  if (formattedDate) {
+    return `Listed ${formattedDate}`
+  }
+
+  return null
 }
