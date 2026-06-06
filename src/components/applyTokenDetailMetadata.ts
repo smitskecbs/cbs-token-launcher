@@ -4,9 +4,13 @@ import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
 import { formatSupply } from '../utils/formatSupply'
 import {
   applyTokenLogo,
-  getLaunchDisplayName,
   getLaunchLogoFallback,
 } from './applyLaunchCardMetadata'
+import {
+  getDetailPageDescription,
+  getDetailPageName,
+  getDetailPageSymbol,
+} from '../utils/launchDetailDisplay'
 import { applyOfficialLinksFromMetadata } from './officialLinks'
 import { applyTokenCategory } from './tokenCategoryField'
 import { applyTokenTags } from './tokenTagsField'
@@ -16,6 +20,7 @@ import { refreshLaunchRisk } from '../services/refreshLaunchRisk'
 
 const LOADING = 'Loading…'
 const EMPTY = '—'
+const UNAVAILABLE = 'Not available'
 
 export function applyTokenDetailFromResult(
   launch: Launch,
@@ -32,19 +37,16 @@ export function applyTokenDetailFromResult(
   const displayName =
     result.jsonName ??
     result.metadataName ??
-    launch.name ??
-    getLaunchDisplayName(launch)
+    getDetailPageName(launch)
 
   const displaySymbol =
     result.jsonSymbol ??
     result.metadataSymbol ??
-    launch.symbol ??
-    EMPTY
+    getDetailPageSymbol(launch)
 
   const displayDescription =
     result.jsonDescription ??
-    launch.description ??
-    EMPTY
+    getDetailPageDescription(launch)
 
   setText(page, '[data-token-name]', displayName)
   setText(page, '[data-token-symbol]', displaySymbol)
@@ -118,19 +120,19 @@ export function setTokenDetailLoading(launch: Launch): void {
 
 function formatDecimals(result: ReadTokenMintResult): string {
   if (result.error || !result.exists) {
-    return EMPTY
+    return UNAVAILABLE
   }
 
-  return result.decimals !== null ? String(result.decimals) : EMPTY
+  return result.decimals !== null ? String(result.decimals) : UNAVAILABLE
 }
 
 function formatSupplyValue(result: ReadTokenMintResult): string {
   if (result.error || !result.exists) {
-    return EMPTY
+    return UNAVAILABLE
   }
 
   if (result.supply === null) {
-    return EMPTY
+    return UNAVAILABLE
   }
 
   return formatSupply(result.supply, result.decimals ?? 0)
@@ -138,22 +140,24 @@ function formatSupplyValue(result: ReadTokenMintResult): string {
 
 function formatMetadataUri(result: ReadTokenMintResult): string {
   if (result.error || !result.exists) {
-    return EMPTY
+    return UNAVAILABLE
   }
 
   if (!result.metadataFound) {
-    return 'Metadata not found'
+    return 'Metadata not found on-chain'
   }
 
-  return result.metadataUri ?? EMPTY
+  return result.metadataUri ?? UNAVAILABLE
 }
 
 function formatRawMetadataDisplay(result: ReadTokenMintResult): string {
   if (result.error || !result.exists) {
-    return EMPTY
+    return UNAVAILABLE
   }
 
-  return formatRawMetadataText(result)
+  const raw = formatRawMetadataText(result)
+
+  return raw === EMPTY ? 'No raw metadata available' : raw
 }
 
 function setText(

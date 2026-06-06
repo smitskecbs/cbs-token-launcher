@@ -82,6 +82,64 @@ export function resolveOfficialLinks(
   return mergeSocialLinksPrimaryMetadata(result.jsonSocialLinks, catalog)
 }
 
+function renderDetailLinkRow(label: string, url: string): string {
+  return `
+    <div class="token-detail-row token-detail-row--full">
+      <dt>${escapeHtml(label)}</dt>
+      <dd>
+        <a
+          class="token-detail-link"
+          href="${escapeHtml(url)}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ${escapeHtml(url)}
+        </a>
+      </dd>
+    </div>
+  `
+}
+
+export function renderDetailLinksContent(links: MetadataSocialLinks): string {
+  const rows: string[] = []
+
+  if (links.website) {
+    rows.push(renderDetailLinkRow('Website', links.website))
+  }
+
+  if (links.telegram) {
+    rows.push(renderDetailLinkRow('Telegram', links.telegram))
+  }
+
+  if (links.twitter) {
+    rows.push(renderDetailLinkRow('X', links.twitter))
+  }
+
+  if (rows.length === 0) {
+    return `
+      <div class="token-detail-row token-detail-row--full">
+        <dt>Links</dt>
+        <dd class="token-detail-fallback">No official links provided yet.</dd>
+      </div>
+    `
+  }
+
+  return rows.join('')
+}
+
+export function applyDetailLinksPanel(
+  root: ParentNode,
+  links: MetadataSocialLinks,
+): void {
+  const host = root.querySelector<HTMLElement>('[data-token-detail-links]')
+
+  if (!host) {
+    return
+  }
+
+  host.innerHTML = renderDetailLinksContent(links)
+}
+
 export function renderOfficialLinkItems(
   links: MetadataSocialLinks,
 ): string {
@@ -153,6 +211,12 @@ export function applyOfficialLinksFromMetadata(
   result: ReadTokenMintResult | null | undefined,
 ): void {
   const links = resolveOfficialLinks(launch, result)
+  const detailLinksHost = root.querySelector('[data-token-detail-links]')
+
+  if (detailLinksHost) {
+    applyDetailLinksPanel(root, links)
+    return
+  }
 
   if (!hasMetadataSocialLinks(links)) {
     const existingPanel = root.querySelector('[data-official-links-panel]')
