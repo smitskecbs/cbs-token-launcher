@@ -18,6 +18,7 @@ import {
   attachMangoDonationSection,
   renderMangoDonationSection,
 } from '../components/mangoDonationSection'
+import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import {
   renderCbsEcosystemTokensSection,
   renderCbsToolsSection,
@@ -28,6 +29,7 @@ import {
   renderTrendingLaunchesSection,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
+import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
 
 /**
  * Compose and mount the CBS Token Launcher homepage.
@@ -36,9 +38,13 @@ import {
  * Priority: Featured > Trending > New > Upcoming > Ecosystem
  */
 export async function renderApp(): Promise<void> {
-  const catalog = await loadLaunchCatalog({ refresh: true })
+  const [catalog, latestUpdatesResult] = await Promise.all([
+    loadLaunchCatalog({ refresh: true }),
+    fetchLatestLaunchUpdates(5),
+  ])
   const homepage = resolveHomepageSections(catalog)
   const renderedLaunches = getAllHomepageLaunches(homepage)
+  const latestUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
 
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
@@ -53,6 +59,7 @@ export async function renderApp(): Promise<void> {
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderTrendingLaunchesSection(homepage.trending)}
+      ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderNewLaunchesSection(homepage.newLaunches)}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsEcosystemTokensSection(homepage.ecosystem)}

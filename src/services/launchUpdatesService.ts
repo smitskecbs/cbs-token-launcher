@@ -17,6 +17,12 @@ export type DeleteLaunchUpdateResult =
   | { ok: true; id: string }
   | { ok: false; message: string; unauthorized?: boolean }
 
+export type FetchLatestLaunchUpdatesResult =
+  | { ok: true; updates: LaunchUpdate[] }
+  | { ok: false; message: string }
+
+const DEFAULT_LATEST_UPDATES_LIMIT = 5
+
 function resolveLaunchUpdatesUrl(
   basePath: string,
   searchParams?: URLSearchParams,
@@ -41,6 +47,47 @@ function buildTargetSearchParams(target: LaunchUpdateTarget): URLSearchParams {
   }
 
   return params
+}
+
+export async function fetchLatestLaunchUpdates(
+  limit = DEFAULT_LATEST_UPDATES_LIMIT,
+): Promise<FetchLatestLaunchUpdatesResult> {
+  const params = new URLSearchParams({
+    latest: String(Math.max(1, Math.min(limit, 20))),
+  })
+
+  try {
+    const response = await fetch(
+      resolveLaunchUpdatesUrl(PUBLIC_LAUNCH_UPDATES_API_PATH, params),
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    const payload = (await response.json()) as {
+      updates?: LaunchUpdate[]
+    }
+
+    return {
+      ok: true,
+      updates: Array.isArray(payload.updates) ? payload.updates : [],
+    }
+  } catch {
+    return {
+      ok: false,
+      message: 'Could not load launch updates right now.',
+    }
+  }
 }
 
 export async function fetchLaunchUpdates(

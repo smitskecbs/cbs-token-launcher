@@ -127,9 +127,24 @@ function resolveLaunchTarget(body) {
   }
 }
 
+function parseLatestLimit(value) {
+  if (value === undefined || value === null || value === '') {
+    return null
+  }
+
+  const parsed = Number.parseInt(String(value), 10)
+
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return null
+  }
+
+  return Math.min(parsed, 20)
+}
+
 export async function listLaunchUpdates(env, queryParams = {}) {
   const submissionId = trimString(queryParams.submissionId)
   const launchId = trimString(queryParams.launchId)
+  const latestLimit = parseLatestLimit(queryParams.latest)
 
   if (submissionId && launchId) {
     return {
@@ -140,11 +155,15 @@ export async function listLaunchUpdates(env, queryParams = {}) {
   }
 
   if (!submissionId && !launchId) {
-    return {
-      ok: false,
-      status: 400,
-      message: 'Submission id or launch id is required.',
+    if (!latestLimit) {
+      return {
+        ok: false,
+        status: 400,
+        message: 'Submission id, launch id, or latest limit is required.',
+      }
     }
+
+    return listLatestLaunchUpdates(env, latestLimit)
   }
 
   if (submissionId && !isValidSubmissionId(submissionId)) {
@@ -218,6 +237,68 @@ export async function listLaunchUpdates(env, queryParams = {}) {
   } catch (error) {
     console.error(
       `${LOG_PREFIX} list failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not load launch updates right now.',
+    }
+  }
+}
+
+async function listLatestLaunchUpdates(env, limit) {
+  const config = getSupabaseConfig(env)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Launch updates service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    select: 'id,submission_id,launch_id,title,content,created_at',
+    order: 'created_at.desc',
+    limit: String(limit),
+  })
+
+  const restUrl = `${config.updatesUrl}?${query.toString()}`
+
+  try {
+    const upstream = await getJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+    )
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${LOG_PREFIX} latest list status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    const rows = JSON.parse(upstream.body)
+    const updates = Array.isArray(rows) ? rows.map(mapUpdateRow) : []
+
+    return {
+      ok: true,
+      status: 200,
+      count: updates.length,
+      updates,
+    }
+  } catch (error) {
+    console.error(
+      `${LOG_PREFIX} latest list failed:`,
       error instanceof Error ? error.message : 'unknown error',
     )
 
