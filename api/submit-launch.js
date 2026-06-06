@@ -9,6 +9,7 @@ import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
 } from './lib/submitLaunchCore.js'
+import { notifyAdminOfNewSubmission } from './lib/telegramNotify.js'
 
 console.log('[submit-launch] handler loaded')
 
@@ -67,6 +68,8 @@ export default async function handler(req, res) {
     res.status(result.status).json({ error: result.message })
     return
   }
+
+  await notifyAdminOfNewSubmission(process.env, validation.data)
 
   res.status(201).json({ ok: true })
 }

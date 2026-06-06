@@ -23,6 +23,7 @@ import {
   validateAdminEditSubmissionPayload,
   validateSubmitLaunchPayload,
 } from './api/lib/submitLaunchCore.js'
+import { notifyAdminOfNewSubmission } from './api/lib/telegramNotify.js'
 
 function sendJson(
   res: ServerResponse,
@@ -670,6 +671,10 @@ function submitLaunchProxyPlugin(env: Record<string, string>): Plugin {
           }
 
           const result = await insertSubmitLaunchRecord(env, validation.data)
+
+          if (result.ok) {
+            await notifyAdminOfNewSubmission(env, validation.data)
+          }
 
           res.statusCode = result.ok ? 201 : result.status
           res.setHeader('Content-Type', 'application/json')
