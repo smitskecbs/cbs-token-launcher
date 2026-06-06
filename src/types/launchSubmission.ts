@@ -7,6 +7,11 @@ export interface LaunchSubmissionSummary {
   mintAddress: string
   status: LaunchSubmissionStatus | string
   logoUrl: string | null
+  website: string | null
+  telegram: string | null
+  x: string | null
+  description: string | null
+  contactEmail: string | null
   createdAt: string
 }
 

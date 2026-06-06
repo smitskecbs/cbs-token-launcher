@@ -134,7 +134,7 @@ function postJsonWithHttps(restUrl, headers, body) {
   })
 }
 
-export function validateSubmitLaunchPayload(body) {
+function validateSubmissionFieldValues(body) {
   const projectName = trimString(body?.projectName)
   const tokenSymbol = trimString(body?.tokenSymbol)
   const mintAddress = trimString(body?.mintAddress)
@@ -212,10 +212,29 @@ export function validateSubmitLaunchPayload(body) {
       x: x || null,
       description,
       contact_email: contactEmail || null,
+    },
+  }
+}
+
+export function validateSubmitLaunchPayload(body) {
+  const result = validateSubmissionFieldValues(body)
+
+  if (!result.ok) {
+    return result
+  }
+
+  return {
+    ok: true,
+    data: {
+      ...result.data,
       status: 'pending',
       created_at: new Date().toISOString(),
     },
   }
+}
+
+export function validateAdminEditSubmissionPayload(body) {
+  return validateSubmissionFieldValues(body)
 }
 
 export async function insertSubmitLaunchRecord(env, record) {

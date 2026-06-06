@@ -10,6 +10,7 @@ import { isValidSubmissionStatus } from './submissionStatuses.js'
 const LIST_LOG_PREFIX = '[list-launch-submissions]'
 const HOMEPAGE_LOG_PREFIX = '[homepage-launches]'
 const UPDATE_LOG_PREFIX = '[update-launch-submission-status]'
+const EDIT_LOG_PREFIX = '[update-launch-submission-details]'
 
 function isValidSubmissionId(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -53,6 +54,11 @@ function mapSubmissionRow(row) {
     mintAddress: row.mint_address,
     status: row.status,
     logoUrl: row.logo_url ?? null,
+    website: row.website ?? null,
+    telegram: row.telegram ?? null,
+    x: row.x ?? null,
+    description: row.description ?? null,
+    contactEmail: row.contact_email ?? null,
     createdAt: row.created_at,
   }
 }
@@ -148,7 +154,7 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,logo_url,created_at',
+      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,created_at',
     order: 'created_at.desc',
   })
 
@@ -279,6 +285,83 @@ export async function updateLaunchSubmissionStatus(env, submissionId, status) {
       ok: false,
       status: 502,
       message: 'Could not update submission status. Please try again later.',
+    }
+  }
+}
+
+export async function updateLaunchSubmissionDetails(
+  env,
+  submissionId,
+  fields,
+) {
+  const trimmedId = typeof submissionId === 'string' ? submissionId.trim() : ''
+
+  if (!isValidSubmissionId(trimmedId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id is invalid.',
+    }
+  }
+
+  const config = getSupabaseConfig(env, EDIT_LOG_PREFIX)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Submission service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    id: `eq.${trimmedId}`,
+  })
+
+  const restUrl = `${config.baseUrl}?${query.toString()}`
+
+  try {
+    console.log(
+      `${EDIT_LOG_PREFIX} Supabase PATCH host: ${new URL(restUrl).host}`,
+    )
+
+    const upstream = await patchJsonWithHttps(
+      restUrl,
+      buildAuthHeaders(config.serviceRoleKey),
+      fields,
+    )
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${EDIT_LOG_PREFIX} Supabase status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not save submission changes. Please try again later.',
+      }
+    }
+
+    console.log(`${EDIT_LOG_PREFIX} updated ${trimmedId}`)
+
+    return {
+      ok: true,
+      status: 200,
+      id: trimmedId,
+    }
+  } catch (error) {
+    console.error(
+      `${EDIT_LOG_PREFIX} Supabase request failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not save submission changes. Please try again later.',
     }
   }
 }

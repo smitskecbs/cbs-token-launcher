@@ -1,4 +1,8 @@
 import bannerUrl from '../assets/launcher-banner.png'
+import {
+  attachAdminEditSubmissionModal,
+  renderAdminEditSubmissionModal,
+} from '../components/adminEditSubmissionModal'
 import { loginAdmin } from '../services/adminLoginService'
 import {
   clearAdminSessionToken,
@@ -40,7 +44,18 @@ function formatSubmissionDate(iso: string): string {
 }
 
 function renderStatusActions(submission: LaunchSubmissionSummary): string {
-  const buttons = STATUS_ACTIONS.filter(
+  const editButton = `
+    <button
+      type="button"
+      class="secondary-btn admin-submissions-action"
+      data-admin-edit-submission
+      data-submission-id="${escapeHtml(submission.id)}"
+    >
+      Edit
+    </button>
+  `
+
+  const statusButtons = STATUS_ACTIONS.filter(
     (action) => action.status !== submission.status,
   )
     .map(
@@ -57,7 +72,7 @@ function renderStatusActions(submission: LaunchSubmissionSummary): string {
     )
     .join('')
 
-  return `<div class="admin-submissions-actions">${buttons}</div>`
+  return `<div class="admin-submissions-actions">${editButton}${statusButtons}</div>`
 }
 
 function renderSubmissionRow(submission: LaunchSubmissionSummary): string {
@@ -224,6 +239,7 @@ export function renderAdminSubmissionsPage(): string {
         </div>
       </section>
 
+      ${renderAdminEditSubmissionModal()}
       ${renderFooter()}
     </main>
   `
@@ -304,18 +320,29 @@ export function attachAdminSubmissionsPage(): void {
     body,
   }
 
+  let loadedSubmissions: LaunchSubmissionSummary[] = []
+
   loginForm.addEventListener('submit', (event) => {
     event.preventDefault()
-    void handleAdminLogin(ui)
+    void handleAdminLogin(ui, loadedSubmissions)
+  })
+
+  const { openEditSubmissionModal } = attachAdminEditSubmissionModal({
+    onSaved: async () => {
+      await loadSubmissions(ui, loadedSubmissions)
+    },
+    onUnauthorized: (message) => {
+      handleUnauthorized(ui, message)
+    },
   })
 
   tableWrap.addEventListener('click', (event) => {
-    void handleStatusActionClick(event, ui)
+    void handleTableActionClick(event, ui, loadedSubmissions, openEditSubmissionModal)
   })
 
   if (getAdminSessionToken()) {
     showDashboard(ui)
-    void loadSubmissions(ui)
+    void loadSubmissions(ui, loadedSubmissions)
   } else {
     showLogin(ui)
   }
@@ -350,7 +377,10 @@ function showDashboard(ui: AdminPageElements): void {
   ui.dashboardPanel.hidden = false
 }
 
-async function handleAdminLogin(ui: AdminPageElements): Promise<void> {
+async function handleAdminLogin(
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+): Promise<void> {
   ui.loginError.hidden = true
   ui.loginError.textContent = ''
   ui.loginSubmit.disabled = true
@@ -367,7 +397,7 @@ async function handleAdminLogin(ui: AdminPageElements): Promise<void> {
     setAdminSessionToken(result.token)
     ui.loginPassword.value = ''
     showDashboard(ui)
-    await loadSubmissions(ui)
+    await loadSubmissions(ui, loadedSubmissions)
   } finally {
     ui.loginSubmit.disabled = false
   }
@@ -382,9 +412,35 @@ function handleUnauthorized(ui: AdminPageElements, message: string): void {
 
 let statusUpdateInFlight = false
 
+async function handleTableActionClick(
+  event: Event,
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+  openEditSubmissionModal: (submission: LaunchSubmissionSummary) => void,
+): Promise<void> {
+  const target = event.target as HTMLElement
+  const editButton = target.closest<HTMLButtonElement>(
+    '[data-admin-edit-submission]',
+  )
+
+  if (editButton && !editButton.disabled) {
+    const submissionId = editButton.getAttribute('data-submission-id')
+    const submission = loadedSubmissions.find((item) => item.id === submissionId)
+
+    if (submission) {
+      openEditSubmissionModal(submission)
+    }
+
+    return
+  }
+
+  await handleStatusActionClick(event, ui, loadedSubmissions)
+}
+
 async function handleStatusActionClick(
   event: Event,
   ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
 ): Promise<void> {
   if (statusUpdateInFlight) {
     return
@@ -435,7 +491,7 @@ async function handleStatusActionClick(
       return
     }
 
-    await loadSubmissions(ui)
+    await loadSubmissions(ui, loadedSubmissions)
   } finally {
     statusUpdateInFlight = false
 
@@ -445,7 +501,10 @@ async function handleStatusActionClick(
   }
 }
 
-async function loadSubmissions(ui: AdminPageElements): Promise<void> {
+async function loadSubmissions(
+  ui: AdminPageElements,
+  loadedSubmissions: LaunchSubmissionSummary[],
+): Promise<void> {
   const { loading, error, empty, count, statsWrap, tableWrap, body } = ui
 
   loading.hidden = false
@@ -487,6 +546,9 @@ async function loadSubmissions(ui: AdminPageElements): Promise<void> {
     empty.hidden = false
     return
   }
+
+  loadedSubmissions.length = 0
+  loadedSubmissions.push(...result.submissions)
 
   body.innerHTML = result.submissions
     .map((submission) => renderSubmissionRow(submission))
