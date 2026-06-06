@@ -675,6 +675,8 @@ interface AdminPageElements {
 
 /** Imperative render — runs whenever dashboard stats refresh (including zero submissions). */
 function ensureBuiltinLaunchesSection(ui: AdminPageElements): void {
+  console.log('[builtin] ensureBuiltinLaunchesSection called')
+
   if (ui.statsWrap.nextElementSibling !== ui.builtinLaunchesHost) {
     ui.statsWrap.insertAdjacentElement('afterend', ui.builtinLaunchesHost)
   }
@@ -755,12 +757,15 @@ function refreshAdminDashboardCounts(
   ui: AdminPageElements,
   loadedSubmissions: LaunchSubmissionSummary[],
 ): void {
+  console.log('[builtin] refreshAdminDashboardCounts called')
+
   const statusCounts = countLaunchSubmissionStatuses(
     loadedSubmissions.map((submission) => submission.status),
   )
 
   ui.statsWrap.innerHTML = renderStatusStats(statusCounts)
   ui.statsWrap.hidden = false
+  console.log('[builtin] calling ensureBuiltinLaunchesSection')
   ensureBuiltinLaunchesSection(ui)
   ui.count.hidden = false
   ui.count.textContent = `${statusCounts.total} submission${statusCounts.total === 1 ? '' : 's'} total`
