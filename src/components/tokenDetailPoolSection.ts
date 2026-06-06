@@ -1,87 +1,112 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
 import { getCachedTokenMarketData } from '../services/tokenMarketDataCache'
+import { renderDexscreenerAnchorHtml } from '../utils/dexscreenerUrl'
+import { renderExternalAnchorHtml } from '../utils/externalLink'
 import { escapeHtml } from '../utils/html'
 import {
   resolvePoolTradingState,
   type PoolTradingState,
 } from '../utils/resolvePoolTradingState'
 
-function renderActionButton(
-  label: string,
-  href: string,
-  variant: 'primary' | 'secondary' = 'secondary',
-): string {
-  const className =
-    variant === 'primary' ? 'primary-btn' : 'secondary-btn'
-
-  return `
-    <a
-      class="${className}"
-      href="${escapeHtml(href)}"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ${escapeHtml(label)}
-    </a>
-  `
-}
-
 function renderPoolActions(state: PoolTradingState): string {
   const actions: string[] = []
 
   if (!state.hasPool) {
-    actions.push(
-      renderActionButton(
-        'Create Pool on Raydium',
-        state.raydiumPoolCreationUrl,
-        'primary',
-      ),
+    const createPool = renderExternalAnchorHtml(
+      state.raydiumPoolCreationUrl,
+      'Create Pool on Raydium',
+      'primary-btn',
     )
+
+    if (createPool) {
+      actions.push(createPool)
+    }
 
     return actions.join('')
   }
 
   if (state.viewPoolUrl) {
-    actions.push(renderActionButton('View Pool', state.viewPoolUrl, 'secondary'))
+    const viewPool = renderExternalAnchorHtml(
+      state.viewPoolUrl,
+      'View Pool',
+      'secondary-btn',
+      ' data-pool-view-link',
+    )
+
+    if (viewPool) {
+      actions.push(viewPool)
+    }
   }
 
   if (state.raydiumTradeUrl) {
-    actions.push(
-      renderActionButton(
-        'Trade on Raydium',
-        state.raydiumTradeUrl,
-        'primary',
-      ),
+    const trade = renderExternalAnchorHtml(
+      state.raydiumTradeUrl,
+      'Trade on Raydium',
+      'primary-btn',
     )
+
+    if (trade) {
+      actions.push(trade)
+    }
   }
 
   if (state.raydiumAddLiquidityUrl) {
-    actions.push(
-      renderActionButton(
-        'Add Liquidity',
-        state.raydiumAddLiquidityUrl,
-        'secondary',
-      ),
+    const addLiquidity = renderExternalAnchorHtml(
+      state.raydiumAddLiquidityUrl,
+      'Add Liquidity',
+      'secondary-btn',
     )
+
+    if (addLiquidity) {
+      actions.push(addLiquidity)
+    }
   }
 
   if (state.jupiterUrl) {
-    actions.push(
-      renderActionButton('Buy on Jupiter', state.jupiterUrl, 'primary'),
+    const jupiter = renderExternalAnchorHtml(
+      state.jupiterUrl,
+      'Buy on Jupiter',
+      'primary-btn',
     )
+
+    if (jupiter) {
+      actions.push(jupiter)
+    }
   }
 
   if (state.dexscreenerUrl) {
-    actions.push(
-      renderActionButton('Dexscreener', state.dexscreenerUrl, 'secondary'),
+    const dexscreener = renderDexscreenerAnchorHtml(
+      state.dexscreenerUrl,
+      'Dexscreener',
+      'secondary-btn',
     )
+
+    if (dexscreener) {
+      actions.push(dexscreener)
+    }
   }
 
   return actions.join('')
 }
 
-function renderPoolSectionBody(state: PoolTradingState): string {
+function renderPoolUrlDebug(launch: Launch, state: PoolTradingState): string {
+  if (launch.id !== 'cbs-coin') {
+    return ''
+  }
+
+  const viewPoolDebug = state.viewPoolUrl ?? 'hidden'
+  const dexscreenerDebug = state.dexscreenerUrl ?? 'hidden'
+
+  return `
+    <div class="token-detail-pool-debug" data-token-detail-pool-debug>
+      <p>View Pool href: ${escapeHtml(viewPoolDebug)}</p>
+      <p>Dexscreener href: ${escapeHtml(dexscreenerDebug)}</p>
+    </div>
+  `
+}
+
+function renderPoolSectionBody(launch: Launch, state: PoolTradingState): string {
   const poolStatusClass = state.hasPool
     ? 'token-detail-pool-status--active'
     : 'token-detail-pool-status--inactive'
@@ -108,6 +133,7 @@ function renderPoolSectionBody(state: PoolTradingState): string {
         `
         : ''
     }
+    ${renderPoolUrlDebug(launch, state)}
   `
 }
 
@@ -125,7 +151,7 @@ export function renderTokenDetailPoolSection(launch: Launch): string {
     >
       <h2 class="token-detail-heading">Pool &amp; Trading</h2>
       <div data-token-detail-pool-body>
-        ${renderPoolSectionBody(state)}
+        ${renderPoolSectionBody(launch, state)}
       </div>
     </section>
   `
@@ -147,5 +173,5 @@ export function applyTokenDetailPoolSection(
     marketData ?? getCachedTokenMarketData(launch.mintAddress) ?? null
   const state = resolvePoolTradingState(launch, resolvedMarketData)
 
-  body.innerHTML = renderPoolSectionBody(state)
+  body.innerHTML = renderPoolSectionBody(launch, state)
 }

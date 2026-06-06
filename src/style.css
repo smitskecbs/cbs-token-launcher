@@ -949,6 +949,26 @@ h3 {
   gap: 10px;
 }
 
+.token-detail-pool-debug {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(216, 111, 0, 0.35);
+  border-radius: 10px;
+  background: rgba(255, 250, 245, 0.9);
+  font-size: 12px;
+  line-height: 1.45;
+  color: #555555;
+  word-break: break-all;
+}
+
+.token-detail-pool-debug p {
+  margin: 0;
+}
+
+.token-detail-pool-debug p + p {
+  margin-top: 6px;
+}
+
 @media (min-width: 480px) {
   .token-detail-pool-actions {
     grid-template-columns: 1fr 1fr;
