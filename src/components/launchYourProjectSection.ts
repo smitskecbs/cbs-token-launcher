@@ -9,7 +9,7 @@ interface LaunchYourProjectFeature {
 
 const FEATURES: LaunchYourProjectFeature[] = [
   {
-    title: 'Submit Your Launch',
+    title: 'Submit Launch',
     description: 'Submit your token for manual review and listing.',
   },
   {
@@ -22,18 +22,9 @@ const FEATURES: LaunchYourProjectFeature[] = [
     description: 'Publish progress updates and keep supporters informed.',
   },
   {
-    title: 'Featured Exposure',
-    description:
-      'Get visibility through featured listings and homepage placement.',
-  },
-  {
-    title: 'Project Profile',
+    title: 'Project Page',
     description:
       'Dedicated launch page with token information, socials and links.',
-  },
-  {
-    title: 'Growth Tracking',
-    description: 'Track community activity and project momentum over time.',
   },
 ]
 

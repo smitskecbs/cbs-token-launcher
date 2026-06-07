@@ -18,12 +18,7 @@ import {
   attachMangoDonationSection,
   renderMangoDonationSection,
 } from '../components/mangoDonationSection'
-import {
-  attachLauncherStatisticsSection,
-  renderLauncherStatisticsSection,
-} from '../components/launcherStatisticsSection'
 import { renderLaunchYourProjectSection } from '../components/launchYourProjectSection'
-import { renderWhyListOnCbsLauncherSection } from '../components/whyListOnCbsLauncherSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import { renderRecentActivitySection } from '../components/recentActivitySection'
 import {
@@ -31,7 +26,6 @@ import {
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
-  renderTrendingLaunchesSection,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
 import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
@@ -40,7 +34,7 @@ import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
  * Compose and mount the CBS Token Launcher homepage.
  *
  * Each launch appears in one homepage section only.
- * Priority: Featured > Trending > New > Upcoming > Ecosystem
+ * Priority: Featured > Trending > New > Upcoming > Ecosystem (section assignment)
  */
 export async function renderApp(): Promise<void> {
   const [catalog, latestUpdatesResult] = await Promise.all([
@@ -61,14 +55,11 @@ export async function renderApp(): Promise<void> {
       />
       ${renderHeroSection()}
       ${renderLaunchFiltersPanel()}
-      ${renderLaunchYourProjectSection()}
-      ${renderWhyListOnCbsLauncherSection()}
-      ${renderLaunchPipelineSection()}
-      ${renderLauncherStatisticsSection(catalog)}
       ${renderFeaturedLaunchesSection(homepage.featured)}
-      ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderRecentActivitySection(fetchedUpdates, catalog)}
-      ${renderTrendingLaunchesSection(homepage.trending, catalog.length)}
+      ${renderLatestUpdatesSection(latestUpdates, catalog)}
+      ${renderLaunchYourProjectSection()}
+      ${renderLaunchPipelineSection()}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsToolsSection(cbsTools)}
       ${renderMangoDonationSection()}
@@ -78,7 +69,6 @@ export async function renderApp(): Promise<void> {
   `
 
   attachMangoDonationSection()
-  attachLauncherStatisticsSection()
   attachLaunchCardHandlers(renderedLaunches)
   attachLaunchFilters(renderedLaunches, {
     initialCount: renderedLaunches.length,

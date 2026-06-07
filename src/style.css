@@ -59,35 +59,35 @@ body {
 }
 
 .hero-card--compact {
-  padding: 14px 18px 16px;
+  padding: 11px 16px 13px;
 }
 
 .hero-card--compact .hero-title {
-  margin: 0 0 6px;
-  font-size: clamp(19px, 3.8vw, 24px);
+  margin: 0 0 4px;
+  font-size: clamp(18px, 3.5vw, 22px);
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: #111111;
 }
 
 .hero-card--compact .hero-text {
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .hero-card--compact .hero-actions {
-  margin-top: 10px;
-  gap: 8px;
+  margin-top: 8px;
+  gap: 6px;
 }
 
 .hero-card--compact .launch-data-actions {
-  gap: 8px;
+  gap: 6px;
 }
 
 .hero-card--compact .primary-btn,
 .hero-card--compact .secondary-btn {
-  padding: 11px 18px;
-  font-size: 14px;
+  padding: 10px 16px;
+  font-size: 13px;
 }
 
 .hero-card--compact .submit-launch-open-btn {
@@ -1350,8 +1350,7 @@ h3 {
   align-items: stretch;
 }
 
-.launch-your-project-section,
-.why-list-on-cbs-section {
+.launch-your-project-section {
   width: 100%;
 }
 
@@ -4091,26 +4090,26 @@ h3 {
   }
 
   .hero-card--compact {
-    padding: 12px 14px 14px;
-    border-radius: 18px;
+    padding: 10px 12px 12px;
+    border-radius: 16px;
   }
 
   .hero-card--compact .hero-title {
-    font-size: 19px;
-    margin-bottom: 5px;
+    font-size: 17px;
+    margin-bottom: 3px;
   }
 
   .hero-card--compact .hero-text {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .hero-card--compact .hero-actions {
-    margin-top: 8px;
-    gap: 6px;
+    margin-top: 6px;
+    gap: 5px;
   }
 
   .hero-card--compact .launch-data-actions {
-    gap: 6px;
+    gap: 5px;
   }
 
   .hero-text {
