@@ -37,7 +37,7 @@ import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService
  * Compose and mount the CBS Token Launcher homepage.
  *
  * Each launch appears in one homepage section only.
- * Priority: Featured > Listed > Trending > New > Upcoming > Ecosystem (section assignment)
+ * Priority: Featured > Listed (live) > Upcoming (coming soon) > Trending > New > Ecosystem
  */
 export async function renderApp(): Promise<void> {
   const isAdmin = Boolean(getAdminSessionToken())

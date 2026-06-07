@@ -28,11 +28,14 @@ export function isFeaturedLaunch(launch: Launch): boolean {
   return launch.featured === true
 }
 
-/** Approved public listings that are Coming Soon or Live (not Preparing/Ended). */
-export function isListedPublicLaunch(launch: Launch): boolean {
-  const statusLabel = getDiscoveryCardStatusLabel(launch)
+/** Non-featured live launches shown in Listed Launches. */
+export function isLivePublicLaunch(launch: Launch): boolean {
+  return getDiscoveryCardStatusLabel(launch) === 'Live'
+}
 
-  return statusLabel === 'Coming Soon' || statusLabel === 'Live'
+/** Non-featured coming-soon launches shown in Upcoming Launches. */
+export function isComingSoonPublicLaunch(launch: Launch): boolean {
+  return getDiscoveryCardStatusLabel(launch) === 'Coming Soon'
 }
 
 const DEFAULT_FEATURED_FALLBACK_IDS = new Set(['cbs-coin', 'mango'])
@@ -67,7 +70,7 @@ function sortLaunchesByCreatedAt(launches: Launch[]): Launch[] {
 
 /**
  * Assign each launch to a single homepage section.
- * Priority: Featured > Listed > Trending > New > Upcoming > Ecosystem
+ * Priority: Featured > Listed (live) > Upcoming (coming soon) > Trending > New > Ecosystem
  */
 export function resolveHomepageSections(
   catalog: Launch[],
@@ -87,13 +90,27 @@ export function resolveHomepageSections(
       (launch) =>
         !assigned.has(launch.id) &&
         !isFeaturedLaunch(launch) &&
-        isListedPublicLaunch(launch),
+        isLivePublicLaunch(launch),
     ),
   )
 
   for (const launch of listed) {
     assigned.add(launch.id)
     launchSectionById.set(launch.id, 'listed')
+  }
+
+  const upcoming = sortLaunchesByRank(
+    catalog.filter(
+      (launch) =>
+        !assigned.has(launch.id) &&
+        !isFeaturedLaunch(launch) &&
+        isComingSoonPublicLaunch(launch),
+    ),
+  )
+
+  for (const launch of upcoming) {
+    assigned.add(launch.id)
+    launchSectionById.set(launch.id, 'upcoming')
   }
 
   const trending = getTrendingLaunchCandidates(catalog)
@@ -120,18 +137,6 @@ export function resolveHomepageSections(
   for (const launch of newLaunches) {
     assigned.add(launch.id)
     launchSectionById.set(launch.id, 'new')
-  }
-
-  const upcoming = sortLaunchesByRank(
-    catalog.filter(
-      (launch) =>
-        !assigned.has(launch.id) && launch.section === 'upcoming',
-    ),
-  )
-
-  for (const launch of upcoming) {
-    assigned.add(launch.id)
-    launchSectionById.set(launch.id, 'upcoming')
   }
 
   const ecosystem = sortEcosystemTokens(
