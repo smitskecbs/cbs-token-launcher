@@ -43,6 +43,27 @@ export function renderFeaturedLaunchesSection(
   `
 }
 
+export function renderListedLaunchesSection(
+  launches: Launch[],
+): string {
+  if (launches.length === 0) {
+    return ''
+  }
+
+  return `
+    <section
+      class="page-section"
+      data-launch-section="listed"
+      aria-labelledby="listed-heading"
+    >
+      <h2 class="section-title" id="listed-heading">
+        Listed Launches
+      </h2>
+      ${renderLaunchCardList(launches, 'listed')}
+    </section>
+  `
+}
+
 export function renderTrendingLaunchesSection(
   launches: Launch[],
   totalListedLaunches: number,

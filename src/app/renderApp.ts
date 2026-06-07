@@ -26,6 +26,7 @@ import {
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
+  renderListedLaunchesSection,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
 import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
@@ -36,7 +37,7 @@ import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService
  * Compose and mount the CBS Token Launcher homepage.
  *
  * Each launch appears in one homepage section only.
- * Priority: Featured > Trending > New > Upcoming > Ecosystem (section assignment)
+ * Priority: Featured > Listed > Trending > New > Upcoming > Ecosystem (section assignment)
  */
 export async function renderApp(): Promise<void> {
   const isAdmin = Boolean(getAdminSessionToken())
@@ -68,6 +69,7 @@ export async function renderApp(): Promise<void> {
       ${renderHeroSection()}
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
+      ${renderListedLaunchesSection(homepage.listed)}
       ${renderRecentActivitySection(fetchedUpdates, catalog, {
         isAdmin,
         pendingSubmissions,

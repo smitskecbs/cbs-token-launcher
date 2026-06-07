@@ -146,6 +146,7 @@ function readHomepageSection(root: HTMLElement): HomepageSectionId | null {
 
   if (
     value === 'featured' ||
+    value === 'listed' ||
     value === 'trending' ||
     value === 'new' ||
     value === 'upcoming' ||

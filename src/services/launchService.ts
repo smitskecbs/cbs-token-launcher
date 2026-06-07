@@ -111,6 +111,13 @@ export function getFeaturedLaunches(
   return resolveHomepageSections(catalog).featured
 }
 
+/** Listed Launches — approved public listings that are not featured */
+export function getListedLaunches(
+  catalog: Launch[] = getLaunchCatalog(),
+): Launch[] {
+  return resolveHomepageSections(catalog).listed
+}
+
 /** CBS Ecosystem Tokens — ecosystem section, deduplicated */
 export function getEcosystemTokens(
   catalog: Launch[] = getLaunchCatalog(),

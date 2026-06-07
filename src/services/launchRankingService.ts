@@ -191,6 +191,7 @@ export function isRankSortedSection(
 ): boolean {
   return (
     section === 'featured' ||
+    section === 'listed' ||
     section === 'upcoming' ||
     section === 'trending'
   )

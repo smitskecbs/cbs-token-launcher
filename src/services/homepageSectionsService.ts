@@ -1,5 +1,6 @@
 import type { Launch } from '../types/launch'
 import type { HomepageSectionId } from '../types/homepage'
+import { getDiscoveryCardStatusLabel } from '../utils/launchDetailDisplay'
 import {
   getVerificationSortPriority,
   sortLaunchesByRank,
@@ -9,6 +10,7 @@ export type { HomepageSectionId } from '../types/homepage'
 
 export interface ResolvedHomepageSections {
   featured: Launch[]
+  listed: Launch[]
   trending: Launch[]
   newLaunches: Launch[]
   upcoming: Launch[]
@@ -24,6 +26,13 @@ export function getLaunchCreatedAt(launch: Launch): number {
 
 export function isFeaturedLaunch(launch: Launch): boolean {
   return launch.featured === true
+}
+
+/** Approved public listings that are Coming Soon or Live (not Preparing/Ended). */
+export function isListedPublicLaunch(launch: Launch): boolean {
+  const statusLabel = getDiscoveryCardStatusLabel(launch)
+
+  return statusLabel === 'Coming Soon' || statusLabel === 'Live'
 }
 
 const DEFAULT_FEATURED_FALLBACK_IDS = new Set(['cbs-coin', 'mango'])
@@ -58,7 +67,7 @@ function sortLaunchesByCreatedAt(launches: Launch[]): Launch[] {
 
 /**
  * Assign each launch to a single homepage section.
- * Priority: Featured > Trending > New > Upcoming > Ecosystem
+ * Priority: Featured > Listed > Trending > New > Upcoming > Ecosystem
  */
 export function resolveHomepageSections(
   catalog: Launch[],
@@ -71,6 +80,20 @@ export function resolveHomepageSections(
   for (const launch of featured) {
     assigned.add(launch.id)
     launchSectionById.set(launch.id, 'featured')
+  }
+
+  const listed = sortLaunchesByRank(
+    catalog.filter(
+      (launch) =>
+        !assigned.has(launch.id) &&
+        !isFeaturedLaunch(launch) &&
+        isListedPublicLaunch(launch),
+    ),
+  )
+
+  for (const launch of listed) {
+    assigned.add(launch.id)
+    launchSectionById.set(launch.id, 'listed')
   }
 
   const trending = getTrendingLaunchCandidates(catalog)
@@ -124,6 +147,7 @@ export function resolveHomepageSections(
 
   return {
     featured,
+    listed,
     trending,
     newLaunches,
     upcoming,
@@ -165,6 +189,8 @@ export function getLaunchesForHomepageSection(
   switch (sectionId) {
     case 'featured':
       return resolved.featured
+    case 'listed':
+      return resolved.listed
     case 'trending':
       return resolved.trending
     case 'new':
@@ -188,6 +214,7 @@ export function getAllHomepageLaunches(
 ): Launch[] {
   return [
     ...resolved.featured,
+    ...resolved.listed,
     ...resolved.trending,
     ...resolved.newLaunches,
     ...resolved.upcoming,

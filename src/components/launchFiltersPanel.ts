@@ -21,6 +21,7 @@ const FILTER_HIDDEN_CLASS = 'is-filter-hidden'
 const SECTION_EMPTY_CLASS = 'is-section-filter-empty'
 const LAUNCH_FILTER_SECTIONS = new Set([
   'featured',
+  'listed',
   'trending',
   'new',
   'upcoming',
