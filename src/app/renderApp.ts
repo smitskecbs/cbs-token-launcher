@@ -25,6 +25,7 @@ import {
 import { renderLaunchYourProjectSection } from '../components/launchYourProjectSection'
 import { renderWhyListOnCbsLauncherSection } from '../components/whyListOnCbsLauncherSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
+import { renderRecentActivitySection } from '../components/recentActivitySection'
 import {
   renderCbsToolsSection,
   renderFeaturedLaunchesSection,
@@ -44,11 +45,12 @@ import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
 export async function renderApp(): Promise<void> {
   const [catalog, latestUpdatesResult] = await Promise.all([
     loadLaunchCatalog({ refresh: true }),
-    fetchLatestLaunchUpdates(5),
+    fetchLatestLaunchUpdates(20),
   ])
   const homepage = resolveHomepageSections(catalog)
   const renderedLaunches = getAllHomepageLaunches(homepage)
-  const latestUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
+  const fetchedUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
+  const latestUpdates = fetchedUpdates.slice(0, 5)
 
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
@@ -65,6 +67,7 @@ export async function renderApp(): Promise<void> {
       ${renderLauncherStatisticsSection(catalog)}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
+      ${renderRecentActivitySection(fetchedUpdates, catalog)}
       ${renderTrendingLaunchesSection(homepage.trending, catalog.length)}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsToolsSection(cbsTools)}

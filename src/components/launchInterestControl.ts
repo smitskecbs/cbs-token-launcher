@@ -5,6 +5,7 @@ import {
   hasVotedForLaunchInterest,
   markLaunchInterestVoted,
 } from '../services/launchInterestStorage'
+import { appendLaunchActivityLogEntry } from '../services/launchActivityLog'
 import { postLaunchInterest } from '../services/launchInterestService'
 
 export function renderLaunchInterestControl(
@@ -129,6 +130,11 @@ async function handleLaunchInterestVote(
 
   launch.interestCount = result.interestCount
   markLaunchInterestVoted(result.mintAddress)
+  appendLaunchActivityLogEntry({
+    type: 'interest_vote_received',
+    launchId: launch.id,
+    occurredAt: new Date().toISOString(),
+  })
 
   for (const control of allControls) {
     const controlButton = control.querySelector<HTMLButtonElement>(
