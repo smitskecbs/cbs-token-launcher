@@ -3,7 +3,7 @@ import { renderLaunchAnalyticsPanel } from './launchAnalyticsPanel'
 import { renderLaunchRiskPanel } from './launchRiskPanel'
 import { renderTechnicalRiskNotice } from './technicalRiskNotice'
 import { renderTokenDetailProjectInfo } from './tokenDetailProjectInfo'
-import { renderTokenDetailLaunchUpdates } from './tokenDetailLaunchUpdates'
+import { renderTokenDetailProjectTimeline } from './tokenDetailProjectTimeline'
 import { renderTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import {
   renderTokenDetailAccordion,
@@ -32,7 +32,7 @@ function renderMetadataSection(launch: Launch): string {
 export function renderTokenDetailSections(launch: Launch): string {
   return `
     ${renderTokenDetailProjectInfo(launch)}
-    ${renderTokenDetailLaunchUpdates(launch)}
+    ${renderTokenDetailProjectTimeline(launch)}
   `
 }
 

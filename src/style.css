@@ -1137,56 +1137,108 @@ h3 {
   margin-top: 4px;
 }
 
-.token-detail-updates {
+.token-detail-project-timeline {
   margin-top: 8px;
   text-align: left;
 }
 
-.token-detail-updates-body {
+.token-detail-project-timeline-body {
   margin-top: 8px;
 }
 
-.token-detail-updates-loading,
-.token-detail-updates-empty,
-.token-detail-updates-error {
+.project-timeline__loading,
+.project-timeline__empty,
+.project-timeline__error {
   margin: 0;
   color: #555555;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.token-detail-updates-list {
+.project-timeline {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 }
 
-.token-detail-update-item {
-  padding: 14px 16px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+.project-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  padding: 0 0 20px;
 }
 
-.token-detail-update-date {
-  display: block;
-  margin-bottom: 6px;
+.project-timeline__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  background: rgba(216, 111, 0, 0.22);
+}
+
+.project-timeline__marker {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: #d86f00;
+  box-shadow: 0 0 0 3px rgba(216, 111, 0, 0.14);
+}
+
+.project-timeline__content {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.project-timeline__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #1a1a1a;
+}
+
+.project-timeline__preview {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555555;
+}
+
+.project-timeline__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
   font-size: 13px;
+  line-height: 1.4;
+  color: #888888;
+}
+
+.project-timeline__meta time {
   color: #666666;
 }
 
-.token-detail-update-title {
-  margin: 0 0 8px;
-  font-size: 17px;
-  line-height: 1.3;
+.project-timeline__relative {
+  font-weight: 700;
+  color: #d86f00;
 }
 
-.token-detail-update-content {
-  margin: 0;
-  line-height: 1.55;
-  color: #444444;
-  white-space: pre-wrap;
+.project-timeline__relative::before {
+  content: '·';
+  margin-right: 10px;
+  color: #cccccc;
+  font-weight: 400;
 }
 
 .token-detail-status-badge {

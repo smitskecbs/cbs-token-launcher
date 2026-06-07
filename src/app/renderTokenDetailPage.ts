@@ -5,7 +5,7 @@ import { getLaunchById } from '../services/launchService'
 import {
   attachTokenDetailProjectInfo,
 } from '../components/tokenDetailProjectInfo'
-import { attachTokenDetailLaunchUpdates } from '../components/tokenDetailLaunchUpdates'
+import { attachTokenDetailProjectTimeline } from '../components/tokenDetailProjectTimeline'
 import { attachLaunchInterestControl } from '../components/launchInterestControl'
 import { getDetailPageName } from '../utils/launchDetailDisplay'
 import { escapeHtml } from '../utils/html'
@@ -140,7 +140,7 @@ export function renderTokenDetailPage(tokenId: string): string {
 
 export function attachTokenDetailHandlers(launch: Launch): void {
   attachTokenDetailProjectInfo(launch)
-  attachTokenDetailLaunchUpdates(launch)
+  attachTokenDetailProjectTimeline(launch)
   attachLaunchInterestControl(launch)
 
   const refreshButton = document.querySelector<HTMLButtonElement>(
