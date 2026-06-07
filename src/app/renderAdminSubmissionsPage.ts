@@ -40,6 +40,11 @@ import {
   getLaunchSubmissionStatusClass,
   type LaunchSubmissionStatus,
 } from '../utils/launchSubmissionStatus'
+import {
+  attachAdminMintVerificationTools,
+  renderAdminMintVerificationTools,
+} from '../components/adminMintVerificationTools'
+import { launches } from '../data/launches'
 import { renderFooter } from '../components/sections'
 
 const STATUS_ACTIONS: Array<{
@@ -176,6 +181,42 @@ function renderStatusActions(
   return `<div class="admin-submissions-actions">${featuredToggle}${verifiedToggle}${editButton}${manageUpdatesButton}${statusButtons}${deleteButton}</div>`
 }
 
+const BUILTIN_LAUNCH_IDS = ['cbs-coin', 'mango'] as const
+
+const BUILTIN_LAUNCH_LABELS: Record<
+  (typeof BUILTIN_LAUNCH_IDS)[number],
+  string
+> = {
+  'cbs-coin': 'CBS Coin',
+  mango: 'ManGo',
+}
+
+function renderBuiltinLaunchItem(launchId: (typeof BUILTIN_LAUNCH_IDS)[number]): string {
+  const launch = launches.find((item) => item.id === launchId)
+  const label = BUILTIN_LAUNCH_LABELS[launchId]
+  const mintTools = launch?.mintAddress
+    ? renderAdminMintVerificationTools(launch.mintAddress)
+    : ''
+
+  return `
+    <li class="admin-builtin-launches__item">
+      <div class="admin-builtin-launches__main">
+        <span class="admin-builtin-launches__name">${escapeHtml(label)}</span>
+        ${mintTools}
+      </div>
+      <button
+        type="button"
+        class="secondary-btn admin-builtin-launches__manage-btn"
+        data-admin-manage-updates
+        data-launch-id="${escapeHtml(launchId)}"
+        data-launch-label="${escapeHtml(label)}"
+      >
+        Manage Updates
+      </button>
+    </li>
+  `
+}
+
 function renderBuiltinLaunchesSection(): string {
   return `
     <section
@@ -187,32 +228,7 @@ function renderBuiltinLaunchesSection(): string {
         Built-in Launches
       </h2>
       <ul class="admin-builtin-launches__list">
-        <li class="admin-builtin-launches__item">
-          <span class="admin-builtin-launches__name">CBS Coin</span>
-          <span class="admin-builtin-launches__separator" aria-hidden="true">—</span>
-          <button
-            type="button"
-            class="secondary-btn admin-builtin-launches__manage-btn"
-            data-admin-manage-updates
-            data-launch-id="cbs-coin"
-            data-launch-label="CBS Coin"
-          >
-            Manage Updates
-          </button>
-        </li>
-        <li class="admin-builtin-launches__item">
-          <span class="admin-builtin-launches__name">ManGo</span>
-          <span class="admin-builtin-launches__separator" aria-hidden="true">—</span>
-          <button
-            type="button"
-            class="secondary-btn admin-builtin-launches__manage-btn"
-            data-admin-manage-updates
-            data-launch-id="mango"
-            data-launch-label="ManGo"
-          >
-            Manage Updates
-          </button>
-        </li>
+        ${BUILTIN_LAUNCH_IDS.map((launchId) => renderBuiltinLaunchItem(launchId)).join('')}
       </ul>
     </section>
   `
@@ -247,7 +263,7 @@ function renderSubmissionRow(
       </td>
       <td>${escapeHtml(submission.tokenSymbol)}</td>
       <td class="admin-submissions-mint-cell">
-        <code class="admin-submissions-mint">${escapeHtml(submission.mintAddress)}</code>
+        ${renderAdminMintVerificationTools(submission.mintAddress)}
         ${mintWarning}
       </td>
       <td>
@@ -631,6 +647,8 @@ export function attachAdminSubmissionsPage(): void {
       )
     }
   })
+
+  attachAdminMintVerificationTools(ui.dashboardPanel)
 
   if (getAdminSessionToken()) {
     showDashboard(ui)

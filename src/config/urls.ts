@@ -7,7 +7,15 @@ export const CBS_URLS = {
 
 /** External explorer links for token mint addresses */
 export function getSolscanTokenUrl(mintAddress: string): string {
-  return `https://solscan.io/token/${mintAddress}`
+  return `https://solscan.io/token/${mintAddress.trim()}`
+}
+
+export function getSolanaExplorerAddressUrl(mintAddress: string): string {
+  return `https://explorer.solana.com/address/${mintAddress.trim()}`
+}
+
+export function getOrbAddressUrl(mintAddress: string): string {
+  return `https://orb.helius.dev/address/${mintAddress.trim()}`
 }
 
 export function getDexscreenerPairUrl(pairAddress: string): string {
