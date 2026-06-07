@@ -8,8 +8,10 @@ import {
   resolveLatestUpdates,
   type ResolvedLatestUpdate,
 } from '../services/resolveLatestUpdates'
+import { renderFeatureCardCarousel } from './featureCardCarousel'
 
 const CONTENT_PREVIEW_MAX_LENGTH = 120
+const LATEST_UPDATES_DISPLAY_LIMIT = 10
 
 function formatUpdateDate(iso: string): string {
   const parsed = new Date(iso)
@@ -70,11 +72,9 @@ function renderLatestUpdateCard({ update, launch }: ResolvedLatestUpdate): strin
 
 function renderLatestUpdatesEmptyState(): string {
   return `
-    <article class="launch-card launch-card--placeholder latest-update-card latest-update-card--empty">
-      <p class="coming-soon-text latest-update-card__empty-text">
-        Project updates will appear here.
-      </p>
-    </article>
+    <p class="coming-soon-text homepage-carousel-empty">
+      No updates available.
+    </p>
   `
 }
 
@@ -82,7 +82,11 @@ export function renderLatestUpdatesSection(
   updates: LaunchUpdate[],
   catalog: Launch[],
 ): string {
-  const resolved = resolveLatestUpdates(updates, catalog)
+  const resolved = resolveLatestUpdates(updates, catalog).slice(
+    0,
+    LATEST_UPDATES_DISPLAY_LIMIT,
+  )
+  const renderedCards = resolved.map(renderLatestUpdateCard).join('')
 
   return `
     <section
@@ -93,13 +97,11 @@ export function renderLatestUpdatesSection(
       <h2 class="section-title" id="latest-updates-heading">
         Latest Updates
       </h2>
-      <div class="launch-card-list latest-updates-list">
-        ${
-          resolved.length > 0
-            ? resolved.map(renderLatestUpdateCard).join('')
-            : renderLatestUpdatesEmptyState()
-        }
-      </div>
+      ${
+        renderedCards
+          ? renderFeatureCardCarousel(renderedCards, { variant: 'cards' })
+          : renderLatestUpdatesEmptyState()
+      }
     </section>
   `
 }

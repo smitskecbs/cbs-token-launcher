@@ -59,7 +59,7 @@ body {
 }
 
 .hero-card--compact {
-  padding: 11px 16px 13px;
+  padding: 10px 16px 11px;
 }
 
 .hero-card--compact .hero-title {
@@ -80,8 +80,14 @@ body {
   gap: 6px;
 }
 
-.hero-card--compact .launch-data-actions {
-  gap: 6px;
+.hero-actions--single {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.hero-card--compact .hero-actions--single {
+  margin-top: 6px;
 }
 
 .hero-card--compact .primary-btn,
@@ -95,17 +101,12 @@ body {
 }
 
 @media (min-width: 520px) {
-  .hero-card--compact .hero-actions {
+  .hero-card--compact .hero-actions:not(.hero-actions--single) {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 8px;
-  }
-
-  .hero-card--compact .launch-data-actions {
-    width: auto;
-    flex-wrap: nowrap;
   }
 }
 
@@ -1442,8 +1443,10 @@ h3 {
   background: rgba(216, 111, 0, 0.35);
 }
 
-.feature-card-carousel__track > .launch-your-project-card {
-  flex: 0 0 min(82%, 260px);
+.feature-card-carousel__track > .launch-your-project-card,
+.feature-card-carousel__track > .recent-activity-card,
+.feature-card-carousel__track > .latest-update-card {
+  flex: 0 0 min(82%, 280px);
   scroll-snap-align: start;
 }
 
@@ -1463,6 +1466,21 @@ h3 {
 
   .feature-card-carousel--stats .feature-card-carousel__track {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .feature-card-carousel--cards .feature-card-carousel__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 4px;
+  }
+
+  .feature-card-carousel--cards .feature-card-carousel__track > .recent-activity-card,
+  .feature-card-carousel--cards .feature-card-carousel__track > .latest-update-card {
+    flex: 0 0 calc((100% - 24px) / 3);
+    min-width: 0;
+    scroll-snap-align: start;
   }
 
   .feature-card-carousel__track > .launch-your-project-card,
@@ -1580,9 +1598,15 @@ h3 {
   }
 }
 
-.latest-updates-list,
-.recent-activity-list {
-  width: 100%;
+.homepage-carousel-empty {
+  margin: 0;
+  padding: 18px 16px;
+  text-align: center;
+}
+
+.feature-card-carousel--cards .recent-activity-card,
+.feature-card-carousel--cards .latest-update-card {
+  height: 100%;
 }
 
 .recent-activity-card {

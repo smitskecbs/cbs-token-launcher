@@ -11,6 +11,7 @@ import {
   type ResolveRecentActivityOptions,
 } from '../services/resolveRecentActivity'
 import { renderTokenLogo } from './tokenLogo'
+import { renderFeatureCardCarousel } from './featureCardCarousel'
 
 function renderRecentActivityCard(activity: ResolvedRecentActivityItem): string {
   const relativeTime = formatRelativeTime(activity.occurredAt)
@@ -55,11 +56,9 @@ function renderRecentActivityCard(activity: ResolvedRecentActivityItem): string 
 
 function renderRecentActivityEmptyState(): string {
   return `
-    <article class="launch-card launch-card--placeholder recent-activity-card recent-activity-card--empty">
-      <p class="coming-soon-text recent-activity-card__empty-text">
-        No recent activity yet.
-      </p>
-    </article>
+    <p class="coming-soon-text homepage-carousel-empty">
+      No recent activity yet.
+    </p>
   `
 }
 
@@ -91,9 +90,11 @@ export function renderRecentActivitySection(
       <h2 class="section-title" id="recent-activity-heading">
         Recent Activity
       </h2>
-      <div class="launch-card-list recent-activity-list">
-        ${renderedCards || renderRecentActivityEmptyState()}
-      </div>
+      ${
+        renderedCards
+          ? renderFeatureCardCarousel(renderedCards, { variant: 'cards' })
+          : renderRecentActivityEmptyState()
+      }
     </section>
   `
 }

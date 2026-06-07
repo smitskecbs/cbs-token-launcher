@@ -1,7 +1,6 @@
 import bannerUrl from '../assets/launcher-banner.png'
 import { cbsTools } from '../data/tools'
 import { attachLaunchCardHandlers } from '../components/launchCardHandlers'
-import { attachLaunchDataActions } from '../components/launchDataActions'
 import { attachAppModals, renderAppModals } from '../components/appModals'
 import {
   attachLaunchFilters,
@@ -48,7 +47,7 @@ export async function renderApp(): Promise<void> {
   ])
   const homepage = resolveHomepageSections(catalog)
   const fetchedUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
-  const latestUpdates = fetchedUpdates.slice(0, 5)
+  const latestUpdates = fetchedUpdates.slice(0, 10)
   const recentActivityOptions = {
     isAdmin,
     pendingSubmissions:
@@ -94,7 +93,6 @@ export async function renderApp(): Promise<void> {
     initialCount: homepageVisibleLaunches.length,
   })
   attachAppModals(handleCatalogChange)
-  attachLaunchDataActions(handleCatalogChange)
 }
 
 export function renderHomepageLoadingState(): void {

@@ -2,7 +2,6 @@ import type { Launch } from '../types/launch'
 import type { CbsTool } from '../types/tool'
 import { renderComingSoonCard } from './comingSoonCard'
 import { renderLaunchCardList } from './launchCard'
-import { renderLaunchDataActions } from './launchDataActions'
 import { renderSubmitLaunchButton } from './submitLaunchModal'
 import { renderToolCardGrid } from './toolCard'
 
@@ -14,9 +13,8 @@ export function renderHeroSection(): string {
         Submit your token, build interest, share updates and help people find
         your project.
       </p>
-      <div class="hero-actions">
+      <div class="hero-actions hero-actions--single">
         ${renderSubmitLaunchButton()}
-        ${renderLaunchDataActions()}
       </div>
     </section>
   `
