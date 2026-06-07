@@ -918,12 +918,12 @@ h3 {
 
 .token-detail-metadata-panel {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .token-detail-metadata-checks {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -932,10 +932,10 @@ h3 {
 .token-detail-metadata-check {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 14px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -1011,23 +1011,10 @@ h3 {
   text-align: left;
 }
 
-.token-detail-pool-details {
-  margin-bottom: 14px;
-}
-
-.token-detail-pool-status--active {
-  color: #15803d;
-  font-weight: 800;
-}
-
-.token-detail-pool-status--inactive {
-  color: #666666;
-  font-weight: 700;
-}
-
 .token-detail-pool-actions {
   display: grid;
   gap: 10px;
+  margin-top: 4px;
 }
 
 @media (min-width: 480px) {
@@ -1056,19 +1043,8 @@ h3 {
   color: #666666;
 }
 
-.token-detail-trading-status {
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.token-detail-trading-status--available {
-  color: #15803d;
-}
-
 .token-detail-trading-stats {
-  margin-bottom: 14px;
+  margin: 4px 0 10px;
 }
 
 .token-detail-trading-actions {
@@ -1131,6 +1107,15 @@ h3 {
   );
   border: 1px solid rgba(216, 111, 0, 0.18);
   text-align: left;
+}
+
+.token-detail-section--compact {
+  margin-bottom: 10px;
+  padding: 14px 16px;
+}
+
+.token-detail-section--compact .token-detail-heading {
+  margin-bottom: 8px;
 }
 
 .token-detail-project {
@@ -1279,7 +1264,13 @@ h3 {
 }
 
 .token-detail-accordions--secondary {
-  margin-top: 8px;
+  margin-top: 0;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.token-detail-accordions--secondary .token-detail-accordion__body {
+  padding: 0 14px 12px;
 }
 
 .token-detail-heading {

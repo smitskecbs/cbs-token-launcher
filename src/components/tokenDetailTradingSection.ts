@@ -45,19 +45,16 @@ export function renderTokenDetailTradingSection(launch: Launch): string {
 
   return `
     <section
-      class="token-detail-section token-detail-trading"
+      class="token-detail-section token-detail-trading token-detail-section--compact"
       data-token-detail-trading
-      aria-label="Trading availability"
+      aria-label="Market data"
     >
-      <h2 class="token-detail-heading">Trading</h2>
+      <h2 class="token-detail-heading">Market Data</h2>
       <div class="token-detail-trading-body" data-token-detail-trading-body>
         <p class="token-detail-trading-loading" data-token-detail-trading-loading>
-          Checking trading status…
+          Loading market data…
         </p>
         <div data-token-detail-trading-available hidden>
-          <p class="token-detail-trading-status token-detail-trading-status--available">
-            ✓ Trading available
-          </p>
           <dl class="token-detail-details token-detail-trading-stats">
             <div class="token-detail-row">
               <dt>DEX</dt>

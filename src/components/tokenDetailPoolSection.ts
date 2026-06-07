@@ -61,18 +61,6 @@ function renderPoolActions(state: PoolTradingState): string {
     }
   }
 
-  if (state.jupiterUrl) {
-    const jupiter = renderExternalAnchorHtml(
-      state.jupiterUrl,
-      'Buy on Jupiter',
-      'primary-btn',
-    )
-
-    if (jupiter) {
-      actions.push(jupiter)
-    }
-  }
-
   if (state.dexscreenerUrl) {
     const dexscreener = renderExternalAnchorHtml(
       state.dexscreenerUrl,
@@ -89,50 +77,40 @@ function renderPoolActions(state: PoolTradingState): string {
 }
 
 function renderPoolSectionBody(state: PoolTradingState): string {
-  const poolStatusClass = state.hasPool
-    ? 'token-detail-pool-status--active'
-    : 'token-detail-pool-status--inactive'
   const actions = renderPoolActions(state)
 
+  if (!actions) {
+    return ''
+  }
+
   return `
-    <dl class="token-detail-details token-detail-pool-details">
-      <div class="token-detail-row">
-        <dt>Pool Status</dt>
-        <dd
-          class="token-detail-pool-status ${poolStatusClass}"
-          data-token-detail-pool-status
-        >
-          ${escapeHtml(state.poolStatusLabel)}
-        </dd>
-      </div>
-    </dl>
-    ${
-      actions
-        ? `
-          <div class="token-detail-pool-actions actions" data-token-detail-pool-actions>
-            ${actions}
-          </div>
-        `
-        : ''
-    }
+    <div class="token-detail-pool-actions actions" data-token-detail-pool-actions>
+      ${actions}
+    </div>
   `
 }
 
 export function renderTokenDetailPoolSection(launch: Launch): string {
   const cachedMarketData = getCachedTokenMarketData(launch.mintAddress)
   const state = resolvePoolTradingState(launch, cachedMarketData)
+  const body = renderPoolSectionBody(state)
+
+  if (!body) {
+    return ''
+  }
+
   const id = escapeHtml(launch.id)
 
   return `
     <section
-      class="token-detail-section token-detail-pool"
+      class="token-detail-section token-detail-pool token-detail-section--compact"
       data-token-detail-pool
       data-token-detail-pool-launch="${id}"
-      aria-label="Pool status and trading"
+      aria-label="Pool and trading actions"
     >
       <h2 class="token-detail-heading">Pool &amp; Trading</h2>
       <div data-token-detail-pool-body>
-        ${renderPoolSectionBody(state)}
+        ${body}
       </div>
     </section>
   `

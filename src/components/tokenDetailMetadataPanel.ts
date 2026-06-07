@@ -43,14 +43,8 @@ export function renderTokenDetailMetadataPanel(launch: Launch): string {
     <section
       class="token-detail-metadata-panel"
       data-token-metadata-status-root
-      aria-labelledby="token-metadata-status-heading"
+      aria-label="Metadata checks"
     >
-      <h3
-        class="token-detail-heading"
-        id="token-metadata-status-heading"
-      >
-        Metadata Status
-      </h3>
       <ul
         class="token-detail-metadata-checks"
         data-token-metadata-checks
