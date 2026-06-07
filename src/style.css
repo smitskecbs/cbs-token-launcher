@@ -59,25 +59,54 @@ body {
 }
 
 .hero-card--compact {
-  padding: 18px 22px 20px;
+  padding: 14px 18px 16px;
 }
 
 .hero-card--compact .hero-title {
-  margin: 0 0 8px;
-  font-size: clamp(22px, 4.5vw, 30px);
-  line-height: 1.25;
+  margin: 0 0 6px;
+  font-size: clamp(19px, 3.8vw, 24px);
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: #111111;
 }
 
 .hero-card--compact .hero-text {
-  font-size: 16px;
-  line-height: 1.45;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .hero-card--compact .hero-actions {
-  margin-top: 14px;
-  gap: 10px;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.hero-card--compact .launch-data-actions {
+  gap: 8px;
+}
+
+.hero-card--compact .primary-btn,
+.hero-card--compact .secondary-btn {
+  padding: 11px 18px;
+  font-size: 14px;
+}
+
+.hero-card--compact .submit-launch-open-btn {
+  min-width: 0;
+}
+
+@media (min-width: 520px) {
+  .hero-card--compact .hero-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-card--compact .launch-data-actions {
+    width: auto;
+    flex-wrap: nowrap;
+  }
 }
 
 .page-section {
@@ -3968,6 +3997,29 @@ h3 {
   .launch-card {
     padding: 20px 18px 22px;
     border-radius: 22px;
+  }
+
+  .hero-card--compact {
+    padding: 12px 14px 14px;
+    border-radius: 18px;
+  }
+
+  .hero-card--compact .hero-title {
+    font-size: 19px;
+    margin-bottom: 5px;
+  }
+
+  .hero-card--compact .hero-text {
+    font-size: 14px;
+  }
+
+  .hero-card--compact .hero-actions {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .hero-card--compact .launch-data-actions {
+    gap: 6px;
   }
 
   .hero-text {
