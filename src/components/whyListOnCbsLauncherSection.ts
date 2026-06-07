@@ -1,3 +1,4 @@
+import { renderFeatureCardCarousel } from './featureCardCarousel'
 import { escapeHtml } from '../utils/html'
 
 interface WhyListBenefit {
@@ -58,9 +59,7 @@ export function renderWhyListOnCbsLauncherSection(): string {
       <p class="launch-your-project-subtitle">
         Show your project, collect interest and keep your community updated.
       </p>
-      <div class="launch-your-project-grid">
-        ${BENEFITS.map(renderBenefitCard).join('')}
-      </div>
+      ${renderFeatureCardCarousel(BENEFITS.map(renderBenefitCard).join(''))}
     </section>
   `
 }

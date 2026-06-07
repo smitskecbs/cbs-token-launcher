@@ -1,3 +1,4 @@
+import { renderFeatureCardCarousel } from './featureCardCarousel'
 import { renderSubmitLaunchButton } from './submitLaunchModal'
 import { escapeHtml } from '../utils/html'
 
@@ -60,9 +61,7 @@ export function renderLaunchYourProjectSection(): string {
       <p class="launch-your-project-subtitle">
         Launch, promote and grow your Solana project with the CBS Token Launcher.
       </p>
-      <div class="launch-your-project-grid">
-        ${FEATURES.map(renderFeatureCard).join('')}
-      </div>
+      ${renderFeatureCardCarousel(FEATURES.map(renderFeatureCard).join(''))}
       <div class="launch-your-project-cta">
         <h3 class="launch-your-project-cta__heading">
           Ready to launch your project?
