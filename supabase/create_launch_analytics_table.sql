@@ -29,3 +29,7 @@ BEGIN
   RETURN v_page_views;
 END;
 $$;
+
+-- PostgREST / service_role access (required for API RPC calls).
+GRANT SELECT, INSERT, UPDATE ON TABLE public.launch_analytics TO service_role;
+GRANT EXECUTE ON FUNCTION public.increment_launch_page_view(text) TO service_role;

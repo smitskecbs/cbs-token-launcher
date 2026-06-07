@@ -184,7 +184,7 @@ async function handlePublicLaunchUpdates(req, res, env) {
 
 async function handleTrackLaunchPageView(req, res, env) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' })
+    res.status(405).json({ success: false, error: 'Method not allowed' })
     return
   }
 
@@ -193,17 +193,33 @@ async function handleTrackLaunchPageView(req, res, env) {
   try {
     body = await readRequestBody(req)
   } catch {
-    res.status(400).json({ error: 'Invalid request body.' })
+    res.status(400).json({ success: false, error: 'Invalid request body.' })
     return
   }
 
   const launchId =
     typeof body?.launchId === 'string' ? body.launchId.trim() : ''
 
+  console.log(`${LOG_PREFIX} track-launch-page-view received launchId=${launchId || '(empty)'}`)
+
   const result = await incrementLaunchPageView(env, launchId)
 
   if (!result.ok) {
-    res.status(result.status).json({ error: result.message })
+    console.error(`${LOG_PREFIX} track-launch-page-view failed`, {
+      launchId: launchId || '(empty)',
+      status: result.status,
+      error: result.message,
+      detail: result.detail,
+      code: result.code,
+      rpcError: result.rpcError,
+    })
+
+    res.status(result.status).json({
+      success: false,
+      error: result.message,
+      detail: result.detail,
+      code: result.code,
+    })
     return
   }
 
