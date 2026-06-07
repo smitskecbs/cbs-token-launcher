@@ -23,6 +23,7 @@ import {
   renderLauncherStatisticsSection,
 } from '../components/launcherStatisticsSection'
 import { renderLaunchYourProjectSection } from '../components/launchYourProjectSection'
+import { renderWhyListOnCbsLauncherSection } from '../components/whyListOnCbsLauncherSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import {
   renderCbsEcosystemTokensSection,
@@ -62,6 +63,7 @@ export async function renderApp(): Promise<void> {
       ${renderLaunchFiltersPanel()}
       ${renderLauncherStatisticsSection(catalog)}
       ${renderLaunchYourProjectSection()}
+      ${renderWhyListOnCbsLauncherSection()}
       ${renderLaunchPipelineSection()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderTrendingLaunchesSection(homepage.trending)}

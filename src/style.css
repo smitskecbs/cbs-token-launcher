@@ -1269,7 +1269,8 @@ h3 {
   align-items: stretch;
 }
 
-.launch-your-project-section {
+.launch-your-project-section,
+.why-list-on-cbs-section {
   width: 100%;
 }
 
