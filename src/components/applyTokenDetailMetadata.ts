@@ -1,16 +1,14 @@
 import type { Launch } from '../types/launch'
 import type { ReadTokenMintResult } from '../solana/verifyMint'
-import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
 import { getCachedMintVerificationCachedAt } from '../services/mintVerificationCache'
 import {
   applyTokenLogo,
+  getLaunchDisplayDescription,
+  getLaunchDisplayName,
+  getLaunchDisplaySymbol,
   getLaunchLogoFallback,
 } from './applyLaunchCardMetadata'
-import {
-  getDetailPageDescription,
-  getDetailPageName,
-  getDetailPageSymbol,
-} from '../utils/launchDetailDisplay'
+import { resolveLaunchLogoUrl } from '../utils/resolveLaunchLogo'
 import { applyOfficialLinksFromMetadata } from './officialLinks'
 import { applyTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import { refreshLaunchAnalytics } from '../services/refreshLaunchAnalytics'
@@ -28,19 +26,9 @@ export function applyTokenDetailFromResult(
     return
   }
 
-  const displayName =
-    result.jsonName ??
-    result.metadataName ??
-    getDetailPageName(launch)
-
-  const displaySymbol =
-    result.jsonSymbol ??
-    result.metadataSymbol ??
-    getDetailPageSymbol(launch)
-
-  const displayDescription =
-    result.jsonDescription ??
-    getDetailPageDescription(launch)
+  const displayName = getLaunchDisplayName(launch, result)
+  const displaySymbol = getLaunchDisplaySymbol(launch, result)
+  const displayDescription = getLaunchDisplayDescription(launch, result)
 
   setText(page, '[data-token-name]', displayName)
   setText(page, '[data-token-symbol]', displaySymbol)
@@ -48,7 +36,7 @@ export function applyTokenDetailFromResult(
 
   applyTokenLogo(
     launch.id,
-    resolveMetadataImageUrl(result.jsonImage ?? undefined),
+    resolveLaunchLogoUrl(launch, result),
     getLaunchLogoFallback(launch),
     displayName,
   )

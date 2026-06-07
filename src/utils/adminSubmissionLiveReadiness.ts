@@ -1,4 +1,5 @@
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
+import { hasResolvableLaunchLogo } from './resolveLaunchLogo'
 
 export interface LiveReadinessCheck {
   id: string
@@ -49,8 +50,11 @@ export function evaluateLiveReadiness(
     },
     {
       id: 'logo',
-      label: 'Logo URL',
-      passed: hasText(submission.logoUrl),
+      label: 'Logo URL or metadata image',
+      passed: hasResolvableLaunchLogo({
+        logo: submission.logoUrl ?? undefined,
+        mintAddress: submission.mintAddress,
+      }),
     },
     {
       id: 'official-link',

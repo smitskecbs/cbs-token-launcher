@@ -1,21 +1,42 @@
 import type { Launch } from '../types/launch'
-import { getLaunchDisplayName, getLaunchLogoFallback } from './applyLaunchCardMetadata'
+import {
+  getLaunchDisplayName,
+  getLaunchLogoFallback,
+} from './applyLaunchCardMetadata'
 import { escapeHtml } from '../utils/html'
+import { resolveLaunchLogoUrl } from '../utils/resolveLaunchLogo'
 
 export function renderTokenLogo(launch: Launch): string {
   const id = escapeHtml(launch.id)
   const name = escapeHtml(getLaunchDisplayName(launch))
   const fallback = escapeHtml(getLaunchLogoFallback(launch))
+  const logoUrl = resolveLaunchLogoUrl(launch)
 
-  if (launch.logo) {
+  if (logoUrl) {
+    const src = escapeHtml(logoUrl)
+
     return `
-      <img
-        class="token-logo"
-        src="${escapeHtml(launch.logo)}"
-        alt="${name} logo"
-        width="64"
-        height="64"
-      />
+      <div
+        class="token-logo-wrap has-metadata-logo"
+        data-token-logo-wrap="${id}"
+      >
+        <img
+          class="token-logo"
+          src="${src}"
+          alt="${name} logo"
+          width="64"
+          height="64"
+        />
+        <div
+          class="token-icon token-icon--fallback"
+          data-token-logo-fallback
+          aria-hidden="true"
+          hidden
+          style="display: none"
+        >
+          ${fallback}
+        </div>
+      </div>
     `
   }
 

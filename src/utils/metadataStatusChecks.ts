@@ -1,6 +1,6 @@
 import type { Launch } from '../types/launch'
 import type { ReadTokenMintResult } from '../solana/verifyMint'
-import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
+import { hasResolvableLaunchLogo } from './resolveLaunchLogo'
 
 export type MetadataCheckState = 'success' | 'missing' | 'pending'
 
@@ -19,15 +19,7 @@ function resolveLogoFound(
   launch: Launch,
   result: ReadTokenMintResult | null,
 ): boolean {
-  if (hasText(launch.logo)) {
-    return true
-  }
-
-  if (result?.jsonImage && resolveMetadataImageUrl(result.jsonImage)) {
-    return true
-  }
-
-  return false
+  return hasResolvableLaunchLogo(launch, result)
 }
 
 function resolveNameFound(

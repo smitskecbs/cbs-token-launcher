@@ -6,6 +6,7 @@ import {
   getCachedMintVerification,
   setCachedMintVerification,
 } from './mintVerificationCache'
+import { hasManualLaunchLogo } from '../utils/resolveLaunchLogo'
 
 export interface LoadMintVerificationOptions {
   forceRefresh?: boolean
@@ -65,5 +66,13 @@ export async function loadMintVerification(
 }
 
 export function shouldAutoLoadMetadata(launch: Launch): boolean {
-  return launch.autoLoadMetadata === true
+  if (hasManualLaunchLogo(launch)) {
+    return false
+  }
+
+  if (launch.autoLoadMetadata === true) {
+    return true
+  }
+
+  return Boolean(launch.mintAddress.trim())
 }

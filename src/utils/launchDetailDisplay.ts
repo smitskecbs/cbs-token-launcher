@@ -1,4 +1,13 @@
 import type { Launch } from '../types/launch'
+import {
+  getLaunchDisplayDescription,
+  getLaunchDisplayName,
+  getLaunchDisplaySymbol,
+} from '../components/applyLaunchCardMetadata'
+import {
+  LAUNCH_CARD_AUTO_LOAD_PLACEHOLDER,
+  LAUNCH_CARD_PLACEHOLDER,
+} from '../types/launch'
 
 export type LaunchDetailStatusLabel = 'Coming Soon' | 'Live' | 'Ended'
 
@@ -81,18 +90,24 @@ export function getLaunchDetailStatusClass(
 }
 
 export function getDetailPageName(launch: Launch): string {
-  return launch.name?.trim() || 'Unnamed project'
+  return getLaunchDisplayName(launch)
 }
 
 export function getDetailPageSymbol(launch: Launch): string {
-  return launch.symbol?.trim() || '—'
+  return getLaunchDisplaySymbol(launch)
 }
 
 export function getDetailPageDescription(launch: Launch): string {
-  return (
-    launch.description?.trim() ||
-    'No project description provided yet.'
-  )
+  const display = getLaunchDisplayDescription(launch)
+
+  if (
+    display !== LAUNCH_CARD_PLACEHOLDER.description &&
+    display !== LAUNCH_CARD_AUTO_LOAD_PLACEHOLDER.description
+  ) {
+    return display
+  }
+
+  return launch.description?.trim() || 'No project description provided yet.'
 }
 
 export function isCatalogSubmissionLaunch(launch: Launch): boolean {

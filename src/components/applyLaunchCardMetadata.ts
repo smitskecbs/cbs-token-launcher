@@ -4,7 +4,8 @@ import {
   LAUNCH_CARD_PLACEHOLDER,
 } from '../types/launch'
 import type { ReadTokenMintResult } from '../solana/verifyMint'
-import { resolveMetadataImageUrl } from '../solana/fetchTokenMetadataJson'
+import { getCachedMintVerification } from '../services/mintVerificationCache'
+import { resolveLaunchLogoUrl } from '../utils/resolveLaunchLogo'
 import { applyOfficialLinksFromMetadata } from './officialLinks'
 import { applyTokenCategory } from './tokenCategoryField'
 import { applyTokenTags } from './tokenTagsField'
@@ -27,16 +28,45 @@ function getLaunchPlaceholder(launch: Launch) {
     : LAUNCH_CARD_PLACEHOLDER
 }
 
-export function getLaunchDisplayName(launch: Launch): string {
-  return launch.name ?? getLaunchPlaceholder(launch).name
+function resolveMintResult(
+  launch: Launch,
+  mintResult?: ReadTokenMintResult | null,
+): ReadTokenMintResult | null {
+  if (mintResult !== undefined) {
+    return mintResult
+  }
+
+  return getCachedMintVerification(launch.mintAddress)
 }
 
-export function getLaunchDisplaySymbol(launch: Launch): string {
-  return launch.symbol ?? getLaunchPlaceholder(launch).symbol
+export function getLaunchDisplayName(
+  launch: Launch,
+  mintResult?: ReadTokenMintResult | null,
+): string {
+  const result = resolveMintResult(launch, mintResult)
+  const resolved = result?.jsonName ?? result?.metadataName ?? launch.name
+
+  return resolved?.trim() || getLaunchPlaceholder(launch).name
 }
 
-export function getLaunchDisplayDescription(launch: Launch): string {
-  return launch.description ?? getLaunchPlaceholder(launch).description
+export function getLaunchDisplaySymbol(
+  launch: Launch,
+  mintResult?: ReadTokenMintResult | null,
+): string {
+  const result = resolveMintResult(launch, mintResult)
+  const resolved = result?.jsonSymbol ?? result?.metadataSymbol ?? launch.symbol
+
+  return resolved?.trim() || getLaunchPlaceholder(launch).symbol
+}
+
+export function getLaunchDisplayDescription(
+  launch: Launch,
+  mintResult?: ReadTokenMintResult | null,
+): string {
+  const result = resolveMintResult(launch, mintResult)
+  const resolved = result?.jsonDescription ?? launch.description
+
+  return resolved?.trim() || getLaunchPlaceholder(launch).description
 }
 
 export function getLaunchLogoFallback(launch: Launch): string {
@@ -72,19 +102,9 @@ export function applyLaunchCardFromResult(
     return
   }
 
-  const displayName =
-    result.jsonName ??
-    result.metadataName ??
-    launch.name
-
-  const displaySymbol =
-    result.jsonSymbol ??
-    result.metadataSymbol ??
-    launch.symbol
-
-  const displayDescription =
-    result.jsonDescription ??
-    launch.description
+  const displayName = getLaunchDisplayName(launch, result)
+  const displaySymbol = getLaunchDisplaySymbol(launch, result)
+  const displayDescription = getLaunchDisplayDescription(launch, result)
 
   if (displayName) {
     const nameEl = card.querySelector<HTMLElement>('[data-token-name]')
@@ -114,9 +134,9 @@ export function applyLaunchCardFromResult(
 
   applyTokenLogo(
     launch.id,
-    resolveMetadataImageUrl(result.jsonImage ?? undefined),
+    resolveLaunchLogoUrl(launch, result),
     getLaunchLogoFallback(launch),
-    displayName ?? getLaunchDisplayName(launch),
+    displayName,
   )
 
   applyOfficialLinksFromMetadata(card, launch, result)
