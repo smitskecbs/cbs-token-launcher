@@ -1419,7 +1419,12 @@ h3 {
     padding-bottom: 0;
   }
 
-  .feature-card-carousel__track > .launch-your-project-card {
+  .feature-card-carousel--stats .feature-card-carousel__track {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .feature-card-carousel__track > .launch-your-project-card,
+  .feature-card-carousel__track > .launcher-stat-card {
     flex: unset;
     width: auto;
   }
@@ -1483,20 +1488,19 @@ h3 {
   width: 100%;
 }
 
-.launcher-statistics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+.feature-card-carousel__track > .launcher-stat-card {
+  flex: 0 0 min(40%, 132px);
+  scroll-snap-align: start;
 }
 
 .launcher-stat-card {
   display: grid;
-  gap: 8px;
-  padding: 16px 14px;
+  gap: 6px;
+  padding: 12px 12px 11px;
   border: 1px solid rgba(216, 111, 0, 0.2);
-  border-radius: 20px;
+  border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 10px 40px rgba(216, 111, 0, 0.08);
+  box-shadow: 0 8px 28px rgba(216, 111, 0, 0.08);
   text-align: center;
 }
 
@@ -1512,7 +1516,7 @@ h3 {
 
 .launcher-stat-card__value {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.1;
   color: #b85a00;

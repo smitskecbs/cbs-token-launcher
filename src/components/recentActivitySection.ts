@@ -12,9 +12,14 @@ import {
 import { renderTokenLogo } from './tokenLogo'
 
 function renderRecentActivityCard(activity: RecentActivityItem): string {
+  const relativeTime = formatRelativeTime(activity.occurredAt)
+
+  if (!relativeTime) {
+    return ''
+  }
+
   const launchName = escapeHtml(getLaunchDisplayName(activity.launch))
   const activityText = escapeHtml(formatRecentActivityText(activity.type))
-  const relativeTime = escapeHtml(formatRelativeTime(activity.occurredAt))
   const occurredAt = escapeHtml(activity.occurredAt)
 
   return `
@@ -28,7 +33,7 @@ function renderRecentActivityCard(activity: RecentActivityItem): string {
             class="recent-activity-card__time"
             datetime="${occurredAt}"
           >
-            ${relativeTime}
+            ${escapeHtml(relativeTime)}
           </time>
         </div>
       </div>
@@ -55,6 +60,10 @@ export function renderRecentActivitySection(
     catalog,
     readLaunchActivityLog(),
   )
+  const renderedCards = activities
+    .map(renderRecentActivityCard)
+    .filter(Boolean)
+    .join('')
 
   return `
     <section
@@ -66,11 +75,7 @@ export function renderRecentActivitySection(
         Recent Activity
       </h2>
       <div class="launch-card-list recent-activity-list">
-        ${
-          activities.length > 0
-            ? activities.map(renderRecentActivityCard).join('')
-            : renderRecentActivityEmptyState()
-        }
+        ${renderedCards || renderRecentActivityEmptyState()}
       </div>
     </section>
   `

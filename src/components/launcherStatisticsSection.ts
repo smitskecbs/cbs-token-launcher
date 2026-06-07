@@ -5,6 +5,7 @@ import {
   type LauncherCatalogStatistics,
 } from '../services/launcherStatisticsService'
 import type { Launch } from '../types/launch'
+import { renderFeatureCardCarousel } from './featureCardCarousel'
 import { escapeHtml } from '../utils/html'
 
 type LauncherStatisticKey = keyof LauncherCatalogStatistics | 'totalProjectUpdates'
@@ -60,8 +61,8 @@ export function renderLauncherStatisticsSection(
       <h2 class="section-title" id="launcher-activity-heading">
         Launcher Activity
       </h2>
-      <div class="launcher-statistics-grid">
-        ${STAT_CARDS.map((card) => {
+      ${renderFeatureCardCarousel(
+        STAT_CARDS.map((card) => {
           if (card.key === 'totalProjectUpdates') {
             return renderStatCard(card, { loading: true })
           }
@@ -69,8 +70,9 @@ export function renderLauncherStatisticsSection(
           const value = formatLauncherStatisticValue(stats[card.key])
 
           return renderStatCard(card, { value })
-        }).join('')}
-      </div>
+        }).join(''),
+        { variant: 'stats' },
+      )}
     </section>
   `
 }

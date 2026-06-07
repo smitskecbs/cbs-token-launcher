@@ -4,80 +4,34 @@ import type {
   RecentActivityItem,
   RecentActivityType,
 } from '../types/recentActivity'
+import { parseActivityTimestamp } from '../utils/activityTimestamp'
 import type { StoredLaunchActivity } from './launchActivityLog'
 import { resolveLatestUpdates } from './resolveLatestUpdates'
 
 const RECENT_ACTIVITY_LIMIT = 10
 
-function resolveLaunchTimestamp(launch: Launch): string | null {
-  const timestamp = launch.submittedAt ?? launch.createdAt
-
-  if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
-    return null
-  }
-
-  return new Date(timestamp).toISOString()
-}
-
-function buildCatalogActivities(catalog: Launch[]): RecentActivityItem[] {
+function buildSubmissionActivities(catalog: Launch[]): RecentActivityItem[] {
   const activities: RecentActivityItem[] = []
 
   for (const launch of catalog) {
-    const occurredAt = resolveLaunchTimestamp(launch)
+    if (!launch.id.startsWith('submission-')) {
+      continue
+    }
+
+    const occurredAt = parseActivityTimestamp(
+      launch.submittedAt ?? launch.createdAt,
+    )
 
     if (!occurredAt) {
       continue
     }
 
-    const isSubmission = launch.id.startsWith('submission-')
-
-    if (isSubmission) {
-      activities.push({
-        id: `new_launch_submitted-${launch.id}-${occurredAt}`,
-        type: 'new_launch_submitted',
-        launch,
-        occurredAt,
-      })
-    }
-
-    if (
-      launch.verificationLevel === 'verified' ||
-      launch.verificationLevel === 'cbs-verified'
-    ) {
-      activities.push({
-        id: `launch_approved-${launch.id}-${occurredAt}`,
-        type: 'launch_approved',
-        launch,
-        occurredAt,
-      })
-    }
-
-    if (launch.status === 'preparing') {
-      activities.push({
-        id: `launch_moved_to_coming_soon-${launch.id}-${occurredAt}`,
-        type: 'launch_moved_to_coming_soon',
-        launch,
-        occurredAt,
-      })
-    }
-
-    if (launch.status === 'live') {
-      activities.push({
-        id: `launch_moved_to_live-${launch.id}-${occurredAt}`,
-        type: 'launch_moved_to_live',
-        launch,
-        occurredAt,
-      })
-    }
-
-    if ((launch.interestCount ?? 0) > 0) {
-      activities.push({
-        id: `interest_vote_received-${launch.id}-${occurredAt}`,
-        type: 'interest_vote_received',
-        launch,
-        occurredAt,
-      })
-    }
+    activities.push({
+      id: `new_launch_submitted-${launch.id}-${occurredAt}`,
+      type: 'new_launch_submitted',
+      launch,
+      occurredAt,
+    })
   }
 
   return activities
@@ -88,13 +42,24 @@ function buildUpdateActivities(
   catalog: Launch[],
 ): RecentActivityItem[] {
   const resolved = resolveLatestUpdates(updates, catalog)
+  const activities: RecentActivityItem[] = []
 
-  return resolved.map(({ update, launch }) => ({
-    id: `launch_update_posted-${update.id}`,
-    type: 'launch_update_posted',
-    launch,
-    occurredAt: update.createdAt,
-  }))
+  for (const { update, launch } of resolved) {
+    const occurredAt = parseActivityTimestamp(update.createdAt)
+
+    if (!occurredAt) {
+      continue
+    }
+
+    activities.push({
+      id: `launch_update_posted-${update.id}`,
+      type: 'launch_update_posted',
+      launch,
+      occurredAt,
+    })
+  }
+
+  return activities
 }
 
 function buildLoggedActivities(
@@ -105,6 +70,16 @@ function buildLoggedActivities(
   const items: RecentActivityItem[] = []
 
   for (const entry of storedActivities) {
+    if (entry.type !== 'interest_vote_received') {
+      continue
+    }
+
+    const occurredAt = parseActivityTimestamp(entry.occurredAt)
+
+    if (!occurredAt) {
+      continue
+    }
+
     const launch = launchesById.get(entry.launchId)
 
     if (!launch) {
@@ -115,7 +90,7 @@ function buildLoggedActivities(
       id: entry.id,
       type: entry.type,
       launch,
-      occurredAt: entry.occurredAt,
+      occurredAt,
     })
   }
 
@@ -161,21 +136,9 @@ export function resolveRecentActivity(
   catalog: Launch[],
   storedActivities: StoredLaunchActivity[] = [],
 ): RecentActivityItem[] {
-  const loggedInterestLaunchIds = new Set(
-    storedActivities
-      .filter((entry) => entry.type === 'interest_vote_received')
-      .map((entry) => entry.launchId),
-  )
-
-  const catalogActivities = buildCatalogActivities(catalog).filter(
-    (activity) =>
-      activity.type !== 'interest_vote_received' ||
-      !loggedInterestLaunchIds.has(activity.launch.id),
-  )
-
   const activities = dedupeRecentActivities([
     ...buildUpdateActivities(updates, catalog),
-    ...catalogActivities,
+    ...buildSubmissionActivities(catalog),
     ...buildLoggedActivities(storedActivities, catalog),
   ])
 
