@@ -11,6 +11,10 @@ import {
   renderTokenDetailPage,
 } from './renderTokenDetailPage'
 import { getLaunchById, loadLaunchCatalog } from '../services/launchService'
+import {
+  beginTokenDetailRoute,
+  clearTokenDetailRoute,
+} from '../services/launchPageViewTracking'
 
 export function renderRoute(route: AppRoute): void {
   const app = document.querySelector<HTMLDivElement>('#app')
@@ -20,6 +24,7 @@ export function renderRoute(route: AppRoute): void {
   }
 
   if (route.name === 'home') {
+    clearTokenDetailRoute()
     document.title = 'CBS Token Launcher'
     renderHomepageLoadingState()
     void renderApp().then(() => {
@@ -29,6 +34,7 @@ export function renderRoute(route: AppRoute): void {
   }
 
   if (route.name === 'admin-submissions') {
+    clearTokenDetailRoute()
     document.title = 'Launch Submissions — CBS Token Launcher'
     app.innerHTML = renderAdminSubmissionsPage()
     attachAdminSubmissionsPage()
@@ -40,6 +46,8 @@ export function renderRoute(route: AppRoute): void {
 }
 
 async function renderTokenRoute(tokenId: string): Promise<void> {
+  beginTokenDetailRoute(tokenId)
+
   if (tokenId.startsWith('submission-') && !getLaunchById(tokenId)) {
     await loadLaunchCatalog({ refresh: true })
   }

@@ -404,6 +404,114 @@ async function countLaunchUpdates(env) {
   }
 }
 
+export async function countLaunchUpdatesForTarget(env, target = {}) {
+  const submissionId = trimString(target.submissionId)
+  const launchId = trimString(target.launchId)
+
+  if (submissionId && launchId) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Provide either submissionId or launchId, not both.',
+    }
+  }
+
+  if (!submissionId && !launchId) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id or launch id is required.',
+    }
+  }
+
+  if (submissionId && !isValidSubmissionId(submissionId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Submission id is invalid.',
+    }
+  }
+
+  if (launchId && !isValidLaunchId(launchId)) {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Launch id is invalid.',
+    }
+  }
+
+  const config = getSupabaseConfig(env)
+
+  if (!config) {
+    return {
+      ok: false,
+      status: 500,
+      message: 'Launch updates service is not configured.',
+    }
+  }
+
+  const query = new URLSearchParams({
+    select: 'id',
+    limit: '0',
+  })
+
+  if (submissionId) {
+    query.set('submission_id', `eq.${submissionId}`)
+  } else {
+    query.set('launch_id', `eq.${launchId}`)
+  }
+
+  const restUrl = `${config.updatesUrl}?${query.toString()}`
+
+  try {
+    const upstream = await getJsonWithHttps(restUrl, {
+      ...buildAuthHeaders(config.serviceRoleKey),
+      Prefer: 'count=exact',
+    })
+
+    if (upstream.status < 200 || upstream.status >= 300) {
+      const errorText = upstream.body.trim().slice(0, 500)
+      console.error(
+        `${LOG_PREFIX} target count status: ${upstream.status}`,
+        errorText || '(empty response body)',
+      )
+
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    const totalCount = parseContentRangeTotal(upstream.headers?.['content-range'])
+
+    if (totalCount === null) {
+      return {
+        ok: false,
+        status: 502,
+        message: 'Could not load launch updates right now.',
+      }
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      totalCount,
+    }
+  } catch (error) {
+    console.error(
+      `${LOG_PREFIX} target count failed:`,
+      error instanceof Error ? error.message : 'unknown error',
+    )
+
+    return {
+      ok: false,
+      status: 502,
+      message: 'Could not load launch updates right now.',
+    }
+  }
+}
+
 export async function createLaunchUpdate(env, body) {
   const title = trimString(body?.title)
   const content = trimString(body?.content)

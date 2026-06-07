@@ -40,6 +40,8 @@ import { loadMintVerification } from '../services/mintVerificationService'
 import { loadMarketStatus } from '../services/marketStatusService'
 import { getCachedMintVerification } from '../services/mintVerificationCache'
 import { getCachedMarketStatus } from '../services/marketStatusCache'
+import { trackLaunchPageView } from '../services/launchEngagementAnalyticsService'
+import { shouldTrackLaunchPageView } from '../services/launchPageViewTracking'
 
 function renderNotFound(tokenId: string): string {
   return `
@@ -139,6 +141,10 @@ export function renderTokenDetailPage(tokenId: string): string {
 }
 
 export function attachTokenDetailHandlers(launch: Launch): void {
+  if (shouldTrackLaunchPageView(launch.id)) {
+    void trackLaunchPageView(launch.id)
+  }
+
   attachTokenDetailProjectInfo(launch)
   attachTokenDetailProjectTimeline(launch)
   attachLaunchInterestControl(launch)

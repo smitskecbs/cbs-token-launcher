@@ -44,7 +44,15 @@ import {
   attachAdminMintVerificationTools,
   renderAdminMintVerificationTools,
 } from '../components/adminMintVerificationTools'
+import {
+  applyAdminLaunchEngagementAnalytics,
+  renderAdminLaunchEngagementAnalytics,
+  setAdminLaunchEngagementAnalyticsError,
+} from '../components/adminLaunchEngagementAnalytics'
 import { launches } from '../data/launches'
+import { fetchLaunchEngagementAnalytics } from '../services/launchEngagementAnalyticsService'
+import { getSubmissionLaunchId } from '../services/mapSubmissionToLaunch'
+import type { LaunchEngagementAnalyticsTarget } from '../types/launchEngagementMetrics'
 import { renderFooter } from '../components/sections'
 
 const STATUS_ACTIONS: Array<{
@@ -203,6 +211,7 @@ function renderBuiltinLaunchItem(launchId: (typeof BUILTIN_LAUNCH_IDS)[number]):
       <div class="admin-builtin-launches__main">
         <span class="admin-builtin-launches__name">${escapeHtml(label)}</span>
         ${mintTools}
+        ${renderAdminLaunchEngagementAnalytics(launchId)}
       </div>
       <button
         type="button"
@@ -271,6 +280,9 @@ function renderSubmissionRow(
       </td>
       <td class="admin-submissions-interest-cell">
         <span class="admin-submissions-interest-count">${submission.interestCount}</span>
+      </td>
+      <td class="admin-submissions-analytics-cell">
+        ${renderAdminLaunchEngagementAnalytics(getSubmissionLaunchId(submission.id))}
       </td>
       <td class="admin-submissions-readiness-cell">
         ${renderAdminSubmissionReadiness(readiness)}
@@ -459,6 +471,7 @@ export function renderAdminSubmissionsPage(): string {
                 <th scope="col">Mint Address</th>
                 <th scope="col">Status</th>
                 <th scope="col">Interest</th>
+                <th scope="col">Analytics</th>
                 <th scope="col">Readiness</th>
                 <th scope="col">Created Date</th>
                 <th scope="col">Actions</th>
@@ -1172,6 +1185,7 @@ async function loadSubmissions(
 
   if (result.count === 0) {
     refreshAdminDashboardCounts(ui, loadedSubmissions)
+    void loadAdminLaunchEngagementAnalytics(ui, loadedSubmissions)
     return
   }
 
@@ -1188,6 +1202,64 @@ async function loadSubmissions(
 
   refreshAdminDashboardCounts(ui, loadedSubmissions)
   scrollToSubmissionFromQuery(ui.body)
+  void loadAdminLaunchEngagementAnalytics(ui, loadedSubmissions)
+}
+
+function buildAdminLaunchAnalyticsTargets(
+  submissions: LaunchSubmissionSummary[],
+): LaunchEngagementAnalyticsTarget[] {
+  const targets: LaunchEngagementAnalyticsTarget[] = BUILTIN_LAUNCH_IDS.map(
+    (launchId) => {
+      const launch = launches.find((item) => item.id === launchId)
+
+      return {
+        launchId,
+        mintAddress: launch?.mintAddress,
+      }
+    },
+  )
+
+  for (const submission of submissions) {
+    targets.push({
+      launchId: getSubmissionLaunchId(submission.id),
+      submissionId: submission.id,
+      mintAddress: submission.mintAddress,
+    })
+  }
+
+  return targets
+}
+
+async function loadAdminLaunchEngagementAnalytics(
+  ui: AdminPageElements,
+  submissions: LaunchSubmissionSummary[],
+): Promise<void> {
+  const targets = buildAdminLaunchAnalyticsTargets(submissions)
+  const result = await fetchLaunchEngagementAnalytics(targets)
+
+  if (!result.ok) {
+    if (result.unauthorized) {
+      handleUnauthorized(ui, 'Your admin session expired. Please sign in again.')
+      return
+    }
+
+    for (const target of targets) {
+      setAdminLaunchEngagementAnalyticsError(target.launchId)
+    }
+
+    return
+  }
+
+  for (const target of targets) {
+    const metrics = result.analytics[target.launchId] ?? {
+      launchId: target.launchId,
+      pageViews: 0,
+      votes: 0,
+      updates: 0,
+    }
+
+    applyAdminLaunchEngagementAnalytics(metrics)
+  }
 }
 
 function scrollToSubmissionFromQuery(body: HTMLElement): void {

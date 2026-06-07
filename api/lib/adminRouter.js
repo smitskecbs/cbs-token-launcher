@@ -13,6 +13,7 @@ import {
   updateLaunchSubmissionStatus,
   updateLaunchSubmissionVerified,
 } from './launchSubmissionsDb.js'
+import { getLaunchEngagementMetrics } from './launchAnalyticsDb.js'
 import {
   createLaunchUpdate,
   deleteLaunchUpdate,
@@ -55,6 +56,8 @@ export async function handleAdminApi(req, res, env = process.env) {
       return handleDeleteLaunchSubmission(req, res, env)
     case 'launch-updates':
       return handleAdminLaunchUpdates(req, res, env)
+    case 'launch-analytics':
+      return handleLaunchAnalytics(req, res, env)
     default:
       res.status(404).json({ error: 'Admin action not found.' })
   }
@@ -374,4 +377,36 @@ async function handleAdminLaunchUpdates(req, res, env) {
   }
 
   res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleLaunchAnalytics(req, res, env) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
+  if (!requireAdminAuth(req, res, env)) {
+    return
+  }
+
+  let body
+
+  try {
+    body = await readRequestBody(req)
+  } catch {
+    res.status(400).json({ error: 'Invalid request body.' })
+    return
+  }
+
+  const result = await getLaunchEngagementMetrics(env, body?.targets)
+
+  if (!result.ok) {
+    res.status(result.status).json({ error: result.message })
+    return
+  }
+
+  res.status(200).json({
+    ok: true,
+    analytics: result.analytics,
+  })
 }

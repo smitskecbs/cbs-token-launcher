@@ -382,6 +382,49 @@ h3 {
   white-space: nowrap;
 }
 
+.admin-submissions-analytics-cell {
+  min-width: 118px;
+  vertical-align: top;
+}
+
+.admin-launch-analytics {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-launch-analytics__label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a3b00;
+}
+
+.admin-launch-analytics__metrics {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-launch-analytics__metric {
+  font-size: 11px;
+  line-height: 1.35;
+  color: #444444;
+  white-space: nowrap;
+}
+
+.admin-launch-analytics__metric strong {
+  font-weight: 800;
+  color: #222222;
+}
+
+.admin-launch-analytics__loading,
+.admin-launch-analytics__error {
+  font-size: 11px;
+  line-height: 1.35;
+  color: #777777;
+}
+
 .admin-submissions-interest-count {
   font-variant-numeric: tabular-nums;
   font-weight: 600;

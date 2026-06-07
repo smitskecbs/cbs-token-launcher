@@ -2,6 +2,7 @@ import {
   getLaunchInterestCounts,
   incrementLaunchInterest,
 } from './launchInterest.js'
+import { incrementLaunchPageView } from './launchAnalyticsDb.js'
 import { listHomepageLaunches } from './launchSubmissionsDb.js'
 import { listLaunchUpdates } from './launchUpdatesDb.js'
 import { getTokenMarketData } from './tokenMarketData.js'
@@ -34,6 +35,8 @@ export async function handlePublicApi(req, res, env = process.env) {
       return handleTokenMarketData(req, res, env)
     case 'launch-updates':
       return handlePublicLaunchUpdates(req, res, env)
+    case 'track-launch-page-view':
+      return handleTrackLaunchPageView(req, res, env)
     default:
       res.status(404).json({ error: 'Public action not found.' })
   }
@@ -176,5 +179,37 @@ async function handlePublicLaunchUpdates(req, res, env) {
     ok: true,
     count: result.count,
     updates: result.updates,
+  })
+}
+
+async function handleTrackLaunchPageView(req, res, env) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
+  let body
+
+  try {
+    body = await readRequestBody(req)
+  } catch {
+    res.status(400).json({ error: 'Invalid request body.' })
+    return
+  }
+
+  const launchId =
+    typeof body?.launchId === 'string' ? body.launchId.trim() : ''
+
+  const result = await incrementLaunchPageView(env, launchId)
+
+  if (!result.ok) {
+    res.status(result.status).json({ error: result.message })
+    return
+  }
+
+  res.status(200).json({
+    ok: true,
+    launchId: result.launchId,
+    pageViews: result.pageViews,
   })
 }
