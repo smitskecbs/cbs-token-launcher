@@ -9,10 +9,8 @@ import {
 } from '../components/launchFiltersPanel'
 import { handleCatalogChange } from './handleCatalogChange'
 import { loadLaunchCatalog } from '../services/launchService'
-import {
-  getAllHomepageLaunches,
-  resolveHomepageSections,
-} from '../services/homepageSectionsService'
+import { resolveHomepageSections } from '../services/homepageSectionsService'
+import { getHomepageVisibleLaunches } from '../services/homepageVisibleLaunchesService'
 import { renderLaunchPipelineSection } from '../components/launchPipelineSection'
 import {
   attachMangoDonationSection,
@@ -49,16 +47,24 @@ export async function renderApp(): Promise<void> {
       : Promise.resolve({ ok: false as const, message: '' }),
   ])
   const homepage = resolveHomepageSections(catalog)
-  const renderedLaunches = getAllHomepageLaunches(homepage)
   const fetchedUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
   const latestUpdates = fetchedUpdates.slice(0, 5)
-  const pendingSubmissions =
-    submissionsResult.ok === true
-      ? submissionsResult.submissions.filter(
-          (submission) => submission.status === 'pending',
-        )
-      : []
-
+  const recentActivityOptions = {
+    isAdmin,
+    pendingSubmissions:
+      submissionsResult.ok === true
+        ? submissionsResult.submissions.filter(
+            (submission) => submission.status === 'pending',
+          )
+        : [],
+  }
+  const homepageVisibleLaunches = getHomepageVisibleLaunches(
+    catalog,
+    homepage,
+    latestUpdates,
+    fetchedUpdates,
+    recentActivityOptions,
+  )
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
       <img
@@ -70,10 +76,7 @@ export async function renderApp(): Promise<void> {
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderListedLaunchesSection(homepage.listed)}
-      ${renderRecentActivitySection(fetchedUpdates, catalog, {
-        isAdmin,
-        pendingSubmissions,
-      })}
+      ${renderRecentActivitySection(fetchedUpdates, catalog, recentActivityOptions)}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}
@@ -86,9 +89,9 @@ export async function renderApp(): Promise<void> {
   `
 
   attachMangoDonationSection()
-  attachLaunchCardHandlers(renderedLaunches)
-  attachLaunchFilters(renderedLaunches, {
-    initialCount: renderedLaunches.length,
+  attachLaunchCardHandlers(homepageVisibleLaunches)
+  attachLaunchFilters(homepageVisibleLaunches, {
+    initialCount: homepageVisibleLaunches.length,
   })
   attachAppModals(handleCatalogChange)
   attachLaunchDataActions(handleCatalogChange)

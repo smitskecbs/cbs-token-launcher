@@ -157,14 +157,25 @@ export function applyTokenLogo(
   fallback: string,
   altName = 'Token logo',
 ): void {
-  const wrap = document.querySelector<HTMLElement>(
+  const wraps = document.querySelectorAll<HTMLElement>(
     `[data-token-logo-wrap="${launchId}"]`,
   )
 
-  if (!wrap) {
+  if (wraps.length === 0) {
     return
   }
 
+  for (const wrap of wraps) {
+    applyTokenLogoToWrap(wrap, imageUrl, fallback, altName)
+  }
+}
+
+function applyTokenLogoToWrap(
+  wrap: HTMLElement,
+  imageUrl: string | null,
+  fallback: string,
+  altName: string,
+): void {
   wrap.querySelector('.token-logo')?.remove()
   wrap.classList.remove('has-metadata-logo')
 
