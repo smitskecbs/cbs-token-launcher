@@ -14,3 +14,12 @@ export interface RecentActivityItem {
   launch: Launch
   occurredAt: string
 }
+
+export interface RecentActivityNavigation {
+  label: 'View Details' | 'View Submission'
+  href: string
+}
+
+export interface ResolvedRecentActivityItem extends RecentActivityItem {
+  navigation: RecentActivityNavigation
+}

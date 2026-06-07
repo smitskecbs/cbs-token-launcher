@@ -15,6 +15,18 @@ export function getAdminSubmissionsPath(): string {
   return ADMIN_SUBMISSIONS_PATH
 }
 
+export function getAdminSubmissionPath(submissionId: string): string {
+  const trimmedId = submissionId.trim()
+
+  if (!trimmedId) {
+    return ADMIN_SUBMISSIONS_PATH
+  }
+
+  const params = new URLSearchParams({ submission: trimmedId })
+
+  return `${ADMIN_SUBMISSIONS_PATH}?${params.toString()}`
+}
+
 export function parseRoute(pathname: string): AppRoute {
   if (pathname === ADMIN_SUBMISSIONS_PATH || pathname === `${ADMIN_SUBMISSIONS_PATH}/`) {
     return { name: 'admin-submissions' }

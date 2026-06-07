@@ -1,6 +1,6 @@
 import type { Launch } from '../types/launch'
 import type { LaunchUpdate } from '../types/launchUpdate'
-import type { RecentActivityItem } from '../types/recentActivity'
+import type { ResolvedRecentActivityItem } from '../types/recentActivity'
 import { getLaunchDisplayName } from './applyLaunchCardMetadata'
 import { escapeHtml } from '../utils/html'
 import { formatRelativeTime } from '../utils/formatRelativeTime'
@@ -8,10 +8,11 @@ import { readLaunchActivityLog } from '../services/launchActivityLog'
 import {
   formatRecentActivityText,
   resolveRecentActivity,
+  type ResolveRecentActivityOptions,
 } from '../services/resolveRecentActivity'
 import { renderTokenLogo } from './tokenLogo'
 
-function renderRecentActivityCard(activity: RecentActivityItem): string {
+function renderRecentActivityCard(activity: ResolvedRecentActivityItem): string {
   const relativeTime = formatRelativeTime(activity.occurredAt)
 
   if (!relativeTime) {
@@ -21,6 +22,8 @@ function renderRecentActivityCard(activity: RecentActivityItem): string {
   const launchName = escapeHtml(getLaunchDisplayName(activity.launch))
   const activityText = escapeHtml(formatRecentActivityText(activity.type))
   const occurredAt = escapeHtml(activity.occurredAt)
+  const actionHref = escapeHtml(activity.navigation.href)
+  const actionLabel = escapeHtml(activity.navigation.label)
 
   return `
     <article class="launch-card recent-activity-card">
@@ -37,6 +40,15 @@ function renderRecentActivityCard(activity: RecentActivityItem): string {
           </time>
         </div>
       </div>
+      <div class="recent-activity-card__actions">
+        <a
+          class="primary-btn recent-activity-card__cta"
+          href="${actionHref}"
+          data-router-link
+        >
+          ${actionLabel}
+        </a>
+      </div>
     </article>
   `
 }
@@ -51,14 +63,19 @@ function renderRecentActivityEmptyState(): string {
   `
 }
 
+export interface RenderRecentActivitySectionOptions
+  extends ResolveRecentActivityOptions {}
+
 export function renderRecentActivitySection(
   updates: LaunchUpdate[],
   catalog: Launch[],
+  options: RenderRecentActivitySectionOptions = {},
 ): string {
   const activities = resolveRecentActivity(
     updates,
     catalog,
     readLaunchActivityLog(),
+    options,
   )
   const renderedCards = activities
     .map(renderRecentActivityCard)

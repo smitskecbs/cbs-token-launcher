@@ -1161,4 +1161,21 @@ async function loadSubmissions(
     .join('')
 
   refreshAdminDashboardCounts(ui, loadedSubmissions)
+  scrollToSubmissionFromQuery(ui.body)
+}
+
+function scrollToSubmissionFromQuery(body: HTMLElement): void {
+  const submissionId = new URLSearchParams(window.location.search)
+    .get('submission')
+    ?.trim()
+
+  if (!submissionId) {
+    return
+  }
+
+  const row = body.querySelector<HTMLElement>(
+    `[data-submission-row="${CSS.escape(submissionId)}"]`,
+  )
+
+  row?.scrollIntoView({ block: 'center', behavior: 'smooth' })
 }

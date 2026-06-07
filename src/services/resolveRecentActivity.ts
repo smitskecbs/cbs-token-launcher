@@ -1,12 +1,24 @@
 import type { Launch } from '../types/launch'
 import type { LaunchUpdate } from '../types/launchUpdate'
+import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import type {
   RecentActivityItem,
   RecentActivityType,
+  ResolvedRecentActivityItem,
 } from '../types/recentActivity'
 import { parseActivityTimestamp } from '../utils/activityTimestamp'
+import { mapAdminSubmissionToLaunch } from '../utils/mapAdminSubmissionToLaunch'
+import {
+  hasPublicLaunchDetailPage,
+  resolveRecentActivityNavigation,
+} from '../utils/recentActivityNavigation'
 import type { StoredLaunchActivity } from './launchActivityLog'
 import { resolveLatestUpdates } from './resolveLatestUpdates'
+
+export interface ResolveRecentActivityOptions {
+  isAdmin?: boolean
+  pendingSubmissions?: LaunchSubmissionSummary[]
+}
 
 const RECENT_ACTIVITY_LIMIT = 10
 
@@ -15,6 +27,10 @@ function buildSubmissionActivities(catalog: Launch[]): RecentActivityItem[] {
 
   for (const launch of catalog) {
     if (!launch.id.startsWith('submission-')) {
+      continue
+    }
+
+    if (!hasPublicLaunchDetailPage(launch)) {
       continue
     }
 
@@ -28,6 +44,45 @@ function buildSubmissionActivities(catalog: Launch[]): RecentActivityItem[] {
 
     activities.push({
       id: `new_launch_submitted-${launch.id}-${occurredAt}`,
+      type: 'new_launch_submitted',
+      launch,
+      occurredAt,
+    })
+  }
+
+  return activities
+}
+
+function buildPendingSubmissionActivities(
+  pendingSubmissions: LaunchSubmissionSummary[],
+  catalog: Launch[],
+): RecentActivityItem[] {
+  const listedSubmissionIds = new Set(
+    catalog
+      .filter((launch) => launch.id.startsWith('submission-'))
+      .map((launch) => launch.id.slice('submission-'.length)),
+  )
+  const activities: RecentActivityItem[] = []
+
+  for (const submission of pendingSubmissions) {
+    if (submission.status !== 'pending') {
+      continue
+    }
+
+    if (listedSubmissionIds.has(submission.id)) {
+      continue
+    }
+
+    const occurredAt = parseActivityTimestamp(submission.createdAt)
+
+    if (!occurredAt) {
+      continue
+    }
+
+    const launch = mapAdminSubmissionToLaunch(submission)
+
+    activities.push({
+      id: `new_launch_submitted-pending-${submission.id}-${occurredAt}`,
       type: 'new_launch_submitted',
       launch,
       occurredAt,
@@ -131,18 +186,46 @@ function dedupeRecentActivities(
   return deduped
 }
 
+function attachNavigation(
+  activities: RecentActivityItem[],
+  isAdmin: boolean,
+): ResolvedRecentActivityItem[] {
+  const resolved: ResolvedRecentActivityItem[] = []
+
+  for (const activity of activities) {
+    const navigation = resolveRecentActivityNavigation(activity, isAdmin)
+
+    if (!navigation) {
+      continue
+    }
+
+    resolved.push({
+      ...activity,
+      navigation,
+    })
+  }
+
+  return resolved
+}
+
 export function resolveRecentActivity(
   updates: LaunchUpdate[],
   catalog: Launch[],
   storedActivities: StoredLaunchActivity[] = [],
-): RecentActivityItem[] {
+  options: ResolveRecentActivityOptions = {},
+): ResolvedRecentActivityItem[] {
+  const isAdmin = options.isAdmin === true
+  const pendingSubmissions = options.pendingSubmissions ?? []
   const activities = dedupeRecentActivities([
     ...buildUpdateActivities(updates, catalog),
     ...buildSubmissionActivities(catalog),
+    ...(isAdmin
+      ? buildPendingSubmissionActivities(pendingSubmissions, catalog)
+      : []),
     ...buildLoggedActivities(storedActivities, catalog),
   ])
 
-  return activities.slice(0, RECENT_ACTIVITY_LIMIT)
+  return attachNavigation(activities, isAdmin).slice(0, RECENT_ACTIVITY_LIMIT)
 }
 
 export function formatRecentActivityText(type: RecentActivityType): string {

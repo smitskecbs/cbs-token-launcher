@@ -29,6 +29,8 @@ import {
   renderUpcomingLaunchesSection,
 } from '../components/sections'
 import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
+import { getAdminSessionToken } from '../services/adminSessionService'
+import { fetchLaunchSubmissions } from '../services/listLaunchSubmissionsService'
 
 /**
  * Compose and mount the CBS Token Launcher homepage.
@@ -37,14 +39,24 @@ import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
  * Priority: Featured > Trending > New > Upcoming > Ecosystem (section assignment)
  */
 export async function renderApp(): Promise<void> {
-  const [catalog, latestUpdatesResult] = await Promise.all([
+  const isAdmin = Boolean(getAdminSessionToken())
+  const [catalog, latestUpdatesResult, submissionsResult] = await Promise.all([
     loadLaunchCatalog({ refresh: true }),
     fetchLatestLaunchUpdates(20),
+    isAdmin
+      ? fetchLaunchSubmissions()
+      : Promise.resolve({ ok: false as const, message: '' }),
   ])
   const homepage = resolveHomepageSections(catalog)
   const renderedLaunches = getAllHomepageLaunches(homepage)
   const fetchedUpdates = latestUpdatesResult.ok ? latestUpdatesResult.updates : []
   const latestUpdates = fetchedUpdates.slice(0, 5)
+  const pendingSubmissions =
+    submissionsResult.ok === true
+      ? submissionsResult.submissions.filter(
+          (submission) => submission.status === 'pending',
+        )
+      : []
 
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
@@ -56,7 +68,10 @@ export async function renderApp(): Promise<void> {
       ${renderHeroSection()}
       ${renderLaunchFiltersPanel()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
-      ${renderRecentActivitySection(fetchedUpdates, catalog)}
+      ${renderRecentActivitySection(fetchedUpdates, catalog, {
+        isAdmin,
+        pendingSubmissions,
+      })}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}

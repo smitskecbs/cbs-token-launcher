@@ -1543,6 +1543,9 @@ h3 {
 }
 
 .recent-activity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px 18px;
   text-align: left;
 }
@@ -1589,6 +1592,16 @@ h3 {
 .recent-activity-card__time {
   font-size: 13px;
   color: #888888;
+}
+
+.recent-activity-card__actions {
+  margin-top: 0;
+}
+
+.recent-activity-card__cta {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .recent-activity-card--empty {
