@@ -1612,9 +1612,18 @@ h3 {
 .recent-activity-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
   padding: 16px 18px;
   text-align: left;
+}
+
+.recent-activity-card--link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.recent-activity-card--link:hover {
+  transform: translateY(-2px);
 }
 
 .recent-activity-card__main {
@@ -1659,16 +1668,6 @@ h3 {
 .recent-activity-card__time {
   font-size: 13px;
   color: #888888;
-}
-
-.recent-activity-card__actions {
-  margin-top: 0;
-}
-
-.recent-activity-card__cta {
-  display: inline-flex;
-  width: 100%;
-  justify-content: center;
 }
 
 .recent-activity-card--empty {

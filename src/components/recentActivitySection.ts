@@ -24,10 +24,17 @@ function renderRecentActivityCard(activity: ResolvedRecentActivityItem): string 
   const activityText = escapeHtml(formatRecentActivityText(activity.type))
   const occurredAt = escapeHtml(activity.occurredAt)
   const actionHref = escapeHtml(activity.navigation.href)
-  const actionLabel = escapeHtml(activity.navigation.label)
+  const ariaLabel = escapeHtml(
+    `${getLaunchDisplayName(activity.launch)}: ${formatRecentActivityText(activity.type)}`,
+  )
 
   return `
-    <article class="launch-card recent-activity-card">
+    <a
+      class="launch-card launch-card--link recent-activity-card recent-activity-card--link"
+      href="${actionHref}"
+      data-router-link
+      aria-label="${ariaLabel}"
+    >
       <div class="recent-activity-card__main">
         ${renderTokenLogo(activity.launch)}
         <div class="recent-activity-card__content">
@@ -41,16 +48,7 @@ function renderRecentActivityCard(activity: ResolvedRecentActivityItem): string 
           </time>
         </div>
       </div>
-      <div class="recent-activity-card__actions">
-        <a
-          class="primary-btn recent-activity-card__cta"
-          href="${actionHref}"
-          data-router-link
-        >
-          ${actionLabel}
-        </a>
-      </div>
-    </article>
+    </a>
   `
 }
 
