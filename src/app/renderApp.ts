@@ -1,5 +1,4 @@
 import bannerUrl from '../assets/launcher-banner.png'
-import { cbsTools } from '../data/tools'
 import { attachLaunchCardHandlers } from '../components/launchCardHandlers'
 import { attachAppModals, renderAppModals } from '../components/appModals'
 import {
@@ -22,7 +21,6 @@ import {
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import { renderRecentActivitySection } from '../components/recentActivitySection'
 import {
-  renderCbsToolsSection,
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
@@ -84,7 +82,6 @@ export async function renderApp(): Promise<void> {
       ${renderLaunchPipelineSection()}
       ${renderLaunchYourProjectCta()}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
-      ${renderCbsToolsSection(cbsTools)}
       ${renderMangoDonationSection()}
       ${renderFooter()}
     </main>
