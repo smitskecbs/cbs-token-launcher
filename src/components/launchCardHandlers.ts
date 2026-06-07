@@ -8,7 +8,10 @@ import {
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
 import { attachLaunchInterestControl } from './launchInterestControl'
-import { getLaunchCardInstanceIds } from './launchCard'
+import {
+  getLaunchCardInstanceIds,
+  getSearchResultLaunchCardInstanceId,
+} from './launchCard'
 
 /**
  * Wire card navigation and lightweight cached metadata for homepage discovery cards.
@@ -24,50 +27,68 @@ export function attachLaunchCardHandlers(
     }
 
     seenLaunchIds.add(launch.id)
-    attachLaunchCardNavigation(launch)
-    attachLaunchInterestControl(launch)
-    restoreCachedLaunchCardData(launch)
-
-    if (
-      shouldAutoLoadMetadata(launch) &&
-      !getCachedMintVerification(launch.mintAddress)
-    ) {
-      void loadDiscoveryCardMetadata(launch)
-    }
+    attachLaunchCardHandlersForLaunch(launch)
   }
 }
 
-function attachLaunchCardNavigation(launch: Launch): void {
-  const cards = getLaunchCardElements(launch.id)
+export function attachLaunchCardHandlersForLaunch(launch: Launch): void {
+  attachLaunchCardNavigation(launch)
+  attachLaunchInterestControl(launch)
+  restoreCachedLaunchCardData(launch)
 
-  if (cards.length === 0) {
-    return
+  if (
+    shouldAutoLoadMetadata(launch) &&
+    !getCachedMintVerification(launch.mintAddress)
+  ) {
+    void loadDiscoveryCardMetadata(launch)
   }
+}
 
+function wireLaunchCardNavigation(
+  card: HTMLElement,
+  launch: Launch,
+): void {
   const openDetail = () => {
     navigate(getTokenDetailPath(launch.id))
   }
 
-  for (const card of cards) {
-    card.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement
+  card.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
 
-      if (target.closest('a, button')) {
-        return
-      }
+    if (target.closest('a, button')) {
+      return
+    }
 
-      openDetail()
-    })
+    openDetail()
+  })
 
-    card.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return
-      }
+  card.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return
+    }
 
-      event.preventDefault()
-      openDetail()
-    })
+    event.preventDefault()
+    openDetail()
+  })
+}
+
+function attachLaunchCardNavigation(launch: Launch): void {
+  for (const card of getLaunchCardElements(launch.id)) {
+    wireLaunchCardNavigation(card, launch)
   }
+}
+
+export function attachLaunchSearchResultCardHandlers(launch: Launch): void {
+  const card = document.querySelector<HTMLElement>(
+    `[data-token-card="${getSearchResultLaunchCardInstanceId(launch.id)}"]`,
+  )
+
+  if (!card) {
+    return
+  }
+
+  wireLaunchCardNavigation(card, launch)
+  attachLaunchInterestControl(launch, card)
 }
 
 function getLaunchCardElements(launchId: string): HTMLElement[] {

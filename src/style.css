@@ -203,6 +203,36 @@ body {
   color: #666666;
 }
 
+.launch-filters-result-count[hidden] {
+  display: none;
+}
+
+.launch-search-results {
+  width: 100%;
+}
+
+.launch-search-results[hidden] {
+  display: none;
+}
+
+.launch-search-results__body {
+  display: grid;
+  gap: 12px;
+}
+
+.launch-search-results__list {
+  width: 100%;
+}
+
+.launch-search-results__empty-card {
+  text-align: center;
+  padding: 24px 20px;
+}
+
+.launch-search-results__empty {
+  margin: 0;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

@@ -6,8 +6,14 @@ import {
   type LaunchFilterState,
   isLaunchFilterActive,
 } from '../types/launchFilters'
+import { attachLaunchSearchResultCardHandlers } from './launchCardHandlers'
+import {
+  renderLaunchSearchResultsContent,
+  renderLaunchSearchResultsShell,
+} from './launchSearchResultsSection'
 import {
   formatLaunchFilterResultCount,
+  launchMatchesFilters,
 } from '../services/launchFilterService'
 import { escapeHtml } from '../utils/html'
 
@@ -89,6 +95,7 @@ export function renderLaunchFiltersPanel(): string {
         ${escapeHtml(formatLaunchFilterResultCount(0))}
       </p>
     </section>
+    ${renderLaunchSearchResultsShell()}
   `
 }
 
@@ -219,11 +226,10 @@ function readFilterStateFromDom(root: HTMLElement): LaunchFilterState {
 
 function applyLaunchFilters(
   state: LaunchFilterState,
-  _launches: Launch[],
+  launches: Launch[],
 ): void {
-  void _launches
-
   const filtersActive = isLaunchFilterActive(state)
+  const searchQueryActive = state.query.trim().length > 0
 
   for (const card of document.querySelectorAll<HTMLElement>(
     '[data-token-card]',
@@ -270,7 +276,45 @@ function applyLaunchFilters(
     )
   }
 
-  updateLaunchFilterResultCount(countVisibleLaunchCards())
+  updateLaunchSearchResults(state, launches)
+  updateLaunchFilterResultCount(countVisibleLaunchCards(), {
+    hidden: searchQueryActive,
+  })
+}
+
+function updateLaunchSearchResults(
+  state: LaunchFilterState,
+  launches: Launch[],
+): void {
+  const resultsSection = document.querySelector<HTMLElement>(
+    '[data-launch-search-results]',
+  )
+  const resultsBody = document.querySelector<HTMLElement>(
+    '[data-launch-search-results-body]',
+  )
+
+  if (!resultsSection || !resultsBody) {
+    return
+  }
+
+  const searchQueryActive = state.query.trim().length > 0
+
+  if (!searchQueryActive) {
+    resultsSection.hidden = true
+    resultsBody.innerHTML = ''
+    return
+  }
+
+  const matchingLaunches = launches.filter((launch) =>
+    launchMatchesFilters(launch, state),
+  )
+
+  resultsSection.hidden = false
+  resultsBody.innerHTML = renderLaunchSearchResultsContent(matchingLaunches)
+
+  for (const launch of matchingLaunches) {
+    attachLaunchSearchResultCardHandlers(launch)
+  }
 }
 
 function matchesLaunchSearch(searchText: string, query: string): boolean {
@@ -336,14 +380,25 @@ function countVisibleLaunchCards(): number {
   ).length
 }
 
-function updateLaunchFilterResultCount(count: number): void {
+function updateLaunchFilterResultCount(
+  count: number,
+  options: { hidden?: boolean } = {},
+): void {
   const element = document.querySelector<HTMLElement>(
     '[data-launch-filter-result-count]',
   )
 
-  if (element) {
-    element.textContent = formatLaunchFilterResultCount(count)
+  if (!element) {
+    return
   }
+
+  if (options.hidden) {
+    element.hidden = true
+    return
+  }
+
+  element.hidden = false
+  element.textContent = formatLaunchFilterResultCount(count)
 }
 
 export { FILTER_HIDDEN_CLASS }

@@ -26,8 +26,16 @@ export function getTrendingLaunchCardInstanceId(launchId: string): string {
   return `${launchId}--trending`
 }
 
+export function getSearchResultLaunchCardInstanceId(launchId: string): string {
+  return `${launchId}--search`
+}
+
 export function getLaunchCardInstanceIds(launchId: string): string[] {
-  return [launchId, getTrendingLaunchCardInstanceId(launchId)]
+  return [
+    launchId,
+    getTrendingLaunchCardInstanceId(launchId),
+    getSearchResultLaunchCardInstanceId(launchId),
+  ]
 }
 
 export function renderLaunchCard(

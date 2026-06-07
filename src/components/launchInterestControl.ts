@@ -49,8 +49,11 @@ export function renderLaunchInterestControl(
   `
 }
 
-export function attachLaunchInterestControl(launch: Launch): void {
-  const roots = document.querySelectorAll<HTMLElement>(
+export function attachLaunchInterestControl(
+  launch: Launch,
+  scope: ParentNode = document,
+): void {
+  const roots = scope.querySelectorAll<HTMLElement>(
     `[data-launch-interest-control][data-launch-id="${launch.id}"]`,
   )
 
