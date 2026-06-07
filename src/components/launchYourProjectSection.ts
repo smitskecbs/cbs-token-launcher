@@ -53,8 +53,18 @@ export function renderLaunchYourProjectSection(): string {
         Launch, promote and grow your Solana project with the CBS Token Launcher.
       </p>
       ${renderFeatureCardCarousel(FEATURES.map(renderFeatureCard).join(''))}
+    </section>
+  `
+}
+
+export function renderLaunchYourProjectCta(): string {
+  return `
+    <section
+      class="page-section launch-your-project-cta-section"
+      aria-labelledby="launch-your-project-cta-heading"
+    >
       <div class="launch-your-project-cta">
-        <h3 class="launch-your-project-cta__heading">
+        <h3 class="launch-your-project-cta__heading" id="launch-your-project-cta-heading">
           Ready to launch your project?
         </h3>
         <p class="launch-your-project-cta__text">

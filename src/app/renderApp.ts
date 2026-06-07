@@ -15,7 +15,10 @@ import {
   attachMangoDonationSection,
   renderMangoDonationSection,
 } from '../components/mangoDonationSection'
-import { renderLaunchYourProjectSection } from '../components/launchYourProjectSection'
+import {
+  renderLaunchYourProjectCta,
+  renderLaunchYourProjectSection,
+} from '../components/launchYourProjectSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import { renderRecentActivitySection } from '../components/recentActivitySection'
 import {
@@ -79,6 +82,7 @@ export async function renderApp(): Promise<void> {
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}
+      ${renderLaunchYourProjectCta()}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderCbsToolsSection(cbsTools)}
       ${renderMangoDonationSection()}
