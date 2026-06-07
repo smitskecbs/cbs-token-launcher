@@ -43,6 +43,7 @@ export async function updateLaunchSubmissionDetails(
         poolUrl: values.poolUrl,
         raydiumUrl: values.raydiumUrl,
         jupiterUrl: values.jupiterUrl,
+        adminNotes: values.adminNotes,
       }),
     })
 

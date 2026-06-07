@@ -14,6 +14,7 @@ const MAX_LENGTH = {
   poolUrl: 500,
   raydiumUrl: 500,
   jupiterUrl: 500,
+  adminNotes: 5000,
 }
 
 export const SUPABASE_FETCH_TIMEOUT_MS = 8000
@@ -274,6 +275,12 @@ export function validateAdminEditSubmissionPayload(body) {
     return { ok: false, message: 'Jupiter URL is invalid.' }
   }
 
+  const adminNotes = trimString(body?.adminNotes)
+
+  if (adminNotes.length > MAX_LENGTH.adminNotes) {
+    return { ok: false, message: 'Admin notes are too long.' }
+  }
+
   return {
     ok: true,
     data: {
@@ -282,6 +289,7 @@ export function validateAdminEditSubmissionPayload(body) {
       pool_url: poolUrl || null,
       raydium_url: raydiumUrl || null,
       jupiter_url: jupiterUrl || null,
+      admin_notes: adminNotes || null,
     },
   }
 }

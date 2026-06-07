@@ -210,6 +210,18 @@ export function renderAdminEditSubmissionModal(): string {
             />
           </label>
 
+          <label class="submit-launch-field">
+            <span class="submit-launch-label">Admin Notes</span>
+            <span class="submit-launch-hint">Private — not shown on the public site</span>
+            <textarea
+              class="submit-launch-input"
+              name="adminNotes"
+              data-admin-edit-admin-notes
+              rows="3"
+              placeholder="Internal review notes…"
+            ></textarea>
+          </label>
+
           <p
             class="submit-launch-error"
             data-admin-edit-submission-error
@@ -385,6 +397,10 @@ function wireAdminEditSubmissionModal(
         form.querySelector<HTMLInputElement>(
           '[data-admin-edit-contact-email]',
         )?.value ?? '',
+      adminNotes:
+        form.querySelector<HTMLTextAreaElement>(
+          '[data-admin-edit-admin-notes]',
+        )?.value ?? '',
     }
   }
 
@@ -427,6 +443,9 @@ function wireAdminEditSubmissionModal(
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-contact-email]',
     )!.value = submission.contactEmail ?? ''
+    form.querySelector<HTMLTextAreaElement>(
+      '[data-admin-edit-admin-notes]',
+    )!.value = submission.adminNotes ?? ''
   }
 
   function closeModal(): void {

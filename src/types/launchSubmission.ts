@@ -19,6 +19,7 @@ export interface LaunchSubmissionSummary {
   raydiumUrl: string | null
   jupiterUrl: string | null
   interestCount: number
+  adminNotes: string | null
   createdAt: string
 }
 

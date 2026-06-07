@@ -3867,6 +3867,18 @@ h3 {
   border: 1px solid rgba(180, 35, 24, 0.18);
 }
 
+.admin-submissions-project-name {
+  margin-right: 6px;
+}
+
+.admin-submissions-has-note {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.75;
+  vertical-align: middle;
+}
+
 .admin-submissions-status {
   display: inline-block;
   padding: 4px 10px;

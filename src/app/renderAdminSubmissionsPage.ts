@@ -234,9 +234,17 @@ function renderSubmissionRow(
       `
     : ''
 
+  const hasNote = Boolean(submission.adminNotes?.trim())
+  const noteIndicator = hasNote
+    ? `<span class="admin-submissions-has-note" title="Has admin note" aria-label="Has admin note">📝</span>`
+    : ''
+
   return `
     <tr data-submission-row="${escapeHtml(submission.id)}">
-      <td>${escapeHtml(submission.projectName)}</td>
+      <td>
+        <span class="admin-submissions-project-name">${escapeHtml(submission.projectName)}</span>
+        ${noteIndicator}
+      </td>
       <td>${escapeHtml(submission.tokenSymbol)}</td>
       <td class="admin-submissions-mint-cell">
         <code class="admin-submissions-mint">${escapeHtml(submission.mintAddress)}</code>

@@ -70,6 +70,7 @@ function mapSubmissionRow(row) {
     raydiumUrl: row.raydium_url ?? null,
     jupiterUrl: row.jupiter_url ?? null,
     interestCount: Number(row.interest_count) || 0,
+    adminNotes: row.admin_notes ?? null,
     createdAt: row.created_at,
   }
 }
@@ -172,7 +173,7 @@ async function fetchSubmissionRows(env, logPrefix, query) {
 export async function listLaunchSubmissions(env) {
   const query = new URLSearchParams({
     select:
-      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,buy_url,pool_url,raydium_url,jupiter_url,interest_count,created_at',
+      'id,project_name,token_symbol,mint_address,status,logo_url,website,telegram,x,description,contact_email,verified,featured,buy_url,pool_url,raydium_url,jupiter_url,interest_count,admin_notes,created_at',
     order: 'created_at.desc',
   })
 

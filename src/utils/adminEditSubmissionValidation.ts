@@ -8,6 +8,7 @@ export interface AdminEditSubmissionFormValues extends SubmitLaunchFormValues {
   poolUrl: string
   raydiumUrl: string
   jupiterUrl: string
+  adminNotes: string
 }
 
 export interface AdminEditSubmissionValidationResult {
@@ -17,6 +18,7 @@ export interface AdminEditSubmissionValidationResult {
 }
 
 const MAX_OPTIONAL_URL_LENGTH = 500
+const MAX_ADMIN_NOTES_LENGTH = 5000
 
 function trimField(value: string): string {
   return value.trim()
@@ -48,6 +50,7 @@ export function validateAdminEditSubmissionForm(
   const poolUrl = trimField(values.poolUrl)
   const raydiumUrl = trimField(values.raydiumUrl)
   const jupiterUrl = trimField(values.jupiterUrl)
+  const adminNotes = trimField(values.adminNotes)
 
   const urlFields = [
     { label: 'Buy URL', value: buyUrl },
@@ -66,6 +69,10 @@ export function validateAdminEditSubmissionForm(
     }
   }
 
+  if (adminNotes.length > MAX_ADMIN_NOTES_LENGTH) {
+    return { valid: false, error: 'Admin notes are too long.' }
+  }
+
   return {
     valid: true,
     values: {
@@ -74,6 +81,7 @@ export function validateAdminEditSubmissionForm(
       poolUrl,
       raydiumUrl,
       jupiterUrl,
+      adminNotes,
     },
   }
 }
