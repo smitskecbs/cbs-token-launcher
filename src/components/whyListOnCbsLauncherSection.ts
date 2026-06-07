@@ -7,30 +7,30 @@ interface WhyListBenefit {
 
 const BENEFITS: WhyListBenefit[] = [
   {
-    title: 'Free Listing',
+    title: 'Free to list',
     description:
       'Submit your project at no cost and build visibility before launch.',
   },
   {
-    title: 'Community Exposure',
-    description: 'Appear in featured and trending launch sections.',
+    title: 'Get seen',
+    description: 'Appear in featured and trending sections.',
   },
   {
-    title: 'Launch Updates',
-    description: 'Keep supporters informed with project progress updates.',
+    title: 'Share updates',
+    description: 'Post progress updates for your community.',
   },
   {
-    title: 'Interest Tracking',
-    description: 'Measure community demand before launch.',
+    title: 'Track interest',
+    description: 'See how many people are interested.',
   },
   {
-    title: 'Verified Projects',
-    description: 'Earn additional trust through project verification.',
+    title: 'Build trust',
+    description: 'Use verification to show your project was reviewed.',
   },
   {
-    title: 'Dedicated Project Page',
+    title: 'Project page',
     description:
-      'Get a public page with project details, links and trading information.',
+      'Get one page with your token info, links and trading status.',
   },
 ]
 
@@ -53,11 +53,10 @@ export function renderWhyListOnCbsLauncherSection(): string {
       aria-labelledby="why-list-on-cbs-heading"
     >
       <h2 class="section-title" id="why-list-on-cbs-heading">
-        Why List On CBS Launcher
+        Why List Here?
       </h2>
       <p class="launch-your-project-subtitle">
-        Give your Solana project visibility, community engagement and a
-        dedicated launch page.
+        Show your project, collect interest and keep your community updated.
       </p>
       <div class="launch-your-project-grid">
         ${BENEFITS.map(renderBenefitCard).join('')}

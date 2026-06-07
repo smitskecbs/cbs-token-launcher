@@ -58,6 +58,28 @@ body {
   text-align: center;
 }
 
+.hero-card--compact {
+  padding: 18px 22px 20px;
+}
+
+.hero-card--compact .hero-title {
+  margin: 0 0 8px;
+  font-size: clamp(22px, 4.5vw, 30px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+.hero-card--compact .hero-text {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.hero-card--compact .hero-actions {
+  margin-top: 14px;
+  gap: 10px;
+}
+
 .page-section {
   display: grid;
   gap: 14px;

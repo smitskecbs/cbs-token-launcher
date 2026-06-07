@@ -26,12 +26,10 @@ import { renderLaunchYourProjectSection } from '../components/launchYourProjectS
 import { renderWhyListOnCbsLauncherSection } from '../components/whyListOnCbsLauncherSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import {
-  renderCbsEcosystemTokensSection,
   renderCbsToolsSection,
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
-  renderNewLaunchesSection,
   renderTrendingLaunchesSection,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
@@ -61,16 +59,14 @@ export async function renderApp(): Promise<void> {
       />
       ${renderHeroSection()}
       ${renderLaunchFiltersPanel()}
-      ${renderLauncherStatisticsSection(catalog)}
       ${renderLaunchYourProjectSection()}
       ${renderWhyListOnCbsLauncherSection()}
       ${renderLaunchPipelineSection()}
+      ${renderLauncherStatisticsSection(catalog)}
       ${renderFeaturedLaunchesSection(homepage.featured)}
-      ${renderTrendingLaunchesSection(homepage.trending)}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
-      ${renderNewLaunchesSection(homepage.newLaunches)}
+      ${renderTrendingLaunchesSection(homepage.trending, catalog.length)}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
-      ${renderCbsEcosystemTokensSection(homepage.ecosystem)}
       ${renderCbsToolsSection(cbsTools)}
       ${renderMangoDonationSection()}
       ${renderFooter()}

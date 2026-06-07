@@ -15,10 +15,10 @@ interface StatCardDefinition {
 }
 
 const STAT_CARDS: StatCardDefinition[] = [
-  { key: 'totalLaunches', label: 'Projects' },
+  { key: 'totalLaunches', label: 'Listed' },
   { key: 'liveLaunches', label: 'Live' },
-  { key: 'comingSoonLaunches', label: 'Coming Soon' },
-  { key: 'communityInterestVotes', label: 'Interest Votes' },
+  { key: 'comingSoonLaunches', label: 'Upcoming' },
+  { key: 'communityInterestVotes', label: 'Votes' },
   { key: 'totalProjectUpdates', label: 'Updates' },
 ]
 
@@ -55,10 +55,10 @@ export function renderLauncherStatisticsSection(
     <section
       class="page-section launcher-statistics-section"
       data-launcher-statistics
-      aria-labelledby="platform-activity-heading"
+      aria-labelledby="launcher-activity-heading"
     >
-      <h2 class="section-title" id="platform-activity-heading">
-        Platform Activity
+      <h2 class="section-title" id="launcher-activity-heading">
+        Launcher Activity
       </h2>
       <div class="launcher-statistics-grid">
         ${STAT_CARDS.map((card) => {

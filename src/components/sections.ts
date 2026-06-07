@@ -8,11 +8,11 @@ import { renderToolCardGrid } from './toolCard'
 
 export function renderHeroSection(): string {
   return `
-    <section class="hero-card">
-      <h1>CBS Token Launcher</h1>
+    <section class="hero-card hero-card--compact">
+      <h1 class="hero-title">Launch, discover and grow Solana projects</h1>
       <p class="hero-text">
-        Discover CBS token launches on Solana, review essential market info,
-        and submit tokens created with CBS Token Builder.
+        Submit your token, build interest, share updates and help people find
+        your project.
       </p>
       <div class="hero-actions">
         ${renderSubmitLaunchButton()}
@@ -45,7 +45,12 @@ export function renderFeaturedLaunchesSection(
 
 export function renderTrendingLaunchesSection(
   launches: Launch[],
+  totalListedLaunches: number,
 ): string {
+  if (totalListedLaunches < 3) {
+    return ''
+  }
+
   return `
     <section
       class="page-section"
