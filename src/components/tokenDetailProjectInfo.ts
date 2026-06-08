@@ -4,7 +4,8 @@ import {
   getLaunchOfficialLinks,
   renderDetailLinksContent,
 } from './officialLinks'
-import { renderFeaturedBadge, renderVerificationBadge } from './launchBadges'
+import { renderFeaturedBadge } from './launchBadges'
+import { renderLaunchVerifiedTrustPanel } from './launchVerifiedTrustPanel'
 import { renderTokenLogo } from './tokenLogo'
 import { escapeHtml } from '../utils/html'
 import {
@@ -55,11 +56,12 @@ export function renderTokenDetailProjectInfo(launch: Launch): string {
           </span>
           <h1 data-token-name>${name}</h1>
           ${renderFeaturedBadge(launch)}
-          ${renderVerificationBadge(launch)}
           <p class="token-symbol" data-token-symbol>${symbol}</p>
           ${listedDateMarkup}
         </div>
       </div>
+
+      ${renderLaunchVerifiedTrustPanel(launch)}
 
       <div class="token-detail-project-description">
         <h2 class="token-detail-heading">About</h2>

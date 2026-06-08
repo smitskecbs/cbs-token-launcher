@@ -3,11 +3,11 @@ import type { HomepageSectionId } from '../types/homepage'
 import {
   formatLaunchRankScore,
   getLaunchBadges,
-  getVerificationBadge,
   getVerificationSortPriority,
   type LaunchBadge,
 } from '../services/launchRankingService'
 import { escapeHtml } from '../utils/html'
+import { renderLaunchVerifiedTrustBadge } from './launchVerifiedTrustPanel'
 
 export function renderLaunchBadges(
   launch: Launch,
@@ -43,19 +43,7 @@ export function renderFeaturedBadge(launch: Launch): string {
 }
 
 export function renderVerificationBadge(launch: Launch): string {
-  const badge = getVerificationBadge(launch)
-
-  if (!badge) {
-    return `
-      <div class="launch-verification-badge" data-launch-verification-badge hidden></div>
-    `
-  }
-
-  return `
-    <div class="launch-verification-badge" data-launch-verification-badge>
-      ${renderLaunchBadge(badge)}
-    </div>
-  `
+  return renderLaunchVerifiedTrustBadge(launch)
 }
 
 function renderLaunchBadge(badge: LaunchBadge): string {

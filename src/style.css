@@ -1949,6 +1949,129 @@ h3 {
   margin-bottom: 0;
 }
 
+.launch-verified-trust {
+  width: 100%;
+}
+
+.launch-verified-trust__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.launch-verified-trust__summary::-webkit-details-marker {
+  display: none;
+}
+
+.launch-verified-trust__info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #8a3b00;
+  background: rgba(255, 179, 71, 0.2);
+  border: 1px solid rgba(216, 111, 0, 0.25);
+}
+
+.launch-verified-trust__panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(216, 111, 0, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 244, 230, 0.92);
+}
+
+.launch-verified-trust__lead,
+.launch-verified-trust__sublead {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #555555;
+}
+
+.launch-verified-trust__sublead {
+  margin-top: 8px;
+  font-weight: 700;
+  color: #8a3b00;
+}
+
+.launch-verified-trust__checks {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.launch-verified-trust__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #444444;
+}
+
+.launch-verified-trust-block {
+  margin: 2px 0 10px;
+}
+
+.launch-verified-trust--detail .launch-verified-trust__summary--detail {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(45, 122, 58, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(45, 122, 58, 0.1),
+    rgba(255, 255, 255, 0.96)
+  );
+}
+
+.launch-verified-trust__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #2d7a3a;
+}
+
+.launch-verified-trust--compact .launch-verified-trust__panel {
+  max-width: 280px;
+}
+
+.admin-verification-readiness {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(216, 111, 0, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 248, 240, 0.95);
+}
+
+.admin-verification-readiness__title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #8a3b00;
+}
+
+.admin-verification-readiness__hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #777777;
+}
+
+.admin-verification-readiness__loading {
+  margin: 0;
+  font-size: 12px;
+  color: #777777;
+}
+
 .launch-badge--ecosystem {
   background: linear-gradient(135deg, rgba(255, 179, 71, 0.22), rgba(216, 111, 0, 0.12));
   border-color: rgba(216, 111, 0, 0.35);

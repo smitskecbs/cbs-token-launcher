@@ -57,11 +57,11 @@ export function getVerificationBadge(launch: Launch): LaunchBadge | null {
   const level = getLaunchVerificationLevel(launch)
 
   if (level === 'cbs-verified') {
-    return { id: 'cbs-verified', label: '⭐ CBS VERIFIED' }
+    return { id: 'cbs-verified', label: '⭐ Verified by CBS Launcher' }
   }
 
   if (level === 'verified') {
-    return { id: 'verified', label: '✓ VERIFIED' }
+    return { id: 'verified', label: '✓ Verified by CBS Launcher' }
   }
 
   return null

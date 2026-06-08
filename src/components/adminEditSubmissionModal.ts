@@ -1,9 +1,14 @@
 import { updateLaunchSubmissionDetails } from '../services/updateLaunchSubmissionDetailsService'
 import type { LaunchSubmissionSummary } from '../types/launchSubmission'
 import {
+  applyAdminVerificationReadiness,
+  renderAdminVerificationReadinessShell,
+} from './adminVerificationReadiness'
+import {
   validateAdminEditSubmissionForm,
   type AdminEditSubmissionFormValues,
 } from '../utils/adminEditSubmissionValidation'
+import { evaluateVerificationReadinessFromAdminForm } from '../utils/verificationReadiness'
 
 export function renderAdminEditSubmissionModal(): string {
   return `
@@ -210,6 +215,8 @@ export function renderAdminEditSubmissionModal(): string {
             />
           </label>
 
+          ${renderAdminVerificationReadinessShell()}
+
           <label class="submit-launch-field">
             <span class="submit-launch-label">Admin Notes</span>
             <span class="submit-launch-hint">Private — not shown on the public site</span>
@@ -329,6 +336,7 @@ function wireAdminEditSubmissionModal(
 
   form.addEventListener('input', () => {
     hideError()
+    refreshVerificationReadiness()
   })
 
   function hideError(): void {
@@ -404,6 +412,12 @@ function wireAdminEditSubmissionModal(
     }
   }
 
+  function refreshVerificationReadiness(): void {
+    applyAdminVerificationReadiness(
+      evaluateVerificationReadinessFromAdminForm(readFormValues()),
+    )
+  }
+
   function populateForm(submission: LaunchSubmissionSummary): void {
     form.querySelector<HTMLInputElement>(
       '[data-admin-edit-project-name]',
@@ -446,6 +460,7 @@ function wireAdminEditSubmissionModal(
     form.querySelector<HTMLTextAreaElement>(
       '[data-admin-edit-admin-notes]',
     )!.value = submission.adminNotes ?? ''
+    refreshVerificationReadiness()
   }
 
   function closeModal(): void {
