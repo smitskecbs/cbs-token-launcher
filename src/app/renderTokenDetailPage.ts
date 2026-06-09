@@ -1,6 +1,5 @@
 import bannerUrl from '../assets/launcher-banner.png'
 import type { Launch } from '../types/launch'
-import { getSolscanTokenUrl } from '../config/urls'
 import { getLaunchById } from '../services/launchService'
 import {
   attachTokenDetailProjectInfo,
@@ -13,6 +12,7 @@ import { renderFooter } from '../components/sections'
 import { renderTokenDetailBackNav } from '../components/tokenDetailBackNav'
 import { renderLaunchAdminActions } from '../components/launchAdminActions'
 import { renderTokenDetailBuySection } from '../components/tokenDetailBuySection'
+import { renderTokenDetailExternalActions } from '../components/tokenDetailExternalActions'
 import { renderTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import {
   renderTokenDetailAccordionSections,
@@ -83,7 +83,6 @@ function renderNotFound(tokenId: string): string {
 
 function renderTokenDetailCard(launch: Launch): string {
   const id = escapeHtml(launch.id)
-  const solscanUrl = escapeHtml(getSolscanTokenUrl(launch.mintAddress))
 
   return `
     <article
@@ -100,15 +99,9 @@ function renderTokenDetailCard(launch: Launch): string {
 
       ${renderTokenDetailAccordionSections(launch)}
 
+      ${renderTokenDetailExternalActions(launch)}
+
       <div class="token-detail-actions actions">
-        <a
-          class="primary-btn"
-          href="${solscanUrl}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View on Solscan
-        </a>
         <button
           type="button"
           class="secondary-btn"

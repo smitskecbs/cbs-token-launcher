@@ -1113,7 +1113,7 @@ h3 {
 
 .token-detail-pool-actions {
   display: grid;
-  gap: 10px;
+  gap: 14px;
   margin-top: 4px;
 }
 
@@ -1127,6 +1127,15 @@ h3 {
     width: 100%;
     text-align: center;
   }
+}
+
+.token-detail-pool-actions .primary-btn,
+.token-detail-pool-actions .secondary-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .token-detail-trading {
@@ -1147,25 +1156,44 @@ h3 {
   margin: 4px 0 10px;
 }
 
-.token-detail-trading-actions {
-  display: grid;
-  gap: 10px;
+.token-detail-external-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: 12px;
 }
 
-@media (min-width: 480px) {
-  .token-detail-trading-actions {
-    grid-template-columns: 1fr 1fr;
-  }
+.token-detail-external-action-slot {
+  width: 100%;
+}
 
-  .token-detail-trading-actions .primary-btn,
-  .token-detail-trading-actions .secondary-btn {
-    width: 100%;
-    text-align: center;
-  }
+.token-detail-external-actions .primary-btn,
+.token-detail-external-actions .secondary-btn,
+.token-detail-external-action-slot .primary-btn,
+.token-detail-external-action-slot .secondary-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .token-detail-actions {
-  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.token-detail-actions .primary-btn,
+.token-detail-actions .secondary-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .token-detail-card .token-tags-panel {
@@ -1176,18 +1204,6 @@ h3 {
   margin-top: 12px;
 }
 
-@media (min-width: 480px) {
-  .token-detail-actions {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .token-detail-actions .primary-btn,
-  .token-detail-actions .secondary-btn {
-    width: auto;
-    min-width: 160px;
-  }
-}
 
 .token-header--detail h1 {
   font-size: clamp(24px, 5vw, 36px);

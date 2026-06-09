@@ -72,8 +72,8 @@ export async function renderApp(): Promise<void> {
         src="${bannerUrl}"
         alt="CBS Token Launcher"
       />
-      ${renderHeroSection()}
       ${renderLaunchFiltersPanel()}
+      ${renderHeroSection()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderListedLaunchesSection(homepage.listed)}
       ${renderRecentActivitySection(fetchedUpdates, catalog, recentActivityOptions)}

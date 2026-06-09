@@ -1,11 +1,6 @@
 import type { Launch } from '../types/launch'
 import type { TokenMarketData } from '../types/tokenMarketData'
-import { getJupiterSwapUrl } from '../config/urls'
-import {
-  renderDexscreenerAnchorHtml,
-  resolveDexscreenerUrl,
-} from '../utils/dexscreenerUrl'
-import { escapeHtml } from '../utils/html'
+import { applyTokenDetailExternalActions } from './tokenDetailExternalActions'
 import { formatLiquidity } from '../utils/formatLiquidity'
 import { formatPrice } from '../utils/formatPrice'
 import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
@@ -32,10 +27,6 @@ function formatPairAddress(pairAddress: string | null): string {
   }
 
   return `${pairAddress.slice(0, 6)}…${pairAddress.slice(-6)}`
-}
-
-function resolveTradingDexscreenerUrl(launch: Launch): string | null {
-  return resolveDexscreenerUrl(launch.mintAddress)
 }
 
 export function renderTokenDetailTradingSection(launch: Launch): string {
@@ -81,10 +72,6 @@ export function renderTokenDetailTradingSection(launch: Launch): string {
               <dd data-token-trading-volume>${EMPTY_VALUE}</dd>
             </div>
           </dl>
-          <div class="token-detail-trading-actions actions">
-            <div data-token-detail-trading-dexscreener-slot></div>
-            <div data-token-detail-trading-jupiter-slot></div>
-          </div>
         </div>
         <p
           class="token-detail-trading-note"
@@ -156,6 +143,7 @@ export function setTokenDetailTradingLoading(launch: Launch): void {
   }
 
   applyTokenDetailBuySection(launch, { poolExists: null })
+  applyTokenDetailExternalActions(launch, null)
 }
 
 export function applyTokenDetailTradingData(
@@ -203,6 +191,7 @@ export function applyTokenDetailTradingData(
 
     applyTokenDetailBuySection(launch, { poolExists: false })
     applyTokenDetailPoolSection(launch, data)
+    applyTokenDetailExternalActions(launch, data)
     return
   }
 
@@ -233,42 +222,9 @@ export function applyTokenDetailTradingData(
   )
   setText(root, '[data-token-trading-volume]', formatVolume(data.volume24hUsd))
 
-  const dexscreenerUrl = resolveTradingDexscreenerUrl(launch)
-  const dexscreenerSlot = root.querySelector<HTMLElement>(
-    '[data-token-detail-trading-dexscreener-slot]',
-  )
-
-  if (dexscreenerSlot) {
-    dexscreenerSlot.innerHTML = dexscreenerUrl
-      ? renderDexscreenerAnchorHtml(
-          dexscreenerUrl,
-          'View on Dexscreener',
-          'secondary-btn',
-        )
-      : ''
-  }
-
-  const jupiterSlot = root.querySelector<HTMLElement>(
-    '[data-token-detail-trading-jupiter-slot]',
-  )
-
-  if (jupiterSlot) {
-    const jupiterUrl = getJupiterSwapUrl(launch.mintAddress)
-
-    jupiterSlot.innerHTML = `
-      <a
-        class="primary-btn"
-        href="${escapeHtml(jupiterUrl)}"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Buy on Jupiter
-      </a>
-    `
-  }
-
   applyTokenDetailBuySection(launch, { poolExists: true })
   applyTokenDetailPoolSection(launch, data)
+  applyTokenDetailExternalActions(launch, data)
 }
 
 export function setTokenDetailTradingError(
@@ -314,4 +270,5 @@ export function setTokenDetailTradingError(
   }
 
   applyTokenDetailBuySection(launch, { poolExists: null })
+  applyTokenDetailExternalActions(launch, null)
 }
