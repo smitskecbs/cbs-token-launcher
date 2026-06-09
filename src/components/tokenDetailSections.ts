@@ -2,7 +2,17 @@ import type { Launch } from '../types/launch'
 import { renderLaunchAnalyticsPanel } from './launchAnalyticsPanel'
 import { renderLaunchRiskPanel } from './launchRiskPanel'
 import { renderTechnicalRiskNotice } from './technicalRiskNotice'
-import { renderTokenDetailProjectInfo } from './tokenDetailProjectInfo'
+import { renderLaunchVerifiedTrustPanel } from './launchVerifiedTrustPanel'
+import {
+  renderTokenDetailMarketOverview,
+} from './tokenDetailMarketOverview'
+import {
+  renderTokenDetailPriceChart,
+} from './tokenDetailPriceChart'
+import {
+  renderTokenDetailProjectHeader,
+  renderTokenDetailProjectInfo,
+} from './tokenDetailProjectInfo'
 import { renderTokenDetailProjectTimeline } from './tokenDetailProjectTimeline'
 import { renderTokenDetailMetadataPanel } from './tokenDetailMetadataPanel'
 import {
@@ -31,6 +41,12 @@ function renderMetadataSection(launch: Launch): string {
 
 export function renderTokenDetailSections(launch: Launch): string {
   return `
+    <section class="token-detail-section token-detail-project-header-wrap">
+      ${renderTokenDetailProjectHeader(launch)}
+    </section>
+    ${renderTokenDetailMarketOverview(launch)}
+    ${renderTokenDetailPriceChart(launch)}
+    ${renderLaunchVerifiedTrustPanel(launch)}
     ${renderTokenDetailProjectInfo(launch)}
     ${renderTokenDetailProjectTimeline(launch)}
   `

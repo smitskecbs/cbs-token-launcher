@@ -5,8 +5,15 @@ import {
   loadMintVerification,
   shouldAutoLoadMetadata,
 } from '../services/mintVerificationService'
+import { fetchTokenMarketData } from '../services/tokenMarketDataService'
+import { getCachedTokenMarketData } from '../services/tokenMarketDataCache'
+import { isLaunchLiveForBuy } from '../utils/launchBuyLink'
 import { applyLaunchCardFromResult } from './applyLaunchCardMetadata'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
+import {
+  applyLaunchDiscoveryCardMarketData,
+  setLaunchDiscoveryCardMarketLoading,
+} from './launchDiscoveryCardStats'
 import { attachLaunchInterestControl } from './launchInterestControl'
 import {
   getLaunchCardInstanceIds,
@@ -35,12 +42,17 @@ export function attachLaunchCardHandlersForLaunch(launch: Launch): void {
   attachLaunchCardNavigation(launch)
   attachLaunchInterestControl(launch)
   restoreCachedLaunchCardData(launch)
+  restoreCachedLaunchCardMarketData(launch)
 
   if (
     shouldAutoLoadMetadata(launch) &&
     !getCachedMintVerification(launch.mintAddress)
   ) {
     void loadDiscoveryCardMetadata(launch)
+  }
+
+  if (isLaunchLiveForBuy(launch)) {
+    void loadDiscoveryCardMarketData(launch)
   }
 }
 
@@ -118,4 +130,35 @@ function restoreCachedLaunchCardData(launch: Launch): void {
 async function loadDiscoveryCardMetadata(launch: Launch): Promise<void> {
   const result = await loadMintVerification(launch.mintAddress)
   applyLaunchCardFromResult(launch, result)
+}
+
+function restoreCachedLaunchCardMarketData(launch: Launch): void {
+  const cached = getCachedTokenMarketData(launch.mintAddress)
+
+  if (cached) {
+    applyLaunchDiscoveryCardMarketData(launch, cached)
+  }
+}
+
+async function loadDiscoveryCardMarketData(launch: Launch): Promise<void> {
+  if (!isLaunchLiveForBuy(launch)) {
+    return
+  }
+
+  const cached = getCachedTokenMarketData(launch.mintAddress)
+
+  if (cached) {
+    applyLaunchDiscoveryCardMarketData(launch, cached)
+    return
+  }
+
+  setLaunchDiscoveryCardMarketLoading(launch)
+
+  const result = await fetchTokenMarketData(launch.mintAddress)
+
+  if (!result.ok) {
+    return
+  }
+
+  applyLaunchDiscoveryCardMarketData(launch, result.data)
 }

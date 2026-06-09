@@ -26,6 +26,21 @@ export function getDexscreenerTokenUrl(mintAddress: string): string {
   return `https://dexscreener.com/solana/${mintAddress.trim()}`
 }
 
+export function getDexscreenerChartEmbedUrl(pairAddress: string): string {
+  const pair = pairAddress.trim()
+  const params = new URLSearchParams({
+    embed: '1',
+    loadChartSettings: '0',
+    chartLeftToolbar: '0',
+    chartTheme: 'light',
+    chartDefaultOnMobile: '1',
+    trades: '0',
+    info: '0',
+  })
+
+  return `https://dexscreener.com/solana/${pair}?${params.toString()}`
+}
+
 export function getJupiterSwapUrl(mintAddress: string): string {
   return `https://jup.ag/swap/SOL-${mintAddress.trim()}`
 }

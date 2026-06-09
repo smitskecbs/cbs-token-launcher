@@ -7,6 +7,7 @@ import {
 } from '../services/launchInterestStorage'
 import { appendLaunchActivityLogEntry } from '../services/launchActivityLog'
 import { postLaunchInterest } from '../services/launchInterestService'
+import { updateLaunchDiscoveryCardInterest } from './launchDiscoveryCardStats'
 
 export function renderLaunchInterestControl(
   launch: Launch,
@@ -132,6 +133,7 @@ async function handleLaunchInterestVote(
   }
 
   launch.interestCount = result.interestCount
+  updateLaunchDiscoveryCardInterest(launch, result.interestCount)
   markLaunchInterestVoted(result.mintAddress)
   appendLaunchActivityLogEntry({
     type: 'interest_vote_received',

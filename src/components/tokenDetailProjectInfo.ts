@@ -5,7 +5,6 @@ import {
   renderDetailLinksContent,
 } from './officialLinks'
 import { renderFeaturedBadge } from './launchBadges'
-import { renderLaunchVerifiedTrustPanel } from './launchVerifiedTrustPanel'
 import { renderTokenLogo } from './tokenLogo'
 import { escapeHtml } from '../utils/html'
 import {
@@ -27,12 +26,9 @@ function renderDetailLinksSection(launch: Launch): string {
   `
 }
 
-export function renderTokenDetailProjectInfo(launch: Launch): string {
-  const id = escapeHtml(launch.id)
+export function renderTokenDetailProjectHeader(launch: Launch): string {
   const name = escapeHtml(getDetailPageName(launch))
   const symbol = escapeHtml(getDetailPageSymbol(launch))
-  const description = escapeHtml(getDetailPageDescription(launch))
-  const mintAddress = escapeHtml(launch.mintAddress)
   const statusLabel = getLaunchDetailStatusLabel(launch)
   const statusClass = getLaunchDetailStatusClass(statusLabel)
   const listedDateDisplay = getLaunchListedDateDisplay(launch)
@@ -41,28 +37,34 @@ export function renderTokenDetailProjectInfo(launch: Launch): string {
     : ''
 
   return `
+    <div class="token-header token-header--detail token-header--detail-section">
+      ${renderTokenLogo(launch)}
+      <div class="token-title-block">
+        <span
+          class="token-detail-status-badge ${statusClass}"
+          data-token-detail-status
+        >
+          ${escapeHtml(statusLabel)}
+        </span>
+        <h1 data-token-name>${name}</h1>
+        ${renderFeaturedBadge(launch)}
+        <p class="token-symbol" data-token-symbol>${symbol}</p>
+        ${listedDateMarkup}
+      </div>
+    </div>
+  `
+}
+
+export function renderTokenDetailProjectInfo(launch: Launch): string {
+  const id = escapeHtml(launch.id)
+  const description = escapeHtml(getDetailPageDescription(launch))
+  const mintAddress = escapeHtml(launch.mintAddress)
+
+  return `
     <section
       class="token-detail-section token-detail-project"
       data-token-detail-project
     >
-      <div class="token-header token-header--detail token-header--detail-section">
-        ${renderTokenLogo(launch)}
-        <div class="token-title-block">
-          <span
-            class="token-detail-status-badge ${statusClass}"
-            data-token-detail-status
-          >
-            ${escapeHtml(statusLabel)}
-          </span>
-          <h1 data-token-name>${name}</h1>
-          ${renderFeaturedBadge(launch)}
-          <p class="token-symbol" data-token-symbol>${symbol}</p>
-          ${listedDateMarkup}
-        </div>
-      </div>
-
-      ${renderLaunchVerifiedTrustPanel(launch)}
-
       <div class="token-detail-project-description">
         <h2 class="token-detail-heading">About</h2>
         <p data-token-description>${description}</p>

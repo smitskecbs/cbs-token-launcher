@@ -19,6 +19,7 @@ import {
 import { renderLaunchMetadataSummary } from './launchCardMetadataSummary'
 import { getCachedMintVerification } from '../services/mintVerificationCache'
 import { renderDiscoveryCardActions } from './launchDiscoveryCardActions'
+import { renderLaunchDiscoveryCardStats } from './launchDiscoveryCardStats'
 import { renderDiscoveryStatusBadge } from './launchDiscoveryStatusBadge'
 
 /** Compact homepage discovery card — deep analysis lives on the token detail page */
@@ -83,6 +84,8 @@ export function renderLaunchCard(
             <p class="token-symbol" data-token-symbol>${symbol}</p>
           </div>
         </div>
+
+        ${renderLaunchDiscoveryCardStats(launch)}
 
         ${renderDiscoveryStatusBadge(launch)}
 

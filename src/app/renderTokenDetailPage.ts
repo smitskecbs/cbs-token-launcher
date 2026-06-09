@@ -20,6 +20,16 @@ import {
 } from '../components/tokenDetailSections'
 import { applyTokenDetailPoolSection } from '../components/tokenDetailPoolSection'
 import {
+  applyTokenDetailMarketOverview,
+  setTokenDetailMarketOverviewError,
+  setTokenDetailMarketOverviewLoading,
+} from '../components/tokenDetailMarketOverview'
+import {
+  applyTokenDetailPriceChart,
+  setTokenDetailPriceChartError,
+  setTokenDetailPriceChartLoading,
+} from '../components/tokenDetailPriceChart'
+import {
   applyTokenDetailTradingData,
   renderTokenDetailTradingSection,
   setTokenDetailTradingError,
@@ -184,6 +194,8 @@ async function loadTokenDetailTradingData(
       applyTokenDetailPoolSection(launch, cached)
 
       if (isLive) {
+        applyTokenDetailMarketOverview(launch, cached)
+        applyTokenDetailPriceChart(launch, cached)
         applyTokenDetailTradingData(launch, cached)
       }
 
@@ -192,6 +204,8 @@ async function loadTokenDetailTradingData(
   }
 
   if (isLive) {
+    setTokenDetailMarketOverviewLoading(launch)
+    setTokenDetailPriceChartLoading(launch)
     setTokenDetailTradingLoading(launch)
   }
 
@@ -199,6 +213,8 @@ async function loadTokenDetailTradingData(
 
   if (!result.ok) {
     if (isLive) {
+      setTokenDetailMarketOverviewError(launch, result.message)
+      setTokenDetailPriceChartError(launch, result.message)
       setTokenDetailTradingError(launch, result.message)
     }
 
@@ -208,6 +224,8 @@ async function loadTokenDetailTradingData(
   applyTokenDetailPoolSection(launch, result.data)
 
   if (isLive) {
+    applyTokenDetailMarketOverview(launch, result.data)
+    applyTokenDetailPriceChart(launch, result.data)
     applyTokenDetailTradingData(launch, result.data)
   }
 }

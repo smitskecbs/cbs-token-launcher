@@ -337,6 +337,62 @@ h3 {
   text-align: left;
 }
 
+.launch-discovery-card__stats {
+  display: grid;
+  gap: 6px;
+}
+
+.launch-discovery-market-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.launch-discovery-market-stat {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid rgba(216, 111, 0, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 248, 240, 0.92);
+}
+
+.launch-discovery-market-stat dt {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a3b00;
+}
+
+.launch-discovery-market-stat dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #222222;
+  font-variant-numeric: tabular-nums;
+}
+
+.launch-discovery-market-loading {
+  margin: 0;
+  font-size: 12px;
+  color: #777777;
+}
+
+.launch-discovery-interest-stat {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(216, 111, 0, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 248, 240, 0.92);
+  font-size: 14px;
+  font-weight: 700;
+  color: #8a3b00;
+}
+
 .launch-discovery-card__status {
   display: flex;
   flex-wrap: wrap;
@@ -1164,6 +1220,85 @@ h3 {
 
 .token-detail-project {
   text-align: center;
+}
+
+.token-detail-project-header-wrap {
+  margin-bottom: 8px;
+}
+
+.token-detail-market-overview,
+.token-detail-price-chart {
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid rgba(216, 111, 0, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 248, 240, 0.92);
+}
+
+.token-detail-market-overview__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.token-detail-market-overview__loading,
+.token-detail-market-overview__unavailable,
+.token-detail-market-overview__error,
+.token-detail-price-chart__loading,
+.token-detail-price-chart__unavailable,
+.token-detail-price-chart__error {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #666666;
+}
+
+.token-detail-market-overview__error,
+.token-detail-price-chart__error {
+  color: #b42318;
+}
+
+.token-detail-price-chart__header {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.token-detail-price-chart__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.token-detail-price-chart__frame-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  border: 1px solid rgba(216, 111, 0, 0.14);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.token-detail-price-chart__frame {
+  display: block;
+  width: 100%;
+  height: 360px;
+  border: 0;
+}
+
+@media (max-width: 520px) {
+  .launch-discovery-market-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .token-detail-market-overview__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .token-detail-price-chart__frame {
+    height: 300px;
+  }
 }
 
 .token-detail-project-description {
