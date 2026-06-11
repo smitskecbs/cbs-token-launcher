@@ -5,6 +5,7 @@ import {
   getMetadataStatusSummary,
   METADATA_CHECK_COUNT,
 } from '../utils/metadataStatusChecks'
+import { forEachLaunchCardElement } from './launchCard'
 
 function getSummaryClassName(
   summary: ReturnType<typeof getMetadataStatusSummary>,
@@ -42,21 +43,23 @@ export function applyLaunchCardMetadataSummary(
   launch: Launch,
   result: ReadTokenMintResult | null,
 ): void {
-  const card = document.getElementById(`launch-${launch.id}`)
-  const element = card?.querySelector<HTMLElement>(
-    '[data-launch-metadata-summary]',
-  )
-
-  if (!element) {
-    return
-  }
-
   const summary = getMetadataStatusSummary(launch, result)
   const className = getSummaryClassName(summary)
+  const label = formatMetadataSummaryLabel(summary)
 
-  element.className = className
-  element.textContent = formatMetadataSummaryLabel(summary)
-  element.setAttribute('aria-label', formatMetadataSummaryLabel(summary))
+  forEachLaunchCardElement(launch.id, (card) => {
+    const element = card.querySelector<HTMLElement>(
+      '[data-launch-metadata-summary]',
+    )
+
+    if (!element) {
+      return
+    }
+
+    element.className = className
+    element.textContent = label
+    element.setAttribute('aria-label', label)
+  })
 }
 
 export { METADATA_CHECK_COUNT }

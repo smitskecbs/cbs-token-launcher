@@ -20,6 +20,9 @@ import {
   getSearchResultLaunchCardInstanceId,
 } from './launchCard'
 
+const pendingDiscoveryMetadataLoads = new Map<string, Promise<void>>()
+const pendingDiscoveryMarketLoads = new Map<string, Promise<void>>()
+
 /**
  * Wire card navigation and lightweight cached metadata for homepage discovery cards.
  */
@@ -38,9 +41,19 @@ export function attachLaunchCardHandlers(
   }
 }
 
-export function attachLaunchCardHandlersForLaunch(launch: Launch): void {
-  attachLaunchCardNavigation(launch)
-  attachLaunchInterestControl(launch)
+export function attachLaunchCardHandlersForLaunch(
+  launch: Launch,
+  options: { cardInstanceId?: string } = {},
+): void {
+  const cards = options.cardInstanceId
+    ? getLaunchCardElementsByInstanceId(options.cardInstanceId)
+    : getLaunchCardElements(launch.id)
+
+  for (const card of cards) {
+    wireLaunchCardNavigation(card, launch)
+    attachLaunchInterestControl(launch, card)
+  }
+
   restoreCachedLaunchCardData(launch)
   restoreCachedLaunchCardMarketData(launch)
 
@@ -84,31 +97,32 @@ function wireLaunchCardNavigation(
   })
 }
 
-function attachLaunchCardNavigation(launch: Launch): void {
-  for (const card of getLaunchCardElements(launch.id)) {
-    wireLaunchCardNavigation(card, launch)
-  }
-}
-
 export function attachLaunchSearchResultCardHandlers(launch: Launch): void {
-  const card = document.querySelector<HTMLElement>(
-    `[data-token-card="${getSearchResultLaunchCardInstanceId(launch.id)}"]`,
-  )
-
-  if (!card) {
-    return
-  }
-
-  wireLaunchCardNavigation(card, launch)
-  attachLaunchInterestControl(launch, card)
+  attachLaunchCardHandlersForLaunch(launch, {
+    cardInstanceId: getSearchResultLaunchCardInstanceId(launch.id),
+  })
 }
 
 function getLaunchCardElements(launchId: string): HTMLElement[] {
   return getLaunchCardInstanceIds(launchId)
-    .map((instanceId) =>
-      document.querySelector<HTMLElement>(`[data-token-card="${instanceId}"]`),
-    )
+    .map((instanceId) => getLaunchCardElementByInstanceId(instanceId))
     .filter((card): card is HTMLElement => card != null)
+}
+
+function getLaunchCardElementsByInstanceId(
+  cardInstanceId: string,
+): HTMLElement[] {
+  const card = getLaunchCardElementByInstanceId(cardInstanceId)
+
+  return card ? [card] : []
+}
+
+function getLaunchCardElementByInstanceId(
+  cardInstanceId: string,
+): HTMLElement | null {
+  return document.querySelector<HTMLElement>(
+    `[data-token-card="${cardInstanceId}"]`,
+  )
 }
 
 /** Restore cached metadata for card header fields without network calls */
@@ -128,8 +142,32 @@ function restoreCachedLaunchCardData(launch: Launch): void {
 
 /** Auto-load metadata only when catalog entries opt in (uses existing cache layer) */
 async function loadDiscoveryCardMetadata(launch: Launch): Promise<void> {
-  const result = await loadMintVerification(launch.mintAddress)
-  applyLaunchCardFromResult(launch, result)
+  const mintAddress = launch.mintAddress.trim()
+  const pending = pendingDiscoveryMetadataLoads.get(mintAddress)
+
+  if (pending) {
+    await pending
+    const cached = getCachedMintVerification(mintAddress)
+
+    if (cached) {
+      applyLaunchCardFromResult(launch, cached)
+    }
+
+    return
+  }
+
+  const loadPromise = (async () => {
+    const result = await loadMintVerification(mintAddress)
+    applyLaunchCardFromResult(launch, result)
+  })()
+
+  pendingDiscoveryMetadataLoads.set(mintAddress, loadPromise)
+
+  try {
+    await loadPromise
+  } finally {
+    pendingDiscoveryMetadataLoads.delete(mintAddress)
+  }
 }
 
 function restoreCachedLaunchCardMarketData(launch: Launch): void {
@@ -145,20 +183,44 @@ async function loadDiscoveryCardMarketData(launch: Launch): Promise<void> {
     return
   }
 
-  const cached = getCachedTokenMarketData(launch.mintAddress)
+  const mintAddress = launch.mintAddress.trim()
+  const cached = getCachedTokenMarketData(mintAddress)
 
   if (cached) {
     applyLaunchDiscoveryCardMarketData(launch, cached)
     return
   }
 
-  setLaunchDiscoveryCardMarketLoading(launch)
+  const pending = pendingDiscoveryMarketLoads.get(mintAddress)
 
-  const result = await fetchTokenMarketData(launch.mintAddress)
+  if (pending) {
+    await pending
+    const resolved = getCachedTokenMarketData(mintAddress)
 
-  if (!result.ok) {
+    if (resolved) {
+      applyLaunchDiscoveryCardMarketData(launch, resolved)
+    }
+
     return
   }
 
-  applyLaunchDiscoveryCardMarketData(launch, result.data)
+  setLaunchDiscoveryCardMarketLoading(launch)
+
+  const loadPromise = (async () => {
+    const result = await fetchTokenMarketData(mintAddress)
+
+    if (!result.ok) {
+      return
+    }
+
+    applyLaunchDiscoveryCardMarketData(launch, result.data)
+  })()
+
+  pendingDiscoveryMarketLoads.set(mintAddress, loadPromise)
+
+  try {
+    await loadPromise
+  } finally {
+    pendingDiscoveryMarketLoads.delete(mintAddress)
+  }
 }

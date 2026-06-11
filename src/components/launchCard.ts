@@ -39,6 +39,19 @@ export function getLaunchCardInstanceIds(launchId: string): string[] {
   ]
 }
 
+export function forEachLaunchCardElement(
+  launchId: string,
+  callback: (card: HTMLElement) => void,
+): void {
+  for (const instanceId of getLaunchCardInstanceIds(launchId)) {
+    const card = document.getElementById(`launch-${instanceId}`)
+
+    if (card) {
+      callback(card)
+    }
+  }
+}
+
 export function renderLaunchCard(
   launch: Launch,
   options: {

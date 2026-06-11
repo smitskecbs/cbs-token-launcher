@@ -18,6 +18,7 @@ import {
 import { getLaunchCatalog } from '../services/launchService'
 import { reapplyLaunchFilters } from './launchFiltersPanel'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
+import { forEachLaunchCardElement } from './launchCard'
 
 /** Session cache of logo URLs that already loaded successfully in this tab */
 const loadedTokenLogoUrls = new Set<string>()
@@ -96,40 +97,50 @@ export function applyLaunchCardFromResult(
     return
   }
 
-  const card = document.getElementById(`launch-${launch.id}`)
-
-  if (!card) {
-    return
-  }
-
   const displayName = getLaunchDisplayName(launch, result)
   const displaySymbol = getLaunchDisplaySymbol(launch, result)
   const displayDescription = getLaunchDisplayDescription(launch, result)
+  let updatedCard = false
 
-  if (displayName) {
-    const nameEl = card.querySelector<HTMLElement>('[data-token-name]')
+  forEachLaunchCardElement(launch.id, (card) => {
+    updatedCard = true
 
-    if (nameEl) {
-      nameEl.textContent = displayName
+    if (displayName) {
+      const nameEl = card.querySelector<HTMLElement>('[data-token-name]')
+
+      if (nameEl) {
+        nameEl.textContent = displayName
+      }
     }
-  }
 
-  if (displaySymbol) {
-    const symbolEl = card.querySelector<HTMLElement>('[data-token-symbol]')
+    if (displaySymbol) {
+      const symbolEl = card.querySelector<HTMLElement>('[data-token-symbol]')
 
-    if (symbolEl) {
-      symbolEl.textContent = displaySymbol
+      if (symbolEl) {
+        symbolEl.textContent = displaySymbol
+      }
     }
-  }
 
-  if (displayDescription) {
-    const descriptionEl = card.querySelector<HTMLElement>(
-      '[data-token-description]',
-    )
+    if (displayDescription) {
+      const descriptionEl = card.querySelector<HTMLElement>(
+        '[data-token-description]',
+      )
 
-    if (descriptionEl) {
-      descriptionEl.textContent = displayDescription
+      if (descriptionEl) {
+        descriptionEl.textContent = displayDescription
+      }
     }
+
+    applyOfficialLinksFromMetadata(card, launch, result)
+    applyTokenCategory(card, result)
+    applyTokenTags(card, result)
+
+    card.dataset.launchSearch = buildLaunchSearchText(launch, result)
+    card.dataset.tokenCategorySlug = getLaunchFilterCategorySlug(launch, result)
+  })
+
+  if (!updatedCard) {
+    return
   }
 
   applyTokenLogo(
@@ -138,13 +149,6 @@ export function applyLaunchCardFromResult(
     getLaunchLogoFallback(launch),
     displayName,
   )
-
-  applyOfficialLinksFromMetadata(card, launch, result)
-  applyTokenCategory(card, result)
-  applyTokenTags(card, result)
-
-  card.dataset.launchSearch = buildLaunchSearchText(launch, result)
-  card.dataset.tokenCategorySlug = getLaunchFilterCategorySlug(launch, result)
 
   reapplyLaunchFilters(getLaunchCatalog())
   refreshLaunchAnalytics(launch)
