@@ -6,7 +6,7 @@ import {
   type LaunchFilterState,
   isLaunchFilterActive,
 } from '../types/launchFilters'
-import { attachLaunchSearchResultCardHandlers } from './launchCardHandlers'
+import { hydrateLaunchSearchResultCard } from './launchCardHandlers'
 import {
   renderLaunchSearchResultsContent,
   renderLaunchSearchResultsShell,
@@ -29,6 +29,12 @@ const LAUNCH_FILTER_SECTIONS = new Set([
 ])
 
 let filterState: LaunchFilterState = { ...DEFAULT_LAUNCH_FILTER_STATE }
+let launchSearchResultsHydrating = false
+
+/** True while inline search result cards are being rendered and hydrated. */
+export function isHydratingLaunchSearchResults(): boolean {
+  return launchSearchResultsHydrating
+}
 
 export function renderLaunchFiltersPanel(): string {
   return `
@@ -313,8 +319,14 @@ function updateLaunchSearchResults(
   resultsSection.hidden = false
   resultsBody.innerHTML = renderLaunchSearchResultsContent(matchingLaunches)
 
-  for (const launch of matchingLaunches) {
-    attachLaunchSearchResultCardHandlers(launch)
+  launchSearchResultsHydrating = true
+
+  try {
+    for (const launch of matchingLaunches) {
+      hydrateLaunchSearchResultCard(launch)
+    }
+  } finally {
+    launchSearchResultsHydrating = false
   }
 }
 

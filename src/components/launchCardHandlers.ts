@@ -54,8 +54,8 @@ export function attachLaunchCardHandlersForLaunch(
     attachLaunchInterestControl(launch, card)
   }
 
-  restoreCachedLaunchCardData(launch)
   restoreCachedLaunchCardMarketData(launch)
+  restoreCachedLaunchCardData(launch)
 
   if (
     shouldAutoLoadMetadata(launch) &&
@@ -97,10 +97,16 @@ function wireLaunchCardNavigation(
   })
 }
 
-export function attachLaunchSearchResultCardHandlers(launch: Launch): void {
+/** Hydrate a single inline search result card using shared discovery caches/loaders. */
+export function hydrateLaunchSearchResultCard(launch: Launch): void {
   attachLaunchCardHandlersForLaunch(launch, {
     cardInstanceId: getSearchResultLaunchCardInstanceId(launch.id),
   })
+}
+
+/** @deprecated Use hydrateLaunchSearchResultCard */
+export function attachLaunchSearchResultCardHandlers(launch: Launch): void {
+  hydrateLaunchSearchResultCard(launch)
 }
 
 function getLaunchCardElements(launchId: string): HTMLElement[] {

@@ -16,7 +16,10 @@ import {
   getLaunchFilterCategorySlug,
 } from '../services/launchFilterService'
 import { getLaunchCatalog } from '../services/launchService'
-import { reapplyLaunchFilters } from './launchFiltersPanel'
+import {
+  isHydratingLaunchSearchResults,
+  reapplyLaunchFilters,
+} from './launchFiltersPanel'
 import { applyLaunchCardMetadataSummary } from './launchCardMetadataSummary'
 import { forEachLaunchCardElement } from './launchCard'
 
@@ -150,7 +153,10 @@ export function applyLaunchCardFromResult(
     displayName,
   )
 
-  reapplyLaunchFilters(getLaunchCatalog())
+  if (!isHydratingLaunchSearchResults()) {
+    reapplyLaunchFilters(getLaunchCatalog())
+  }
+
   refreshLaunchAnalytics(launch)
   refreshLaunchRisk(launch)
 }

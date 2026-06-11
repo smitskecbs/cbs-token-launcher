@@ -71,12 +71,14 @@ export function renderLaunchCard(
   const searchText = escapeHtml(buildLaunchSearchText(launch))
   const categorySlug = escapeHtml(getLaunchFilterCategorySlug(launch))
   const cachedMintResult = getCachedMintVerification(launch.mintAddress)
+  const launchId = escapeHtml(launch.id)
 
   return `
     <article
       class="launch-card launch-card--link launch-card--discovery"
       id="launch-${id}"
       data-token-card="${id}"
+      data-launch-id="${launchId}"
       data-launch-rank-score="${score ?? 0}"
       data-launch-verification-priority="${verificationPriority}"
       data-launch-search="${searchText}"
