@@ -1,7 +1,7 @@
 /**
  * Consolidated admin API — auth, submissions CRUD, launch update writes.
  */
-import { handleAdminApi } from './lib/adminRouter.js'
+import { handleAdminApi } from '../server/lib/adminRouter.js'
 
 console.log('[admin-api] handler loaded')
 

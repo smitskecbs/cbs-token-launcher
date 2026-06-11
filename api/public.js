@@ -1,7 +1,7 @@
 /**
  * Consolidated public API — homepage, interest, market data, launch update reads.
  */
-import { handlePublicApi } from './lib/publicRouter.js'
+import { handlePublicApi } from '../server/lib/publicRouter.js'
 
 console.log('[public-api] handler loaded')
 

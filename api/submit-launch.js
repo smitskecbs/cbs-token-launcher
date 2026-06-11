@@ -8,8 +8,8 @@
 import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
-} from './lib/submitLaunchCore.js'
-import { notifyAdminOfNewSubmission } from './lib/telegramNotify.js'
+} from '../server/lib/submitLaunchCore.js'
+import { notifyAdminOfNewSubmission } from '../server/lib/telegramNotify.js'
 
 console.log('[submit-launch] handler loaded')
 

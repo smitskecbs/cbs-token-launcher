@@ -1,16 +1,16 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { handleAdminApi } from './api/lib/adminRouter.js'
-import { handlePublicApi } from './api/lib/publicRouter.js'
+import { handleAdminApi } from './server/lib/adminRouter.js'
+import { handlePublicApi } from './server/lib/publicRouter.js'
 import {
   buildVercelLikeRequest,
   createVercelLikeResponse,
-} from './api/lib/createVercelLikeResponse.js'
+} from './server/lib/createVercelLikeResponse.js'
 import {
   insertSubmitLaunchRecord,
   validateSubmitLaunchPayload,
-} from './api/lib/submitLaunchCore.js'
-import { notifyAdminOfNewSubmission } from './api/lib/telegramNotify.js'
+} from './server/lib/submitLaunchCore.js'
+import { notifyAdminOfNewSubmission } from './server/lib/telegramNotify.js'
 
 async function forwardToApiHandler(
   req: IncomingMessage,
