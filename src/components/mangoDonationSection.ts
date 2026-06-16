@@ -8,43 +8,34 @@ export function renderMangoDonationSection(): string {
 
   return `
     <section
-      class="mango-donation-section page-section"
-      aria-labelledby="mango-donation-title"
+      class="support-section page-section mango-donation-section"
+      aria-labelledby="support-cbs-ecosystem-title"
     >
-      <div class="mango-donation-card">
-        <h2 class="mango-donation-title" id="mango-donation-title">
-          Support CBS Ecosystem Development
+      <div class="support-card mango-donation-card">
+        <h2 class="support-title mango-donation-title" id="support-cbs-ecosystem-title">
+          Support CBS Ecosystem
         </h2>
-        <p class="mango-donation-text">
-          Donations help fund development, infrastructure, liquidity, and future CBS ecosystem tools.
+        <p class="support-text mango-donation-text">
+          Optional donations help fund development and infrastructure.
         </p>
-        <ul class="mango-donation-points" aria-label="What support helps fund">
-          <li>Liquidity</li>
-          <li>Development</li>
-          <li>Launch tools</li>
-        </ul>
-        <p class="mango-donation-wallet-label">Wallet address</p>
         <code
-          class="mango-donation-wallet"
+          class="support-wallet mango-donation-wallet"
           data-mango-donation-wallet
         >${wallet}</code>
         <button
           type="button"
-          class="secondary-btn mango-donation-copy-btn"
+          class="secondary-btn support-copy-btn mango-donation-copy-btn"
           data-mango-donation-copy
         >
-          Copy Address
+          Copy address
         </button>
         <p
-          class="mango-donation-confirm"
+          class="support-confirm mango-donation-confirm"
           data-mango-donation-confirm
           hidden
           aria-live="polite"
         >
           Address copied.
-        </p>
-        <p class="mango-donation-disclaimer">
-          No promises. No pressure. Only support if you believe in the build.
         </p>
       </div>
     </section>

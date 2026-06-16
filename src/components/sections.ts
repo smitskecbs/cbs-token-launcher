@@ -1,14 +1,67 @@
 import type { Launch } from '../types/launch'
 import type { CbsTool } from '../types/tool'
+import solanaLogomarkUrl from '../assets/solana-logomark.svg'
 import { renderComingSoonCard } from './comingSoonCard'
 import { renderLaunchCardList } from './launchCard'
 import { renderSubmitLaunchButton } from './submitLaunchModal'
 import { renderToolCardGrid } from './toolCard'
 
+export function renderSiteHero(bannerHtml: string): string {
+  return `
+    <header class="site-hero">
+      ${bannerHtml}
+      <h1 class="site-hero-title">CBS Token Launcher</h1>
+      <p class="site-hero-subtitle">
+        Create a public launch profile for your Solana token project.
+      </p>
+    </header>
+  `
+}
+
+export function renderLauncherOverviewSection(): string {
+  return `
+    <section
+      class="page-section launcher-overview-section"
+      aria-labelledby="launcher-overview-heading"
+    >
+      <div class="edu-block launcher-overview-card">
+        <h2 class="edu-block-heading" id="launcher-overview-heading">
+          What can you do here?
+        </h2>
+        <p class="edu-block-text">
+          Use the CBS Token Launcher to submit and present your token project with
+          clear information, links, status and community details.
+        </p>
+        <ul class="edu-block-list">
+          <li>Submit your token project</li>
+          <li>Add project name, symbol, logo and description</li>
+          <li>Share website and community links</li>
+          <li>Prepare your project for public visibility</li>
+        </ul>
+      </div>
+    </section>
+  `
+}
+
 export function renderHeroSection(): string {
   return `
     <section class="hero-card hero-card--compact">
-      <h1 class="hero-title">Launch, discover and grow Solana projects</h1>
+      <h1 class="hero-title">
+        <span class="hero-title__lead">Launch, discover and grow</span>
+        <span class="hero-title__solana-word">
+          <img
+            class="hero-title__solana-logo"
+            src="${solanaLogomarkUrl}"
+            alt=""
+            aria-hidden="true"
+            width="20"
+            height="16"
+            decoding="async"
+          />
+          <span>Solana</span>
+        </span>
+        <span class="hero-title__trail">projects</span>
+      </h1>
       <p class="hero-text">
         Submit your token, build interest, share updates and help people find
         your project.
@@ -168,7 +221,52 @@ export function renderCbsToolsSection(tools: CbsTool[]): string {
 export function renderFooter(): string {
   return `
     <footer class="site-footer">
-      <p>Always verify the official mint address before interacting with any token.</p>
+      <nav class="footer-links" aria-label="CBS ecosystem links">
+        <a href="https://tools.cbs-coin.com" target="_blank" rel="noopener noreferrer">
+          CBS Tools
+        </a>
+        <a href="https://cbs-coin.com" target="_blank" rel="noopener noreferrer">
+          CBS Coin
+        </a>
+        <a href="https://github.com/smitskecbs" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      </nav>
+
+      <div class="footer-open-source">
+        <p class="footer-open-title">Built in the Open</p>
+        <p class="footer-open-text">
+          CBS Tools is developed publicly and transparently.
+          Source code, improvements and community contributions can be followed on GitHub.
+        </p>
+        <a
+          class="footer-github-link"
+          href="https://github.com/smitskecbs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg
+            class="footer-github-icon"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              fill="currentColor"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+            />
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <p class="footer-badge-row">
+        Open Source • Community Driven • Built on Solana
+      </p>
+
+      <p class="site-footer-copy">
+        Community-built tools for Solana builders.
+      </p>
     </footer>
   `
 }

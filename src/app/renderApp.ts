@@ -16,7 +16,6 @@ import {
 } from '../components/mangoDonationSection'
 import {
   renderLaunchYourProjectCta,
-  renderLaunchYourProjectSection,
 } from '../components/launchYourProjectSection'
 import { renderLatestUpdatesSection } from '../components/latestUpdatesSection'
 import { renderRecentActivitySection } from '../components/recentActivitySection'
@@ -24,7 +23,9 @@ import {
   renderFeaturedLaunchesSection,
   renderFooter,
   renderHeroSection,
+  renderLauncherOverviewSection,
   renderListedLaunchesSection,
+  renderSiteHero,
   renderUpcomingLaunchesSection,
 } from '../components/sections'
 import { fetchLatestLaunchUpdates } from '../services/launchUpdatesService'
@@ -67,18 +68,20 @@ export async function renderApp(): Promise<void> {
   )
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <main class="app-shell" id="top">
+      ${renderSiteHero(`
       <img
         class="site-banner"
         src="${bannerUrl}"
         alt="CBS Token Launcher"
       />
+      `)}
+      ${renderLauncherOverviewSection()}
       ${renderLaunchFiltersPanel()}
       ${renderHeroSection()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderListedLaunchesSection(homepage.listed)}
       ${renderRecentActivitySection(fetchedUpdates, catalog, recentActivityOptions)}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
-      ${renderLaunchYourProjectSection()}
       ${renderLaunchPipelineSection()}
       ${renderLaunchYourProjectCta()}
       ${renderUpcomingLaunchesSection(homepage.upcoming)}
