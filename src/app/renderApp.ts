@@ -22,7 +22,6 @@ import { renderRecentActivitySection } from '../components/recentActivitySection
 import {
   renderFeaturedLaunchesSection,
   renderFooter,
-  renderHeroSection,
   renderLauncherOverviewSection,
   renderListedLaunchesSection,
   renderSiteHero,
@@ -83,7 +82,6 @@ export async function renderApp(): Promise<void> {
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
       ${renderLauncherOverviewSection()}
       ${renderLaunchPipelineSection()}
-      ${renderHeroSection()}
       ${renderLaunchYourProjectCta()}
       ${renderMangoDonationSection()}
       ${renderFooter()}
