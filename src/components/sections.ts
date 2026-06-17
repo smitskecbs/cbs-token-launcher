@@ -8,12 +8,8 @@ import { renderToolCardGrid } from './toolCard'
 
 export function renderSiteHero(bannerHtml: string): string {
   return `
-    <header class="site-hero">
+    <header class="site-hero site-hero--banner-only">
       ${bannerHtml}
-      <h1 class="site-hero-title">CBS Token Launcher</h1>
-      <p class="site-hero-subtitle">
-        Create a public launch profile for your Solana token project.
-      </p>
     </header>
   `
 }
