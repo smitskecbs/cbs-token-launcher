@@ -75,16 +75,16 @@ export async function renderApp(): Promise<void> {
         alt="CBS Token Launcher"
       />
       `)}
-      ${renderLauncherOverviewSection()}
       ${renderLaunchFiltersPanel()}
-      ${renderHeroSection()}
       ${renderFeaturedLaunchesSection(homepage.featured)}
       ${renderListedLaunchesSection(homepage.listed)}
+      ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderRecentActivitySection(fetchedUpdates, catalog, recentActivityOptions)}
       ${renderLatestUpdatesSection(latestUpdates, catalog)}
+      ${renderLauncherOverviewSection()}
       ${renderLaunchPipelineSection()}
+      ${renderHeroSection()}
       ${renderLaunchYourProjectCta()}
-      ${renderUpcomingLaunchesSection(homepage.upcoming)}
       ${renderMangoDonationSection()}
       ${renderFooter()}
     </main>
